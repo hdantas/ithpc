@@ -1,0 +1,9 @@
+OpenMP Challenge
+
+In Lecture 3, we have used the MVP (matrix-vector multiplication) as an example for OpenMP. In the lecture, there are two examples of parallelizing this application using OpenMP: one that parallelizes the outer loop, and another one that parallelizes the inner loop (Slides 16 and 17, respectively). 
+
+As an OpenMP challenge, I propose the following assignment: 
+
+Using these two solutions as "inspiration", design and implement a third solution, that parallelizes both loops. Is this possible? If so, test its correctness, and compare its performance with the other two versions. Which one is the best? Any idea why? 
+
+If you decide to test your OpenMP abilities and solve this challenge, please send your answers - code + notes, text file will do - to h.j.sips@tudelft.nl *before* Monday, 30/09/2013, 6:00AM.
