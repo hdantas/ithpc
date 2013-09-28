@@ -1,0 +1,32 @@
+OpenMP Challenge
+
+In Lecture 3, we have used the MVP (matrix-vector multiplication) as an example for OpenMP. In the lecture, there are two examples of parallelizing this application using OpenMP: one that parallelizes the outer loop, and another one that parallelizes the inner loop (Slides 16 and 17, respectively). 
+
+As an OpenMP challenge, I propose the following assignment: 
+
+Using these two solutions as "inspiration", design and implement a third solution, that parallelizes both loops. Is this possible? If so, test its correctness, and compare its performance with the other two versions. Which one is the best? Any idea why?
+
+If you decide to test your OpenMP abilities and solve this challenge, please send your answers - code + notes, text file will do - to h.j.sips@tudelft.nl *before* Monday, 30/09/2013, 6:00AM.
+
+-------------------------------------------------------------------------------------------
+
+Using these two solutions as "inspiration", design and implement a third solution, that parallelizes both loops. Is this possible?
+	It is possible to parallelize both loops. Instead of parallelizing in one dimension (along row or column) as show in the slides we can do it in two dimensions (per individual cell). Thereafter each cell will hold the following: A[i, j] * x[j]. Finally in order to determine the final result an addition reduction along the column indexes is necessary.
+
+If so, test its correctness, and compare its performance with the other two versions.
+	Based on the C file provided for the Parallel Algorithms and Parallel Computers (in4026) course I was able to obtain the following results (please see OpenMP.zip attached and the enclosed README). The following results were obtained from a Netbook equipped with a Dual-core (2 Cores/4 Threads) Intel Atom 64 bit CPU clocked at 1.5 GHz.
+
+	| NSize | Iterations |    Seq   |    Outer   |    Inner   |    Both    |
+	|   256 |        500 | 0.818568 |  0.0283872 |  0.0885059 |  2.0148888 | 
+
+
+	Where NSize is the size of the matrix (DIM in the slides), Iterations indicates the number of times each operation was run. "Seq", "Outer", "Inner" and "Both" show the average time over all iterations of the Sequential version, the outer loop version (slide 16), inner loop version (slide 17) and finally the solution proposed above, respectively.
+	As one can see parallelizing one of the loops has a ~10x to ~30x improvement (for this particular NSize) over the sequential version. However parallelizing both is detrimental to the performance.
+	During my tests the computation times occasionally vary (except for "Seq"). Nonetheless "Outer" was always the fastest and "Both" the slowest. "Inner" would sometimes reach 1 second. This sporadic behavior is probably caused by background processes overloading the CPU.
+
+Which one is the best? Any idea why?
+	As previously stated parallelizing the "Outer" loop reaps the most benefits. I believe the main reason is the low amount of communication required when compared with the other versions. In this implementation each thread reads from memory the values of A[i, j] and x[j] and accumulates their sum on y[i]. However since each i is assigned to one thread, they do not need to communicate between themselves to obtain the final value.
+	
+	In comparison for the "Inner" each thread must share its variable tmp at the end of the inner loop so the reduction takes place. Thus resulting in higher communication overhead.
+
+	Following the same reasoning it is easy to understand why "Both" performs so poorly. On the second for loop the same communication issues occur. In addition since there are two distinct parallel regions the threads must synchronize two times (instead of one) which penalizes even more the performance.
