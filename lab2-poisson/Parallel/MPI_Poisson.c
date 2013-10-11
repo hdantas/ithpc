@@ -20,19 +20,20 @@ enum
 
 /* global variables */
 int gridsize[2];
-double precision_goal;		/* precision_goal of solution */
-int max_iter;			/* maximum number of iterations alowed */
+double precision_goal;    /* precision_goal of solution */
+int max_iter;     /* maximum number of iterations alowed */
 int offset[2];
+MPI_Datatype border_type[2];
 
 /* benchmark related variables */
-clock_t ticks;			/* number of systemticks */
-int timer_on = 0;		/* is timer running? */
+clock_t ticks;      /* number of systemticks */
+int timer_on = 0;   /* is timer running? */
 double wtime;                   /* wallclock time */
 
 /* local grid related variables */
-double **phi;			/* grid */
-int **source;			/* TRUE if subgrid element is a source */
-int dim[2];			/* grid dimensions */
+double **phi;     /* grid */
+int **source;     /* TRUE if subgrid element is a source */
+int dim[2];     /* grid dimensions */
 
 /* MPI related variables*/
 // int np;
@@ -59,6 +60,9 @@ void start_timer();
 void resume_timer();
 void stop_timer();
 void print_timer();
+void Setup_MPI_Datatypes();
+void Exchange_Borders();
+
 
 void start_timer()
 {
@@ -221,11 +225,11 @@ double Do_Step(int parity)
     for (y = 1; y < dim[Y_DIR] - 1; y++)
       if ((x + y) % 2 == parity && source[x][y] != 1)
       {
-	old_phi = phi[x][y];
-	phi[x][y] = (phi[x + 1][y] + phi[x - 1][y] +
-		     phi[x][y + 1] + phi[x][y - 1]) * 0.25;
-	if (max_err < fabs(old_phi - phi[x][y]))
-	  max_err = fabs(old_phi - phi[x][y]);
+        old_phi = phi[x][y];
+        phi[x][y] = (phi[x + 1][y] + phi[x - 1][y] + phi[x][y + 1] + phi[x][y - 1]) * 0.25;
+        
+        if (max_err < fabs(old_phi - phi[x][y]))
+          max_err = fabs(old_phi - phi[x][y]);
       }
 
   return max_err;
@@ -330,10 +334,89 @@ proc_right */
 proc_left);
 }
 
+void Setup_MPI_Datatypes()
+{
+  Debug("Setup_MPI_Datatypes", 0);
+ 
+  /* Datatype for vertical data exchange (Y_DIR) */
+  MPI_Type_vector(dim[X_DIR] - 2, 1, dim[Y_DIR], MPI_DOUBLE, &border_type[Y_DIR]);
+  MPI_Type_commit(&border_type[Y_DIR]);
+  
+  /* Datatype for horizontal data exchange (X_DIR) */
+  MPI_Type_vector(dim[Y_DIR] - 2, 1, 1, MPI_DOUBLE, &border_type[X_DIR]);
+  MPI_Type_commit(&border_type[X_DIR]);
+}
+
+void Exchange_Borders()
+{
+  Debug("Exchange_Borders", 0);
+
+  /* all traffic in direction "top" */
+  MPI_Sendrecv( &phi[1][1],             // sendbuf   - initial address of send buffer (choice)
+                1,                      // sendcount - number of elements in send buffer (integer)
+                border_type[Y_DIR],     // sendtype  - type of elements in send buffer (handle)
+                proc_top,               // dest      - rank of destination (integer)
+                0,                      // sendtag   - send tag (integer)
+                &phi[1][offset[Y_DIR]], // recvbuf   - initial address of receive buffer (choice)
+                1,                      // recvcount - number of elements in receive buffer (integer)
+                border_type[Y_DIR],     // recvtype  - type of elements in receive buffer (handle)
+                proc_bottom,            // source    - rank of source (integer)
+                0,                      // recvtag   - receive tag (integer)
+                grid_comm,              // comm      - communicator (handle)
+                &status);               // status    - status object (Status).  This refers to the receive operation.
+
+  /* all traffic in direction "bottom" */
+  MPI_Sendrecv( &phi[1][offset[Y_DIR]], // sendbuf   - initial address of send buffer (choice)
+                1,                      // sendcount - number of elements in send buffer (integer)
+                border_type[Y_DIR],     // sendtype  - type of elements in send buffer (handle)
+                proc_bottom,            // dest      - rank of destination (integer)
+                0,                      // sendtag   - send tag (integer)
+                &phi[1][1],             // recvbuf   - initial address of receive buffer (choice)
+                1,                      // recvcount - number of elements in receive buffer (integer)
+                border_type[Y_DIR],     // recvtype  - type of elements in receive buffer (handle)
+                proc_top,               // source    - rank of source (integer)
+                0,                      // recvtag   - receive tag (integer)
+                grid_comm,              // comm      - communicator (handle)
+                &status);               // status    - status object (Status).  This refers to the receive operation.
+
+  /* all traffic in direction "left" */
+  MPI_Sendrecv( &phi[1][1],             // sendbuf   - initial address of send buffer (choice)
+                1,                      // sendcount - number of elements in send buffer (integer)
+                border_type[X_DIR],     // sendtype  - type of elements in send buffer (handle)
+                proc_left,              // dest      - rank of destination (integer)
+                0,                      // sendtag   - send tag (integer)
+                &phi[offset[X_DIR]][1], // recvbuf   - initial address of receive buffer (choice)
+                1,                      // recvcount - number of elements in receive buffer (integer)
+                border_type[X_DIR],     // recvtype  - type of elements in receive buffer (handle)
+                proc_right,             // source    - rank of source (integer)
+                0,                      // recvtag   - receive tag (integer)
+                grid_comm,              // comm      - communicator (handle)
+                &status);               // status    - status object (Status).  This refers to the receive operation.
+  
+  /* all traffic in direction "right" */
+
+  MPI_Sendrecv( &phi[1][offset[X_DIR]], // sendbuf   - initial address of send buffer (choice)
+                1,                      // sendcount - number of elements in send buffer (integer)
+                border_type[X_DIR],     // sendtype  - type of elements in send buffer (handle)
+                proc_right,             // dest      - rank of destination (integer)
+                0,                      // sendtag   - send tag (integer)
+                &phi[1][1],             // recvbuf   - initial address of receive buffer (choice)
+                1,                      // recvcount - number of elements in receive buffer (integer)
+                border_type[X_DIR],     // recvtype  - type of elements in receive buffer (handle)
+                proc_left,              // source    - rank of source (integer)
+                0,                      // recvtag   - receive tag (integer)
+                grid_comm,              // comm      - communicator (handle)
+                &status);               // status    - status object (Status).  This refers to the receive operation.
+
+}
+
 
 int main(int argc, char **argv)
 {
+
   MPI_Init(&argc, &argv);
+
+  Setup_MPI_Datatypes();
 
   Setup_Proc_Grid(argc, argv);
 
@@ -342,6 +425,8 @@ int main(int argc, char **argv)
   Setup_Grid();
 
   Solve();
+
+  Exchange_Borders();
 
   Write_Grid();
 
