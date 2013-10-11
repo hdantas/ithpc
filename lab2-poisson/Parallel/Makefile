@@ -1,10 +1,10 @@
 all: run-seq
 
 seq: SEQ_Poisson.c
-	gcc -o $@.out $^
+	gcc -o $@.out $^ -Wall
 
 step1: MPI_Poisson.c
-	mpicc -o $@.out $^ -lm
+	mpicc -o $@.out $^ -lm -Wall
 
 run-seq: seq
 	./$^.out
