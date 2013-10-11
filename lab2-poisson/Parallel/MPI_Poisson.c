@@ -23,6 +23,7 @@ int gridsize[2];
 double precision_goal;    /* precision_goal of solution */
 int max_iter;     /* maximum number of iterations alowed */
 int offset[2];
+double global_delta;
 MPI_Datatype border_type[2];
 
 /* benchmark related variables */
@@ -244,9 +245,10 @@ void Solve()
   Debug("Solve", 0);
 
   /* give global_delta a higher value then precision_goal */
-  delta = 2 * precision_goal;
+  global_delta = 2 * precision_goal;
+  MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
 
-  while (delta > precision_goal && count < max_iter)
+  while (global_delta > precision_goal && count < max_iter)
   {
     Debug("Do_Step 0", 0);
     delta1 = Do_Step(0);
