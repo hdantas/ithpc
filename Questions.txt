@@ -1,0 +1,1 @@
+Why in lab1 exercise 4-1 is the timer not reset as it shoud be?
