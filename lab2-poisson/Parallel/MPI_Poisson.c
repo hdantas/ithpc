@@ -351,7 +351,7 @@ void Exchange_Borders()
 {
   Debug("Exchange_Borders", 0);
 
-  /* all traffic in direction "top" */
+  // all traffic in direction "top"
   MPI_Sendrecv( &phi[1][1],             // sendbuf   - initial address of send buffer (choice)
                 1,                      // sendcount - number of elements in send buffer (integer)
                 border_type[Y_DIR],     // sendtype  - type of elements in send buffer (handle)
@@ -365,7 +365,7 @@ void Exchange_Borders()
                 grid_comm,              // comm      - communicator (handle)
                 &status);               // status    - status object (Status).  This refers to the receive operation.
 
-  /* all traffic in direction "bottom" */
+  // all traffic in direction "bottom"
   MPI_Sendrecv( &phi[1][offset[Y_DIR]], // sendbuf   - initial address of send buffer (choice)
                 1,                      // sendcount - number of elements in send buffer (integer)
                 border_type[Y_DIR],     // sendtype  - type of elements in send buffer (handle)
@@ -379,7 +379,7 @@ void Exchange_Borders()
                 grid_comm,              // comm      - communicator (handle)
                 &status);               // status    - status object (Status).  This refers to the receive operation.
 
-  /* all traffic in direction "left" */
+  // all traffic in direction "left"
   MPI_Sendrecv( &phi[1][1],             // sendbuf   - initial address of send buffer (choice)
                 1,                      // sendcount - number of elements in send buffer (integer)
                 border_type[X_DIR],     // sendtype  - type of elements in send buffer (handle)
@@ -393,7 +393,7 @@ void Exchange_Borders()
                 grid_comm,              // comm      - communicator (handle)
                 &status);               // status    - status object (Status).  This refers to the receive operation.
   
-  /* all traffic in direction "right" */
+  // all traffic in direction "right"
 
   MPI_Sendrecv( &phi[1][offset[X_DIR]], // sendbuf   - initial address of send buffer (choice)
                 1,                      // sendcount - number of elements in send buffer (integer)
@@ -416,13 +416,13 @@ int main(int argc, char **argv)
 
   MPI_Init(&argc, &argv);
 
-  Setup_MPI_Datatypes();
-
   Setup_Proc_Grid(argc, argv);
 
   start_timer();
 
   Setup_Grid();
+
+  Setup_MPI_Datatypes();
 
   Solve();
 
