@@ -1,0 +1,12 @@
+Description
+As a building block for many other routines, the GEMM (Matrix Multiplication) routine calculates the new value of matrix C based on the matrix-product of matrices A and B, and the old value of matrix C: C ← αAB + βC, where α and β values are scalar coefficients. 
+
+The sequential code is given (matmul.c). Students need to give their parallel implementations and reports their results (in GFlops) using 4 nodes on DAS3. Besides, you have the following limitations for a fair comparison:
+
+You need to ensure the parallel version is functional and can give the same output (Matrix C) as the sequential version. 
+You are allowed to use at most 4 nodes on DAS4.
+You are allowed to use gcc 4.3.2, rather than other compilers.
+You are allowed to use the given sequential code.
+You are recommended to use OpenMP (or Pthreads) to maximize performance on a single node. Empirically speaking, programmers need first to implement OpenMP (or Pthreads) on a single and then scale it to multiple nodes with MPI.
+In-depth optimizations are recommended such as vectorization and data locality.
+Scalability analysis is recommended, i.e., analyzing your experimental results from using one node to four nodes. 
