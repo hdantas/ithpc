@@ -157,9 +157,8 @@ int main(int argc, char **argv)
 
   init();
 
-  do_job(ORIGINAL_VERSION);
-  MPI_Barrier(MPI_COMM_WORLD);
-  do_job(MODIFIED_VERSION);
+  do_work(ORIGINAL_VERSION);
+  do_work(MODIFIED_VERSION);
  
   MPI_Finalize();
   return 0;
