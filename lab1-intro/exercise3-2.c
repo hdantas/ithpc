@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "mpi.h"
+#include <math.h>
 
 int np, rank;
 
@@ -7,6 +8,7 @@ int main(int argc, char **argv)
 {
   int dest;
   float f = 1.0;
+  float g = 0.0;
   MPI_Status status;
 
   MPI_Init(&argc, &argv);
@@ -14,16 +16,19 @@ int main(int argc, char **argv)
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   
   if (rank == 0) {
-    for (dest = 1; dest < np; dest++) {
-      f *= f;
-      MPI_Send(&f, 1, MPI_FLOAT, dest, 42, MPI_COMM_WORLD);
-      f++;
-    }
-  } else {
-      MPI_Recv(&f, 1, MPI_FLOAT, 0, 42, MPI_COMM_WORLD, &status);
-      printf("Node %i received %f\n", rank, f);
+    f = 4.2;
+    // printf("Enter a float:\n");
+    // scanf("%f", &f);
   }
   
+  MPI_Bcast(&f, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
+  f = pow(f, rank);
+  MPI_Reduce(&f, &g, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+  if (rank == 0) {
+    printf("Reduced: %f\n", g);
+  }
+
   MPI_Finalize();
   return 0;
 }
