@@ -7,6 +7,9 @@
 
 // #define N 128
 #define N 8388608
+#define ORIGINAL_VERSION 0
+#define MODIFIED_VERSION 1
+
 
 int rank, np;
 int length, begin, end;
@@ -101,7 +104,7 @@ void show_g()
 void start_timer()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  timer = MPI_Wtime();
+  timer = MPI_Wtime() - timer;
 }
 
 void stop_timer()
@@ -114,51 +117,50 @@ void show_timer()
   printf("(Node %i) Timer: %.6f seconds\n", rank, timer);
 }
 
+void do_work(int version)
+{
+  if(rank == 0) {
+    if (version == MODIFIED_VERSION)
+      printf("Modified Version:\n");
+    else
+      printf("Original Version:\n");
+
+    set_f();
+  }
+
+  start_timer();
+  
+  if (version == MODIFIED_VERSION)
+    MPI_Scatter(&f[rank * length], length, MPI_FLOAT, &f[begin], length , MPI_FLOAT, 0, MPI_COMM_WORLD);
+  else
+    distribute_f();
+
+  calc_g();
+
+  if (version == MODIFIED_VERSION)
+    MPI_Gather(&g[begin], length, MPI_FLOAT, &g[rank * length], length, MPI_FLOAT, 0, MPI_COMM_WORLD);
+  else
+    collect_g();
+  
+  if (rank == 0) {
+    stop_timer();
+    show_timer();
+    printf("\n");
+  }
+}
+
 int main(int argc, char **argv)
 {
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &np);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
   init();
 
-
-  if(rank == 0) {
-    printf("Original Version:\n");
-    set_f();
-  }
-
-  start_timer();
-  distribute_f();
-  calc_g();
-  collect_g();
-  
-  stop_timer();
-
-  if (rank == 0) {
-    show_timer();
-    printf("\n");
-  }
-
+  do_job(ORIGINAL_VERSION);
   MPI_Barrier(MPI_COMM_WORLD);
-
-  if (rank == 0) {
-    printf("Modified Version:\n");
-    set_f();
-  }
-
-  start_timer();
-  MPI_Scatter(&f[rank * length], length, MPI_FLOAT, &f[begin], length , MPI_FLOAT, 0, 
-MPI_COMM_WORLD);
-  calc_g();
-  MPI_Gather(&g[begin], length, MPI_FLOAT, &g[rank * length], length, MPI_FLOAT, 0, 
-MPI_COMM_WORLD);
-
-
-  stop_timer();
-
-  if(rank == 0)
-    show_timer();
-  
+  do_job(MODIFIED_VERSION);
+ 
   MPI_Finalize();
   return 0;
 }
