@@ -1,16 +1,16 @@
-all: run-seq
+all: run-par
 
 seq: SEQ_Poisson.c
 	gcc -o $@.out $^ -Wall
 
-step1: MPI_Poisson.c
+par: MPI_Poisson.c
 	mpicc -o $@.out $^ -lm -Wall
 
 run-seq: seq
 	./$^.out
 
-run-step1: step1
+run-par: par
 	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script ./$^.out 2 2 1
 
 clean:
-	rm -rfv *.o *.out
+	rm -rfv *.o *.out output*.dat

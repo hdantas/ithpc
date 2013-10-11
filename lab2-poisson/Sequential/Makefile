@@ -7,4 +7,4 @@ run: compile
 	./$^.out
 
 clean:
-	rm -rfv *.o *.out
+	rm -rfv *.o *.out output*.dat
