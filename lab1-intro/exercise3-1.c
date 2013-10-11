@@ -17,9 +17,9 @@ int main(int argc, char **argv)
     f = 4.2;
   }
   
-  MPI_Bcast(&f, 1, MPI_FLOAT, rank, MPI_COMM_WORLD);
+  MPI_Bcast(&f, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
   printf("Node %i received %f\n", rank, f);
-  
+
   MPI_Finalize();
   return 0;
 }

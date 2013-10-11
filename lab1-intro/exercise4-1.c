@@ -5,12 +5,14 @@
 #include <math.h>
 #include "mpi.h"
 
-#define N 128
+// #define N 128
+#define N 8388608
 
 int rank, np;
 int length, begin, end;
 MPI_Status status;
 float f[N], g[N];
+double timer = 0.0;
 
 /***
 * init() sets the begin-index, the end-index, and the length of
@@ -96,26 +98,66 @@ void show_g()
   printf("\n");
 }
 
+void start_timer()
+{
+  MPI_Barrier(MPI_COMM_WORLD);
+  timer = MPI_Wtime();
+}
+
+void stop_timer()
+{
+  timer = MPI_Wtime() - timer;
+}
+
+void show_timer()
+{
+  printf("(Node %i) Timer: %.6f seconds\n", rank, timer);
+}
+
 int main(int argc, char **argv)
 {
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &np);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   init();
-  
-  if(rank == 0)
-    set_f();
 
-  // distribute_f();
+
+  if(rank == 0) {
+    printf("Original Version:\n");
+    set_f();
+  }
+
+  start_timer();
+  distribute_f();
+  calc_g();
+  collect_g();
+  
+  stop_timer();
+
+  if (rank == 0) {
+    show_timer();
+    printf("\n");
+  }
+
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  if (rank == 0) {
+    printf("Modified Version:\n");
+    set_f();
+  }
+
+  start_timer();
   MPI_Scatter(&f[rank * length], length, MPI_FLOAT, &f[begin], length , MPI_FLOAT, 0, 
 MPI_COMM_WORLD);
   calc_g();
-  // collect_g();
   MPI_Gather(&g[begin], length, MPI_FLOAT, &g[rank * length], length, MPI_FLOAT, 0, 
-MPI_COMM_WORLD);  
+MPI_COMM_WORLD);
+
+
+  stop_timer();
 
   if(rank == 0)
-    show_g();
+    show_timer();
   
   MPI_Finalize();
   return 0;
