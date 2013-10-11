@@ -10,7 +10,7 @@ run-seq: seq
 	./$^.out
 
 run-step1: step1
-	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script ./$^.out 16 4 4
+	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script ./$^.out 2 2 1
 
 clean:
 	rm -rfv *.o *.out

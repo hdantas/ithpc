@@ -22,7 +22,7 @@ enum
 int gridsize[2];
 double precision_goal;		/* precision_goal of solution */
 int max_iter;			/* maximum number of iterations alowed */
-int offset;
+int offset[2];
 
 /* benchmark related variables */
 clock_t ticks;			/* number of systemticks */
@@ -115,7 +115,8 @@ void Debug(char *mesg, int terminate)
 
 void Setup_Grid()
 {
-  int x, y, s, upper_offset;
+  int x, y, s;
+  int upper_offset[2];
   double source_x, source_y, source_val;
   FILE *f;
 
