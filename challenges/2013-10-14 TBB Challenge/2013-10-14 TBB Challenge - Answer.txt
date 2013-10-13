@@ -1,0 +1,19 @@
+Implement the matrix vector product in TBB and show code plus performance results of running code. Deadline Monday Oct 14, 6:00 am. Requires experience with C++.
+
+
+As shown in the previous challenge with OpenMP it is advantageous for the MVP problem to only parallelize the outer loop. This was accomplished using TBB, in particular the lambda version of parallel_for.
+
+The following results were obtained:
+
+| NSize | Iterations |     Seq    |     TBB    |
+|    32 |        100 |  0.002798  |   0.013001 |
+|    64 |        100 |  0.012129  |   0.013614 |
+|   128 |        100 |  0.048898  |   0.026705 |
+|   256 |        100 |  0.184790  |   0.087869 |
+|   512 |        100 |  0.724704  |   0.264819 |
+|  1024 |        100 |  2.874343  |   1.017528 |
+|  2048 |        100 | 11.476852  |   3.998517 |
+
+
+
+As one can see the speed up obtained is significant, even more so for greater matrix sizes.
