@@ -10,16 +10,15 @@ using namespace tbb;
 using namespace std;
 
 // Maximum integer value for matrix and vector
-#define MAXNUMBER 100000
+#define MAXNUMBER 10
 
 // Number of iterations
-#define TIMES 500
+#define TIMES 100
 
 // Input Size
-#define NSIZE 1
-#define NMAX 256
-// #define NMAX 1447
-
+#define NMAX 8192
+#define NCOUNT 9
+int NSIZE[NCOUNT] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 8192};
 
 // Seed Input
 int y[NMAX];
@@ -49,15 +48,13 @@ void innerloop (int dim, int i) {
     int j;
     y[i] = 0;
     for(j = 0; j < dim; j++)
-        y[i] = y[i] + A[i][j] * x[j];    
+        y[i] = y[i] + A[i][j] * x[j];  
 }
 
 void par_function (int dim) {
-    parallel_for(
-        blocked_range<int>(0, dim),
-        [=](blocked_range<int> r) {
-            for (int i=r.begin(); i!=r.end(); ++i)
-                innerloop(dim, i);
+    parallel_for(0, dim, 1,
+        [=](int i) {
+            innerloop(dim, i);
         }
     );
 }
@@ -97,36 +94,38 @@ int main (int argc, char *argv[]) {
         }
     }        
 
-    printf("| NSize | Iterations |    Seq   |     TBB    |\n");
+    printf("| NSize | Iterations |     Seq    |     TBB    |\n");
 
     // for each input size
-    n = NMAX;
-    printf("| %5d | %10d |",n,TIMES);
+    for (i = 0; i < NCOUNT; i++) {
+        n = NSIZE[i];
 
-    /* Run sequential algorithm */
-    result.tv_usec=0;
-    gettimeofday (&startt, NULL);
-    for (t=0; t<TIMES; t++) {
+        printf("| %5d | %10d |",n,TIMES);
+
+        /* Run sequential algorithm */
+        result.tv_usec=0;
+        gettimeofday (&startt, NULL);
         init(n);
-        seq_function(n);
+        for (t=0; t<TIMES; t++) {
+            seq_function(n);
+        }
+        gettimeofday (&endt, NULL);
+        result.tv_usec = (endt.tv_sec*1000000+endt.tv_usec) - (startt.tv_sec*1000000+startt.tv_usec);
+        printf(" %2ld.%06ld  | ", result.tv_usec/1000000, result.tv_usec%1000000);
+        print("seq.txt", n);
+
+        /* Run Paralel (outer loop) algorithm */
+        result.tv_sec=0; result.tv_usec=0;
+        gettimeofday (&startt, NULL);
+        init(n);
+        for (t = 0; t < TIMES; t++) {
+            par_function(n);
+        }
+        gettimeofday (&endt, NULL);
+        result.tv_usec += (endt.tv_sec*1000000+endt.tv_usec) - (startt.tv_sec*1000000+startt.tv_usec);
+        printf(" %2ld.%06ld |\n", result.tv_usec/1000000, result.tv_usec%1000000);
+        print("par.txt", n);
     }
 
-    gettimeofday (&endt, NULL);
-    result.tv_usec = (endt.tv_sec*1000000+endt.tv_usec) - (startt.tv_sec*1000000+startt.tv_usec);
-    printf(" %ld.%06ld | ", result.tv_usec/1000000, result.tv_usec%1000000);
-
-    print("seq.txt", n);
-    result.tv_sec=0; result.tv_usec=0;
-    gettimeofday (&startt, NULL);
-        
-    for (t = 0; t < TIMES; t++) {
-        init(n);
-        par_function(n);
-    }
-
-    gettimeofday (&endt, NULL);
-    result.tv_usec += (endt.tv_sec*1000000+endt.tv_usec) - (startt.tv_sec*1000000+startt.tv_usec);
-    printf(" %ld.%07ld |\n", result.tv_usec/1000000, result.tv_usec%1000000);
-    print("par.txt", n);
     return 0;
 }

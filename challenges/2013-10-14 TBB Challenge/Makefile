@@ -6,6 +6,9 @@ par: tbb.cpp
 run-par: par
 	./$^.out
 
+compare: seq.txt par.txt
+	diff $^
+
 clean:
 	rm -rfv *.out *~ *.o
 
