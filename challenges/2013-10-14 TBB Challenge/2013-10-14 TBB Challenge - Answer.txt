@@ -1,19 +1,25 @@
+Author: Henrique Dantas (student number: 4172922)
+
 Implement the matrix vector product in TBB and show code plus performance results of running code. Deadline Monday Oct 14, 6:00 am. Requires experience with C++.
 
+---------------------------------------------------------------------------------------------------------------
 
-As shown in the previous challenge with OpenMP it is advantageous for the MVP problem to only parallelize the outer loop. This was accomplished using TBB, in particular the lambda version of parallel_for.
+As shown in the previous challenge with OpenMP it is advantageous for the MVP problem to only parallelize the outer loop. This was accomplished using TBB, in particular the parallel_for with lambda expressions [see: http://software.intel.com/sites/products/documentation/doclib/tbb_sa/help/index.htm#tbb_userguide/title.htm].
 
 The following results were obtained:
 
-| NSize | Iterations |     Seq    |     TBB    |
-|    32 |        100 |  0.002798  |   0.013001 |
-|    64 |        100 |  0.012129  |   0.013614 |
-|   128 |        100 |  0.048898  |   0.026705 |
-|   256 |        100 |  0.184790  |   0.087869 |
-|   512 |        100 |  0.724704  |   0.264819 |
-|  1024 |        100 |  2.874343  |   1.017528 |
-|  2048 |        100 | 11.476852  |   3.998517 |
+| NSize | Iterations |     Seq     |     TBB    |
+|    32 |        100 |  0.003032   |   0.012924 |
+|    64 |        100 |  0.017843   |   0.018986 |
+|   128 |        100 |  0.070161   |   0.044303 |
+|   256 |        100 |  0.274319   |   0.123371 |
+|   512 |        100 |  0.986180   |   0.277935 |
+|  1024 |        100 |  2.853137   |   1.057393 |
+|  2048 |        100 | 11.474300   |   4.098581 |
+|  4096 |        100 | 46.048689   |  15.890975 |
+|  8192 |        100 | 183.462787  |  61.064301 |
 
-
+Machine used: Netbook equipped with a Dual-core (2 Cores/4 Threads) Intel Atom 64 bit CPU clocked at 1.5 GHz running Linux (3.8.0-31-generic x86_64).
 
 As one can see the speed up obtained is significant, even more so for greater matrix sizes.
+In the chart attached [chart.png] it becomes even more evident the evolution of the running times.
