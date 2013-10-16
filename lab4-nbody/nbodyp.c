@@ -8,11 +8,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
 #include "mpi.h"
 
-#define DEBUG 0
+#define DEBUG 1
 #define max(a,b) ((a)>(b)?a:b)
 #define min(a,b) ((a)<(b)?a:b)
 #define RANMAX 2147483648
@@ -328,9 +329,12 @@ void ReadInput(const char *fname)
     if(fscanf(fp, "nPartY:%i\n", &nPartY) != 1) Debug("nPartY?", 1);
     if(fscanf(fp, "nCellX:%i\n", &nCellX) != 1) Debug("nCellX?", 1);
     if(fscanf(fp, "nCellY:%i\n", &nCellY) != 1) Debug("nCellY?", 1);
-    if(fscanf(fp, "steps: %li\n", &steps) != 1) Debug("steps?",  1);
+    if(fscanf(fp, "steps: %i\n", &steps) != 1) Debug("steps?",  1);
     if(fscanf(fp, "dt:    %lf\n", &dt)    != 1) Debug("dt?",     1);
     if(fscanf(fp, "logs:  %c\n",  &c)     != 1) Debug("logs?",   1);
+    printf("sizeX = %lf\nsizeY = %lf\nnPartX = %d\nnPartY = %d\nnCellX = %d\nnCellY = %d\nsteps = %d\ndt = %lf\nlogs = %c\n", 
+      sizeX, sizeY, nPartX, nPartY, nCellX, nCellY, steps, dt, logs);
+
     logs = (c == 'y');
     fclose(fp);
   }
@@ -358,7 +362,9 @@ void InitCells()
 
   Debug("InitCells", 0);
 
-  sizeCellX = sizeX / nCellX;     
+  sizeCellX = sizeX / nCellX;
+  printf("nCellX = %fd, sizeCellX = %d\n", sizeCellX, nCellX);
+   
   sizeCellY = sizeY / nCellY;
 
   startcx = (px*nCellX) / nProcX;  /* index of my first cell                */
@@ -638,11 +644,11 @@ void SetupLogs()
   if(rank==0) /* Process 0 clears up all files */
   {
     fp = fopen(energyLog, "w");
-    close(fp);
+    fclose(fp);
     fp = fopen(particleDump, "w");
-    close(fp);
+    fclose(fp);
     fp = fopen(trajectLog, "w");
-    close(fp);
+    fclose(fp);
   }
 }
 
