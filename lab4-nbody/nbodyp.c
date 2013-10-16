@@ -332,8 +332,8 @@ void ReadInput(const char *fname)
     if(fscanf(fp, "steps: %i\n", &steps) != 1) Debug("steps?",  1);
     if(fscanf(fp, "dt:    %lf\n", &dt)    != 1) Debug("dt?",     1);
     if(fscanf(fp, "logs:  %c\n",  &c)     != 1) Debug("logs?",   1);
-    printf("sizeX = %lf\nsizeY = %lf\nnPartX = %d\nnPartY = %d\nnCellX = %d\nnCellY = %d\nsteps = %d\ndt = %lf\nlogs = %c\n", 
-      sizeX, sizeY, nPartX, nPartY, nCellX, nCellY, steps, dt, logs);
+
+    // printf("sizeX = %lf\nsizeY = %lf\nnPartX = %d\nnPartY = %d\nnCellX = %d\nnCellY = %d\nsteps = %d\ndt = %lf\nlogs = %s\n", sizeX, sizeY, nPartX, nPartY, nCellX, nCellY, steps, dt, logs);
 
     logs = (c == 'y');
     fclose(fp);
