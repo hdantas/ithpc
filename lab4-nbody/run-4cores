@@ -1,0 +1,856 @@
+nCellX = 32.000000d, sizeCellX = 10
+[0] sends 500 particles to [2] 
+[0] sends 500 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] sends 500 particles to [2] 
+[0] sends 500 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 10 I have 3600 part.
+[0] sends 500 particles to [2] 
+[0] sends 500 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 20 I have 3600 part.
+[0] sends 500 particles to [2] 
+[0] sends 500 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 30 I have 3600 part.
+[0] sends 500 particles to [2] 
+[0] sends 500 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 40 I have 3600 part.
+[0] sends 500 particles to [2] 
+[0] sends 500 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 50 I have 3600 part.
+[0] sends 500 particles to [2] 
+[0] sends 500 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 60 I have 3600 part.
+[0] sends 500 particles to [2] 
+[0] sends 500 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] nCellX = 32.000000d, sizeCellX = 10
+[2] sends 500 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] sends 500 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] After step 10 I have 3600 part.
+[2] sends 500 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] After step 20 I have 3600 part.
+[2] sends 500 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] After step 30 I have 3600 part.
+[2] sends 500 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] After step 40 I have 3600 part.
+[2] sends 500 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] After step 50 I have 3600 part.
+[2] sends 500 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] After step 60 I have 3600 part.
+[2] sends 500 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] nCellX = 32.000000d, sizeCellX = 10
+[3] sends 100 particles to [0] 
+[3] sends 500 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] sends 100 particles to [0] 
+[3] sends 500 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] After step 10 I have 3600 part.
+[3] sends 100 particles to [0] 
+[3] sends 500 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] After step 20 I have 3600 part.
+[3] sends 100 particles to [0] 
+[3] sends 500 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] After step 30 I have 3600 part.
+[3] sends 100 particles to [0] 
+[3] sends 500 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] After step 40 I have 3600 part.
+[3] sends 100 particles to [0] 
+[3] sends 500 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] After step 50 I have 3600 part.
+[3] sends 100 particles to [0] 
+[3] sends 500 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] After step 60 I have 3600 part.
+[3] sends 100 particles to [0] 
+[3] sends 500 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] nCellX = 32.000000d, sizeCellX = 10
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 10 I have 3600 part.
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 20 I have 3600 part.
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 30 I have 3600 part.
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 40 I have 3600 part.
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 50 I have 3600 part.
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 60 I have 3600 part.
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 70 I have 3600 part.
+[2] sends 501 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] After step 80 I have 3601 part.
+[2] sends 503 particles to [0] 
+[2] sends 104 particles to [1] 
+[2] sends 506 particles to [3] 
+[2] After step 90 I have 3604 part.
+[2] sends 503 particles to [0] 
+[2] sends 107 particles to [1] 
+[2] sends 510 particles to [3] 
+[2] After step 100 I have 3606 part.
+[2] sends 508 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 509 particles to [3] 
+[2] After step 110 I have 3600 part.
+[2] sends 507 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 507 particles to [3] 
+[2] After step 120 I have 3602 part.
+[2] sends 506 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 510 particles to [3] 
+[2] After step 130 I have 3604 part.
+[2] sends 505 particles to [0] 
+[2] sends 108 particles to [1] 
+[2] sends 510 particles to [3] 
+[2] After step 140 I have 3603 part.
+[2] sends 505 particles to [0] 
+[2] sends 108 particles to [1] After step 70 I have 3600 part.
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 80 I have 3600 part.
+[1] sends 500 particles to [0] 
+[1] sends 101 particles to [2] 
+[1] sends 502 particles to [3] 
+[1] After step 90 I have 3608 part.
+[1] sends 503 particles to [0] 
+[1] sends 103 particles to [2] 
+[1] sends 504 particles to [3] 
+[1] After step 100 I have 3614 part.
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 501 particles to [3] 
+[1] After step 110 I have 3617 part.
+[1] sends 502 particles to [0] 
+[1] sends 101 particles to [2] 
+[1] sends 502 particles to [3] 
+[1] After step 120 I have 3612 part.
+[1] sends 500 particles to [0] 
+[1] sends 101 particles to [2] 
+[1] sends 503 particles to [3] 
+[1] After step 130 I have 3613 part.
+[1] sends 498 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 503 particles to [3] 
+[1] After step 140 I have 3611 part.
+[1] sends 499 particles to [0] 
+[1] sends 102 particles to [2] After step 70 I have 3600 part.
+[0] sends 500 particles to [2] 
+[0] sends 500 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 80 I have 3600 part.
+[0] sends 502 particles to [2] 
+[0] sends 506 particles to [1] 
+[0] sends 101 particles to [3] 
+[0] After step 90 I have 3605 part.
+[0] sends 504 particles to [2] 
+[0] sends 508 particles to [1] 
+[0] sends 102 particles to [3] 
+[0] After step 100 I have 3607 part.
+[0] sends 501 particles to [2] 
+[0] sends 505 particles to [1] 
+[0] sends 98 particles to [3] 
+[0] After step 110 I have 3610 part.
+[0] sends 502 particles to [2] 
+[0] sends 501 particles to [1] 
+[0] sends 98 particles to [3] 
+[0] After step 120 I have 3609 part.
+[0] sends 503 particles to [2] 
+[0] sends 504 particles to [1] 
+[0] sends 99 particles to [3] 
+[0] After step 130 I have 3605 part.
+[0] sends 503 particles to [2] 
+[0] sends 504 particles to [1] 
+[0] sends 99 particles to [3] 
+[0] After step 140 I have 3602 part.
+[0] sends 505 particles to [2] 
+[0] sends 503 particles to [1] 
+[0]After step 70 I have 3600 part.
+[3] sends 100 particles to [0] 
+[3] sends 500 particles to [2] 
+[3] sends 501 particles to [1] 
+[3] After step 80 I have 3601 part.
+[3] sends 99 particles to [0] 
+[3] sends 498 particles to [2] 
+[3] sends 501 particles to [1] 
+[3] After step 90 I have 3606 part.
+[3] sends 97 particles to [0] 
+[3] sends 499 particles to [2] 
+[3] sends 499 particles to [1] 
+[3] After step 100 I have 3612 part.
+[3] sends 99 particles to [0] 
+[3] sends 498 particles to [2] 
+[3] sends 504 particles to [1] 
+[3] After step 110 I have 3605 part.
+[3] sends 97 particles to [0] 
+[3] sends 498 particles to [2] 
+[3] sends 503 particles to [1] 
+[3] After step 120 I have 3604 part.
+[3] sends 97 particles to [0] 
+[3] sends 498 particles to [2] 
+[3] sends 502 particles to [1] 
+[3] After step 130 I have 3610 part.
+[3] sends 97 particles to [0] 
+[3] sends 498 particles to [2] 
+[3] sends 501 particles to [1] 
+[3] After step 140 I have 3610 part.
+[3] sends 94 particles to [0] 
+[3] sends 497 particles to [2] 
+[3] se
+[2] sends 509 particles to [3] 
+[2] After step 150 I have 3606 part.
+[2] sends 505 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 509 particles to [3] 
+[2] After step 160 I have 3609 part.
+[2] sends 505 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 512 particles to [3] 
+[2] After step 170 I have 3607 part.
+[2] sends 507 particles to [0] 
+[2] sends 110 particles to [1] 
+[2] sends 510 particles to [3] 
+[2] After step 180 I have 3605 part.
+[2] sends 505 particles to [0] 
+[2] sends 110 particles to [1] 
+[2] sends 508 particles to [3] 
+[2] After step 190 I have 3609 part.
+[2] sends 504 particles to [0] 
+[2] sends 110 particles to [1] 
+[2] sends 506 particles to [3] 
+[2] After step 200 I have 3612 part.
+[2] sends 504 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 505 particles to [3] 
+[2] After step 210 I have 3614 part.
+[2] sends 500 particles to [0] 
+[2] sends 107 particles to [1] 
+[2] sends 505 particles to [3] 
+[2] After step 220 I have 3618 part.
+[2] sends 500 particles
+[1] sends 507 particles to [3] 
+[1] After step 150 I have 3608 part.
+[1] sends 500 particles to [0] 
+[1] sends 103 particles to [2] 
+[1] sends 508 particles to [3] 
+[1] After step 160 I have 3609 part.
+[1] sends 495 particles to [0] 
+[1] sends 102 particles to [2] 
+[1] sends 508 particles to [3] 
+[1] After step 170 I have 3610 part.
+[1] sends 496 particles to [0] 
+[1] sends 103 particles to [2] 
+[1] sends 506 particles to [3] 
+[1] After step 180 I have 3611 part.
+[1] sends 499 particles to [0] 
+[1] sends 104 particles to [2] 
+[1] sends 508 particles to [3] 
+[1] After step 190 I have 3611 part.
+[1] sends 501 particles to [0] 
+[1] sends 104 particles to [2] 
+[1] sends 511 particles to [3] 
+[1] After step 200 I have 3610 part.
+[1] sends 502 particles to [0] 
+[1] sends 103 particles to [2] 
+[1] sends 511 particles to [3] 
+[1] After step 210 I have 3610 part.
+[1] sends 504 particles to [0] 
+[1] sends 104 particles to [2] 
+[1] sends 515 particles to [3] 
+[1] After step 220 I have 3609 part.
+[1] sends 502 particles sends 97 particles to [3] 
+[0] After step 150 I have 3602 part.
+[0] sends 506 particles to [2] 
+[0] sends 503 particles to [1] 
+[0] sends 97 particles to [3] 
+[0] After step 160 I have 3601 part.
+[0] sends 506 particles to [2] 
+[0] sends 508 particles to [1] 
+[0] sends 97 particles to [3] 
+[0] After step 170 I have 3599 part.
+[0] sends 502 particles to [2] 
+[0] sends 506 particles to [1] 
+[0] sends 94 particles to [3] 
+[0] After step 180 I have 3600 part.
+[0] sends 504 particles to [2] 
+[0] sends 506 particles to [1] 
+[0] sends 94 particles to [3] 
+[0] After step 190 I have 3601 part.
+[0] sends 507 particles to [2] 
+[0] sends 504 particles to [1] 
+[0] sends 93 particles to [3] 
+[0] After step 200 I have 3602 part.
+[0] sends 507 particles to [2] 
+[0] sends 503 particles to [1] 
+[0] sends 94 particles to [3] 
+[0] After step 210 I have 3604 part.
+[0] sends 511 particles to [2] 
+[0] sends 505 particles to [1] 
+[0] sends 95 particles to [3] 
+[0] After step 220 I have 3605 part.
+[0] sends 511 particles to [2] 
+[0]nds 499 particles to [1] 
+[3] After step 150 I have 3609 part.
+[3] sends 94 particles to [0] 
+[3] sends 498 particles to [2] 
+[3] sends 499 particles to [1] 
+[3] After step 160 I have 3612 part.
+[3] sends 93 particles to [0] 
+[3] sends 495 particles to [2] 
+[3] sends 499 particles to [1] 
+[3] After step 170 I have 3613 part.
+[3] sends 93 particles to [0] 
+[3] sends 496 particles to [2] 
+[3] sends 501 particles to [1] 
+[3] After step 180 I have 3608 part.
+[3] sends 93 particles to [0] 
+[3] sends 499 particles to [2] 
+[3] sends 499 particles to [1] 
+[3] After step 190 I have 3608 part.
+[3] sends 93 particles to [0] 
+[3] sends 501 particles to [2] 
+[3] sends 498 particles to [1] 
+[3] After step 200 I have 3608 part.
+[3] sends 96 particles to [0] 
+[3] sends 504 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] After step 210 I have 3610 part.
+[3] sends 96 particles to [0] 
+[3] sends 506 particles to [2] 
+[3] sends 496 particles to [1] 
+[3] After step 220 I have 3612 part.
+[3] sends 96 particles to [0] 
+[3] se to [0] 
+[2] sends 107 particles to [1] 
+[2] sends 505 particles to [3] 
+[2] After step 230 I have 3616 part.
+[2] sends 499 particles to [0] 
+[2] sends 106 particles to [1] 
+[2] sends 504 particles to [3] 
+[2] After step 240 I have 3617 part.
+[2] sends 497 particles to [0] 
+[2] sends 106 particles to [1] 
+[2] sends 502 particles to [3] 
+[2] After step 250 I have 3617 part.
+[2] sends 500 particles to [0] 
+[2] sends 108 particles to [1] 
+[2] sends 502 particles to [3] 
+[2] After step 260 I have 3614 part.
+[2] sends 502 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 501 particles to [3] 
+[2] After step 270 I have 3608 part.
+[2] sends 502 particles to [0] 
+[2] sends 110 particles to [1] 
+[2] sends 503 particles to [3] 
+[2] After step 280 I have 3604 part.
+[2] sends 502 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 501 particles to [3] 
+[2] After step 290 I have 3602 part.
+[2] sends 502 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 501 particles to [3] 
+[2] After step 300 I to [0] 
+[1] sends 103 particles to [2] 
+[1] sends 515 particles to [3] 
+[1] After step 230 I have 3608 part.
+[1] sends 504 particles to [0] 
+[1] sends 103 particles to [2] 
+[1] sends 513 particles to [3] 
+[1] After step 240 I have 3604 part.
+[1] sends 503 particles to [0] 
+[1] sends 102 particles to [2] 
+[1] sends 514 particles to [3] 
+[1] After step 250 I have 3602 part.
+[1] sends 502 particles to [0] 
+[1] sends 102 particles to [2] 
+[1] sends 511 particles to [3] 
+[1] After step 260 I have 3606 part.
+[1] sends 500 particles to [0] 
+[1] sends 101 particles to [2] 
+[1] sends 507 particles to [3] 
+[1] After step 270 I have 3605 part.
+[1] sends 498 particles to [0] 
+[1] sends 99 particles to [2] 
+[1] sends 504 particles to [3] 
+[1] After step 280 I have 3607 part.
+[1] sends 496 particles to [0] 
+[1] sends 99 particles to [2] 
+[1] sends 503 particles to [3] 
+[1] After step 290 I have 3607 part.
+[1] sends 499 particles to [0] 
+[1] sends 99 particles to [2] 
+[1] sends 499 particles to [3] 
+[1] After step 300 I ha sends 505 particles to [1] 
+[0] sends 95 particles to [3] 
+[0] After step 230 I have 3604 part.
+[0] sends 509 particles to [2] 
+[0] sends 504 particles to [1] 
+[0] sends 95 particles to [3] 
+[0] After step 240 I have 3605 part.
+[0] sends 512 particles to [2] 
+[0] sends 503 particles to [1] 
+[0] sends 96 particles to [3] 
+[0] After step 250 I have 3603 part.
+[0] sends 509 particles to [2] 
+[0] sends 503 particles to [1] 
+[0] sends 94 particles to [3] 
+[0] After step 260 I have 3606 part.
+[0] sends 505 particles to [2] 
+[0] sends 502 particles to [1] 
+[0] sends 93 particles to [3] 
+[0] After step 270 I have 3604 part.
+[0] sends 504 particles to [2] 
+[0] sends 504 particles to [1] 
+[0] sends 94 particles to [3] 
+[0] After step 280 I have 3603 part.
+[0] sends 503 particles to [2] 
+[0] sends 506 particles to [1] 
+[0] sends 95 particles to [3] 
+[0] After step 290 I have 3602 part.
+[0] sends 499 particles to [2] 
+[0] sends 506 particles to [1] 
+[0] sends 94 particles to [3] 
+[0] After step 300 I have 3604 part.
+[0]nds 504 particles to [2] 
+[3] sends 496 particles to [1] 
+[3] After step 230 I have 3611 part.
+[3] sends 97 particles to [0] 
+[3] sends 506 particles to [2] 
+[3] sends 495 particles to [1] 
+[3] After step 240 I have 3609 part.
+[3] sends 97 particles to [0] 
+[3] sends 506 particles to [2] 
+[3] sends 493 particles to [1] 
+[3] After step 250 I have 3609 part.
+[3] sends 97 particles to [0] 
+[3] sends 505 particles to [2] 
+[3] sends 496 particles to [1] 
+[3] After step 260 I have 3603 part.
+[3] sends 96 particles to [0] 
+[3] sends 503 particles to [2] 
+[3] sends 496 particles to [1] 
+[3] After step 270 I have 3598 part.
+[3] sends 96 particles to [0] 
+[3] sends 501 particles to [2] 
+[3] sends 496 particles to [1] 
+[3] After step 280 I have 3597 part.
+[3] sends 96 particles to [0] 
+[3] sends 501 particles to [2] 
+[3] sends 496 particles to [1] 
+[3] After step 290 I have 3596 part.
+[3] sends 97 particles to [0] 
+[3] sends 506 particles to [2] 
+[3] sends 497 particles to [1] 
+[3] After step 300 I have 3593 part.
+[3] s have 3603 part.
+[2] sends 502 particles to [0] 
+[2] sends 109 particles to [1] 
+[2] sends 504 particles to [3] 
+[2] After step 310 I have 3608 part.
+[2] sends 499 particles to [0] 
+[2] sends 105 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] After step 320 I have 3608 part.
+[2] sends 500 particles to [0] 
+[2] sends 105 particles to [1] 
+[2] sends 499 particles to [3] 
+[2] After step 330 I have 3611 part.
+[2] sends 500 particles to [0] 
+[2] sends 104 particles to [1] 
+[2] sends 500 particles to [3] 
+[2] After step 340 I have 3611 part.
+[2] sends 502 particles to [0] 
+[2] sends 105 particles to [1] 
+[2] sends 498 particles to [3] 
+[2] After step 350 I have 3609 part.
+[2] sends 502 particles to [0] 
+[2] sends 104 particles to [1] 
+[2] sends 497 particles to [3] 
+[2] After step 360 I have 3608 part.
+[2] sends 504 particles to [0] 
+[2] sends 104 particles to [1] 
+[2] sends 499 particles to [3] 
+[2] After step 370 I have 3610 part.
+[2] sends 503 particles to [0] 
+[2] sends 104 particles to [1] 
+[2] sends 50ve 3608 part.
+[1] sends 501 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 501 particles to [3] 
+[1] After step 310 I have 3610 part.
+[1] sends 502 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 502 particles to [3] 
+[1] After step 320 I have 3606 part.
+[1] sends 502 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 504 particles to [3] 
+[1] After step 330 I have 3602 part.
+[1] sends 502 particles to [0] 
+[1] sends 99 particles to [2] 
+[1] sends 502 particles to [3] 
+[1] After step 340 I have 3602 part.
+[1] sends 504 particles to [0] 
+[1] sends 99 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 350 I have 3604 part.
+[1] sends 501 particles to [0] 
+[1] sends 98 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 360 I have 3601 part.
+[1] sends 500 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 501 particles to [3] 
+[1] After step 370 I have 3603 part.
+[1] sends 496 particles to [0] 
+[1] sends 100 particles to [2] 
+[1] sends 502 part sends 501 particles to [2] 
+[0] sends 508 particles to [1] 
+[0] sends 97 particles to [3] 
+[0] After step 310 I have 3606 part.
+[0] sends 502 particles to [2] 
+[0] sends 508 particles to [1] 
+[0] sends 98 particles to [3] 
+[0] After step 320 I have 3604 part.
+[0] sends 504 particles to [2] 
+[0] sends 507 particles to [1] 
+[0] sends 99 particles to [3] 
+[0] After step 330 I have 3605 part.
+[0] sends 504 particles to [2] 
+[0] sends 509 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 340 I have 3606 part.
+[0] sends 502 particles to [2] 
+[0] sends 507 particles to [1] 
+[0] sends 99 particles to [3] 
+[0] After step 350 I have 3609 part.
+[0] sends 504 particles to [2] 
+[0] sends 506 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 360 I have 3606 part.
+[0] sends 505 particles to [2] 
+[0] sends 508 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] After step 370 I have 3608 part.
+[0] sends 506 particles to [2] 
+[0] sends 511 particles to [1] 
+[0] sends 100 particles to [3] 
+[0] ends 97 particles to [0] 
+[3] sends 507 particles to [2] 
+[3] sends 497 particles to [1] 
+[3] After step 310 I have 3600 part.
+[3] sends 97 particles to [0] 
+[3] sends 508 particles to [2] 
+[3] sends 495 particles to [1] 
+[3] After step 320 I have 3598 part.
+[3] sends 96 particles to [0] 
+[3] sends 508 particles to [2] 
+[3] sends 493 particles to [1] 
+[3] After step 330 I have 3599 part.
+[3] sends 96 particles to [0] 
+[3] sends 509 particles to [2] 
+[3] sends 493 particles to [1] 
+[3] After step 340 I have 3599 part.
+[3] sends 97 particles to [0] 
+[3] sends 511 particles to [2] 
+[3] sends 494 particles to [1] 
+[3] After step 350 I have 3596 part.
+[3] sends 96 particles to [0] 
+[3] sends 508 particles to [2] 
+[3] sends 494 particles to [1] 
+[3] After step 360 I have 3595 part.
+[3] sends 96 particles to [0] 
+[3] sends 506 particles to [2] 
+[3] sends 495 particles to [1] 
+[3] After step 370 I have 3597 part.
+[3] sends 96 particles to [0] 
+[3] sends 504 particles to [2] 
+[3] sends 494 particles to [1] 
+[3] After After step 380 I have 3606 part.
+[0] sends 507 particles to [2] 
+[0] sends 512 particles to [1] 
+[0] sends 102 particles to [3] 
+[0] After step 390 I have 3603 part.
+[0] sends 506 particles to [2] 
+[0] sends 510 particles to [1] 
+[0] sends 102 particles to [3] 
+[0] After step 400 I have 3600 part.
+[0] sends 507 particles to [2] 
+[0] sends 511 particles to [1] 
+[0] sends 103 particles to [3] 
+[0] After step 410 I have 3597 part.
+[0] sends 507 particles to [2] 
+[0] sends 508 particles to [1] 
+[0] sends 102 particles to [3] 
+[0] After step 420 I have 3598 part.
+[0] sends 507 particles to [2] 
+[0] sends 510 particles to [1] 
+[0] sends 103 particles to [3] 
+[0] After step 430 I have 3599 part.
+[0] sends 507 particles to [2] 
+[0] sends 508 particles to [1] 
+[0] sends 102 particles to [3] 
+[0] After step 440 I have 3601 part.
+[0] sends 510 particles to [2] 
+[0] sends 511 particles to [1] 
+[0] sends 105 particles to [3] 
+[0] After step 450 I have 3601 part.
+[0] sends 509 particles to [2] 
+[0] sends 510 particles to [0 particles to [3] 
+[2] After step 380 I have 3608 part.
+[2] sends 502 particles to [0] 
+[2] sends 102 particles to [1] 
+[2] sends 499 particles to [3] 
+[2] After step 390 I have 3606 part.
+[2] sends 503 particles to [0] 
+[2] sends 102 particles to [1] 
+[2] sends 497 particles to [3] 
+[2] After step 400 I have 3603 part.
+[2] sends 500 particles to [0] 
+[2] sends 101 particles to [1] 
+[2] sends 496 particles to [3] 
+[2] After step 410 I have 3601 part.
+[2] sends 500 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 494 particles to [3] 
+[2] After step 420 I have 3604 part.
+[2] sends 503 particles to [0] 
+[2] sends 100 particles to [1] 
+[2] sends 496 particles to [3] 
+[2] After step 430 I have 3606 part.
+[2] sends 508 particles to [0] 
+[2] sends 101 particles to [1] 
+[2] sends 496 particles to [3] 
+[2] After step 440 I have 3608 part.
+[2] sends 507 particles to [0] 
+[2] sends 99 particles to [1] 
+[2] sends 497 particles to [3] 
+[2] After step 450 I have 3610 part.
+[2] sends 508 particles to [0] 
+[2] sicles to [3] 
+[1] After step 380 I have 3604 part.
+[1] sends 495 particles to [0] 
+[1] sends 99 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 390 I have 3605 part.
+[1] sends 493 particles to [0] 
+[1] sends 99 particles to [2] 
+[1] sends 499 particles to [3] 
+[1] After step 400 I have 3606 part.
+[1] sends 491 particles to [0] 
+[1] sends 99 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 410 I have 3606 part.
+[1] sends 491 particles to [0] 
+[1] sends 99 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 420 I have 3601 part.
+[1] sends 489 particles to [0] 
+[1] sends 98 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 430 I have 3603 part.
+[1] sends 487 particles to [0] 
+[1] sends 98 particles to [2] 
+[1] sends 500 particles to [3] 
+[1] After step 440 I have 3605 part.
+[1] sends 484 particles to [0] 
+[1] sends 97 particles to [2] 
+[1] sends 502 particles to [3] 
+[1] After step 450 I have 3603 part.
+[1] sends 485 particles to [0] 
+[1] sends 97 partstep 380 I have 3598 part.
+[3] sends 96 particles to [0] 
+[3] sends 503 particles to [2] 
+[3] sends 498 particles to [1] 
+[3] After step 390 I have 3601 part.
+[3] sends 96 particles to [0] 
+[3] sends 501 particles to [2] 
+[3] sends 501 particles to [1] 
+[3] After step 400 I have 3600 part.
+[3] sends 97 particles to [0] 
+[3] sends 499 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] After step 410 I have 3600 part.
+[3] sends 99 particles to [0] 
+[3] sends 501 particles to [2] 
+[3] sends 500 particles to [1] 
+[3] After step 420 I have 3598 part.
+[3] sends 100 particles to [0] 
+[3] sends 501 particles to [2] 
+[3] sends 503 particles to [1] 
+[3] After step 430 I have 3602 part.
+[3] sends 101 particles to [0] 
+[3] sends 501 particles to [2] 
+[3] sends 508 particles to [1] 
+[3] After step 440 I have 3603 part.
+[3] sends 102 particles to [0] 
+[3] sends 498 particles to [2] 
+[3] sends 507 particles to [1] 
+[3] After step 450 I have 3605 part.
+[3] sends 102 particles to [0] 
+[3] sends 498 particles to [2] 
+[3] seends 99 particles to [1] 
+[2] sends 496 particles to [3] 
+[2] After step 460 I have 3610 part.
+[2] sends 507 particles to [0] 
+[2] sends 98 particles to [1] 
+[2] sends 495 particles to [3] 
+[2] After step 470 I have 3610 part.
+[2] sends 504 particles to [0] 
+[2] sends 97 particles to [1] 
+[2] sends 495 particles to [3] 
+[2] After step 480 I have 3611 part.
+[2] sends 503 particles to [0] 
+[2] sends 97 particles to [1] 
+[2] sends 493 particles to [3] 
+[2] After step 490 I have 3614 part.
+[2] sends 504 particles to [0] 
+[2] sends 97 particles to [1] 
+[2] sends 494 particles to [3] 
+[2] After step 500 I have 3614 part.
+Process 2 reporting in...
+(process 2)  [97][101][92][106][99][103][ 0]
+(process 2)  [107] 97  99  101  98  99 [ 0]
+(process 2)  [102] 106  92  108  93  101 [ 0]
+(process 2)  [101] 98  106  101  97  104 [ 0]
+(process 2)  [104] 104  98  93  100  104 [ 0]
+(process 2)  [103] 99  91  108  99  103 [ 0]
+(process 2)  [ 0][ 0][ 0][ 0][ 0][ 0][ 0]
+
+(2) Elapsed time:      68.402344 s (100.0% CPU)
+icles to [2] 
+[1] sends 502 particles to [3] 
+[1] After step 460 I have 3602 part.
+[1] sends 488 particles to [0] 
+[1] sends 98 particles to [2] 
+[1] sends 502 particles to [3] 
+[1] After step 470 I have 3602 part.
+[1] sends 487 particles to [0] 
+[1] sends 97 particles to [2] 
+[1] sends 504 particles to [3] 
+[1] After step 480 I have 3603 part.
+[1] sends 491 particles to [0] 
+[1] sends 97 particles to [2] 
+[1] sends 506 particles to [3] 
+[1] After step 490 I have 3603 part.
+[1] sends 491 particles to [0] 
+[1] sends 97 particles to [2] 
+[1] sends 506 particles to [3] 
+[1] After step 500 I have 3606 part.
+Process 1 reporting in...
+(process 1)  [ 0][ 0][ 0][ 0][ 0][ 0][ 0]
+(process 1)  [ 0] 103  100  99  98  102 [98]
+(process 1)  [ 0] 105  92  108  93  102 [106]
+(process 1)  [ 0] 95  106  101  97  101 [98]
+(process 1)  [ 0] 103  98  93  100  104 [104]
+(process 1)  [ 0] 97  92  106  99  97 [101]
+(process 1)  [ 0][106][99][101][98][107][97]
+
+(1) Elapsed time:      68.402344 s (100.0% CPU)
+nds 507 particles to [1] 
+[3] After step 460 I have 3604 part.
+[3] sends 102 particles to [0] 
+[3] sends 498 particles to [2] 
+[3] sends 508 particles to [1] 
+[3] After step 470 I have 3603 part.
+[3] sends 102 particles to [0] 
+[3] sends 497 particles to [2] 
+[3] sends 506 particles to [1] 
+[3] After step 480 I have 3605 part.
+[3] sends 102 particles to [0] 
+[3] sends 501 particles to [2] 
+[3] sends 505 particles to [1] 
+[3] After step 490 I have 3606 part.
+[3] sends 101 particles to [0] 
+[3] sends 501 particles to [2] 
+[3] sends 507 particles to [1] 
+[3] After step 500 I have 3607 part.
+Process 3 reporting in...
+(process 3)  [ 0][ 0][ 0][ 0][ 0][ 0][ 0]
+(process 3)  [102] 98  100  99  98  99 [ 0]
+(process 3)  [102] 106  92  108  93  101 [ 0]
+(process 3)  [101] 98  106  101  97  104 [ 0]
+(process 3)  [104] 104  98  93  100  104 [ 0]
+(process 3)  [97] 101  92  106  99  103 [ 0]
+(process 3)  [107][97][99][101][98][99][ 0]
+
+(3) Elapsed time:      68.398438 s (100.0% CPU)
+1] 
+[0] sends 105 particles to [3] 
+[0] After step 460 I have 3602 part.
+[0] sends 509 particles to [2] 
+[0] sends 509 particles to [1] 
+[0] sends 104 particles to [3] 
+[0] After step 470 I have 3603 part.
+[0] sends 514 particles to [2] 
+[0] sends 512 particles to [1] 
+[0] sends 107 particles to [3] 
+[0] After step 480 I have 3603 part.
+[0] sends 516 particles to [2] 
+[0] sends 510 particles to [1] 
+[0] sends 107 particles to [3] 
+[0] After step 490 I have 3605 part.
+[0] sends 517 particles to [2] 
+[0] sends 511 particles to [1] 
+[0] sends 107 particles to [3] 
+[0] After step 500 I have 3606 part.
+Process 0 reporting in...
+(process 0)  [ 0][97][92][106][99][97][101]
+(process 0)  [ 0] 106  99  101  98  107 [97]
+(process 0)  [ 0] 105  92  108  93  102 [106]
+(process 0)  [ 0] 95  106  101  97  101 [98]
+(process 0)  [ 0] 103  98  93  100  104 [104]
+(process 0)  [ 0] 100  91  108  99  103 [99]
+(process 0)  [ 0][ 0][ 0][ 0][ 0][ 0][ 0]
+
+(0) Elapsed time:      68.398438 s (100.0% CPU)
