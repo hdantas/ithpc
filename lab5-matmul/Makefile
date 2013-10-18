@@ -10,7 +10,7 @@ run-original: original
 	./$^.out $(DIM)
 
 seq: lab5.c
-	gcc -o $@.out $(FLAGS) $^
+	gcc -o $@.out $(FLAGS) -fopenmp $^
 
 run-seq: seq
 	./$^.out $(DIM)

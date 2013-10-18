@@ -145,9 +145,9 @@ void seq_mat_mul(double* A, double* B, double* C, int min_row, int max_row, int 
     double a, b, c;
     int chunk = CHUNKSIZE;
 
-    #pragma omp parallel shared(a, b, c, chunk, max_col, max_row) private(i, j, k) {
-
-        #pragma omp for schedule(dynamic,chunk) nowait
+    #pragma omp parallel shared(alpha, beta, A, B, C, chunk, max_col, max_row) private(a, b, c, i, j, k)
+    {
+        #pragma omp for schedule(auto) nowait
         for(j = min_row - 1; j < max_row; j++) // row_
         {
            for(i = 0; i < max_col; i++) // col_
