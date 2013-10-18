@@ -4,3 +4,10 @@
 *.out
 *.o
 output*.dat
+lab5-matmul/A.txt
+lab5-matmul/originalA.txt
+lab5-matmul/B.txt
+lab5-matmul/originalB.txt
+lab5-matmul/C.txt
+lab5-matmul/originalC.txt
+

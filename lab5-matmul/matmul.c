@@ -4,6 +4,7 @@
 #include <math.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 //#define MIC
 typedef double DT;
 
@@ -36,6 +37,23 @@ double timer()
 	return (double)t_val;	
 }
 
+void write_to_file(const char *txt, int n, double* array) {
+    int i;
+    char filename[80] = "original";
+    strcat (filename, txt);
+    FILE *f = fopen(filename, "w");
+        
+    if (f == NULL) {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
+    for(i = 0; i < n; i++) {
+        fprintf(f, "%s[%d] = %lf\n", txt, i, array[i]);
+    }    
+
+    fclose(f);
+}
 
 /**
 	main entry
@@ -107,6 +125,10 @@ int main (int argc, char** argv)
 	t_end = timer();
 	t_delta = t_end - t_start;
 	
+    write_to_file("A.txt", x_max * y_max, A);
+    write_to_file("B.txt", x_max * y_max, B);
+    write_to_file("C.txt", x_max * y_max, C);
+
 	// statistics
 	bytes = (double)x_max * (double)y_max * (double)4 * (double)sizeof(DT);
 	flops = (double)x_max * (double)y_max * (double)x_max * 2;
