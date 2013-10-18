@@ -4,18 +4,15 @@ Lab 1
 Lab 2
 	Understand what is wrong with lab2 (Im not sure about steps 8 and 9)
 	Do step 10 of lab2
-	Ask questions if any
-	Complete Part 2
 	Report
 
 Lab 3
-	Do
 	Report
 
 Lab 4
-	Do
 	Report
 
-Lab 5
-	Do
+* Lab 5
+	Use pthreads/OpenMP to improve sequential part
+	Use MPI to improve even further
 	Report
