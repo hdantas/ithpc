@@ -5,6 +5,7 @@
 #include <time.h>
 #include <math.h>
 //#define MIC
+#define CHUNKSIZE 100
 
 double alpha = 0.1;
 double beta = 0.5;
@@ -104,13 +105,14 @@ int main (int argc, char** argv)
 
     // run matrix multiplication
     t_start = timer();
-    for (i = 1; i <= nodes; i++) {
+    /*for (i = 1; i <= nodes; i++) {
         min_row = (i - 1) * y_max / nodes + 1;
         max_row = i * y_max / nodes;
         seq_mat_mul(A, B, C, min_row, max_row, x_max);
         // printf("seq_mat_mul(A, B, C, %d, %d, %d);\n", min_row, max_row, x_max);
-    }
-    
+    }*/
+
+    seq_mat_mul(A, B, C, 1, y_max, x_max);
 
     t_end = timer();
     t_delta = t_end - t_start;
@@ -141,23 +143,28 @@ void seq_mat_mul(double* A, double* B, double* C, int min_row, int max_row, int 
     
     int i, j, k;
     double a, b, c;
-    
-    for(j = min_row - 1; j < max_row; j++) // row_
-    {
-       for(i = 0; i < max_col; i++) // col_
-       {
-            c = 0.0f;
-            for(k = 0; k < max_col; k++)
-            {
-                a = A[k + j * max_col];
-                b = B[i + k * max_col];
-                c += a * b;
-                // printf("\ta = A[%d] = %lf\n", k + j * max_col, A[k + j * max_col]);
-                // printf("\tb = B[%d] = %lf\n", i + k * max_col, B[i + k * max_col]);
-                // printf("\tc = %lf\n",c);
+    int chunk = CHUNKSIZE;
+
+    #pragma omp parallel shared(a, b, c, chunk, max_col, max_row) private(i, j, k) {
+
+        #pragma omp for schedule(dynamic,chunk) nowait
+        for(j = min_row - 1; j < max_row; j++) // row_
+        {
+           for(i = 0; i < max_col; i++) // col_
+           {
+                c = 0.0f;
+                for(k = 0; k < max_col; k++)
+                {
+                    a = A[k + j * max_col];
+                    b = B[i + k * max_col];
+                    c += a * b;
+                    // printf("\ta = A[%d] = %lf\n", k + j * max_col, A[k + j * max_col]);
+                    // printf("\tb = B[%d] = %lf\n", i + k * max_col, B[i + k * max_col]);
+                    // printf("\tc = %lf\n",c);
+                }
+                C[i + j * max_col] = beta * C[i + j * max_col] + alpha * c;
+                // printf("C[%d] = %lf\n", i + j * max_col, C[i + j * max_col]);
             }
-            C[i + j * max_col] = beta * C[i + j * max_col] + alpha * c;
-            // printf("C[%d] = %lf\n", i + j * max_col, C[i + j * max_col]);
         }
     }
 
