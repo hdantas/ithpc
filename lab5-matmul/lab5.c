@@ -5,7 +5,7 @@
 #include <time.h>
 #include <math.h>
 //#define MIC
-#define CHUNKSIZE 100
+// #define CHUNKSIZE 100
 
 double alpha = 0.1;
 double beta = 0.5;
@@ -62,7 +62,7 @@ void write_to_file(const char *txt, int n, double* array) {
 **/
 int main (int argc, char** argv)
 {
-    int i,j,k,r;
+    int i, j, k, r;
     
     double * A;
     double * B;
@@ -103,32 +103,25 @@ int main (int argc, char** argv)
     init_mat(A, B, C, x_max, y_max);        
 
 
-    // run matrix multiplication
-    t_start = timer();
-    /*for (i = 1; i <= nodes; i++) {
-        min_row = (i - 1) * y_max / nodes + 1;
-        max_row = i * y_max / nodes;
-        seq_mat_mul(A, B, C, min_row, max_row, x_max);
-        // printf("seq_mat_mul(A, B, C, %d, %d, %d);\n", min_row, max_row, x_max);
-    }*/
+    for (i = 1; i < 1000; i *= 2) {
+        // run matrix multiplication
+        t_start = timer();
+        seq_mat_mul(i, A, B, C, 1, y_max, x_max);
+        t_end = timer();
+        t_delta = t_end - t_start;
 
-    seq_mat_mul(A, B, C, 1, y_max, x_max);
+        // statistics
+        bytes = (double)x_max * (double)y_max * (double)4 * (double)sizeof(double);
+        flops = (double)x_max * (double)y_max * (double)x_max * 2;
+        printf("chunk: %d\t",i);
+        printf("time elapsed: %lf\t", t_delta*1.0e-9); 
+        printf("gflops: %lf\t", flops/t_delta);
+        printf("bandwidth: %lf\n", bytes/t_delta);
+    }
 
-    t_end = timer();
-    t_delta = t_end - t_start;
-    
     write_to_file("A.txt", x_max * y_max, A);
     write_to_file("B.txt", x_max * y_max, B);
     write_to_file("C.txt", x_max * y_max, C);
-
-
-    // statistics
-    bytes = (double)x_max * (double)y_max * (double)4 * (double)sizeof(double);
-    flops = (double)x_max * (double)y_max * (double)x_max * 2;
-
-    printf("time elapsed: %lf\n", t_delta*1.0e-9); 
-    printf("gflops: %lf\t\n", flops/t_delta);
-    printf("bandwidth: %lf\t\n", bytes/t_delta);
 
     // free memory space
     free(A);
@@ -139,11 +132,11 @@ int main (int argc, char** argv)
 }
 
 
-void seq_mat_mul(double* A, double* B, double* C, int min_row, int max_row, int max_col) {
+void seq_mat_mul(int chunksize, double* A, double* B, double* C, int min_row, int max_row, int max_col) {
     
     int i, j, k;
     double a, b, c;
-    int chunk = CHUNKSIZE;
+    int chunk = chunksize;
 
     #pragma omp parallel shared(alpha, beta, A, B, C, chunk, max_col, max_row) private(a, b, c, i, j, k)
     {
