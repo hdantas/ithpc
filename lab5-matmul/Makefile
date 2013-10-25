@@ -1,4 +1,4 @@
-DIM = 1000 1000
+DIM = 500 500
 FLAGS = -lrt -lm -Wall
 
 all: run
@@ -31,3 +31,8 @@ clean:
 
 clean-all: clean
 	rm -rfv A.txt B.txt C.txt originalA.txt originalB.txt originalC.txt
+
+remote:
+	sshpass -p 'u&Kqy43C' scp lab5.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	sshpass -p 'u&Kqy43C' scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	sshpass -p 'u&Kqy43C' ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make"
