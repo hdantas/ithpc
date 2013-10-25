@@ -1,7 +1,7 @@
 DIM = 1000 1000
 FLAGS = -lrt -lm -Wall
 
-all: run-seq
+all: run
 
 original: matmul.c
 	gcc -o $@.out $(FLAGS) $^
@@ -9,10 +9,10 @@ original: matmul.c
 run-original: original
 	./$^.out $(DIM)
 
-seq: lab5.c
+compile: lab5.c
 	gcc -o $@.out $(FLAGS) -fopenmp $^
 
-run-seq: seq
+run: compile
 	./$^.out $(DIM)
 
 diffA: originalA.txt A.txt
