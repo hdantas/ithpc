@@ -10,7 +10,8 @@
 double alpha = 0.1;
 double beta = 0.5;
 
-void seq_mat_mul(double* A, double* B, double* C, int min_row, int max_row, int max_col);
+void seq_mat_mul(int chunksize, double* A, double* B, double* C, int 
+min_row, int max_row, int max_col);
 
 
 void init_mat(double *  A, double *  B, double *  C, int x_max, int y_max)
@@ -100,10 +101,9 @@ int main (int argc, char** argv)
     B = (double * )malloc(arr_bytes);
     C = (double * )malloc(arr_bytes);
 
-    init_mat(A, B, C, x_max, y_max);        
+    for (i = 1; i < 100000; i *= 2) {
+        init_mat(A, B, C, x_max, y_max);        
 
-
-    for (i = 1; i < 1000; i *= 2) {
         // run matrix multiplication
         t_start = timer();
         seq_mat_mul(i, A, B, C, 1, y_max, x_max);
@@ -140,7 +140,9 @@ void seq_mat_mul(int chunksize, double* A, double* B, double* C, int min_row, in
 
     #pragma omp parallel shared(alpha, beta, A, B, C, chunk, max_col, max_row) private(a, b, c, i, j, k)
     {
+        //#pragma omp for schedule(dynamic) nowait
         #pragma omp for schedule(dynamic, chunk) nowait
+        //#pragma omp for schedule(static) nowait
         for(j = min_row - 1; j < max_row; j++) // row_
         {
            for(i = 0; i < max_col; i++) // col_
