@@ -10,6 +10,7 @@
 double alpha = 0.1;
 double beta = 0.5;
 
+void splitWork(int numberOfProcessors, int dim);
 void seq_mat_mul(int chunksize, double* A, double* B, double* C, int 
 min_row, int max_row, int max_col);
 
@@ -101,6 +102,9 @@ int main (int argc, char** argv)
     B = (double * )malloc(arr_bytes);
     C = (double * )malloc(arr_bytes);
 
+    splitWork(16, 4);
+    return;
+
     for (i = 1; i < 100000; i *= 2) {
         init_mat(A, B, C, x_max, y_max);        
 
@@ -131,6 +135,74 @@ int main (int argc, char** argv)
     return 0;
 }
 
+void splitWork(int numberOfProcessors, int dim) { //matrices are square
+    int i, j, k, steps, size;
+    steps = sqrt(numberOfProcessors);
+    char orderA[steps][steps];
+    char orderB[steps][steps];
+    char orderC[steps][steps][2 * steps];
+
+    // 1. Partition these matrices in square blocks p, where p is the number of processes available.
+    for (i = 0; i < steps; i++) {
+        for (j = 0; j < steps; j++) {
+            orderA[i][j] = 'A' + i * steps + j;
+            orderB[i][j] = 'A' + i * steps + j;
+            printf("orderA[%d][%d] = %c\n", i, j, orderA[i][j]);
+            printf("orderB[%d][%d] = %c\n", i, j, orderB[i][j]);
+        }
+    }
+    
+// 2. Create a matrix of processes of size p 1/2 x p 1/2 so that each process can maintain a block of A matrix and a block of B matrix.
+    //init MPI
+    printf("Reodering %d times!\n", steps);
+
+    char tmpA, tmpB;
+// 5. Repeat steps 3 y 4 sqrt(p) times.
+    for (k = 0; k < steps; k++) {
+        for (i = 0; i <= k; i++) {
+            
+            tmpA = orderA[steps - i - 1][0]; //shift row left starting from bottom
+            tmpB = orderB[0][steps - i - 1]; //shift column up starting from rightmost
+            // printf("\ttmpA : %c, tmpB: %c\n",tmpA, tmpB);
+            for (j = 1; j < steps; j++) {
+            // 3. Each block is sent to each process, and the copied sub blocks are multiplied together and the results added to the partial results in the C sub-blocks.
+            // multiply();
+            
+            // 4. The A sub-blocks are rolled one step to the left and the B sub-blocks are rolled one step upward.
+                orderA[steps - i - 1][j - 1] = orderA[steps - i - 1][j];
+                orderB[j - 1][steps - i - 1] = orderB[j][steps - i - 1];
+            }
+
+            orderA[steps - i - 1][steps - 1] = tmpA;
+            orderB[steps - 1][steps - i - 1] = tmpB;
+
+        }  
+        // printf("After %d shift\n", k + 1);
+        for (i = 0; i < steps; i++) {
+            for (j = 0; j < steps; j++) {
+                // printf("orderA[%d][%d] = %c\n", i, j, orderA[i][j]);
+                // printf("orderB[%d][%d] = %c\n", i, j, orderB[i][j]);
+                orderC[i][j][2 * k + 0] = orderA[i][j];
+                orderC[i][j][2 * k + 1] = orderB[i][j];
+                // printf("C[%d][%d] = %c * %c\n", i, j, orderC[i][j][0], orderC[i][j][1]);
+            }
+        }
+        // printf("\n");
+    }
+    // printf("done\n");
+    for (i = 0; i < steps; i++) {
+        for (j = 0; j < steps; j++) {
+            printf("C[%d][%d] = ", i, j);
+            for (k = 0; k < steps; k++) {    
+                printf("%c * %c", orderC[i][j][2 * k + 0], orderC[i][j][2 * k + 1]);
+                if (k != steps -1)
+                    printf(" + ");
+            }
+            printf("\n");
+        }
+    }
+
+}
 
 void seq_mat_mul(int chunksize, double* A, double* B, double* C, int min_row, int max_row, int max_col) {
     
