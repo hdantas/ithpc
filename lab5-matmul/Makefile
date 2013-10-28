@@ -4,13 +4,13 @@ FLAGS = -lrt -lm -Wall
 all: run
 
 original: matmul.c
-	gcc -o $@.out $(FLAGS) $^
+	gcc $^ -o $@.out $(FLAGS)
 
 run-original: original
 	./$^.out $(DIM)
 
 compile: lab5.c
-	gcc -o $@.out $(FLAGS) -fopenmp $^
+	gcc $^ -o $@.out $(FLAGS) -fopenmp
 
 run: compile
 	./$^.out $(DIM)
