@@ -1,0 +1,3 @@
+Apply OpenMP to sequential algorithm
+Use MPI to convert the letter scheme to send the submatrices to the different nodes
+
