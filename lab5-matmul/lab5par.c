@@ -11,6 +11,7 @@ void init_mat(double *A, double *B, double *C, int x_max, int y_max, int numtask
 double timer();
 void write_to_file(const char *txt, int x_max, int y_max, double* array);
 void multiply(double* A, double* B, double* localC, char subA, char subB, int minRowC, int minColC, int dim, int numberOfProcessors, double alpha, double beta);
+void readFromFile(char* filename, char* multiplyOrder);
 
 int main (int argc, char** argv)
 {
@@ -23,6 +24,7 @@ int main (int argc, char** argv)
 
     if (argc != 3) {
         printf("Wrong number of parameters (%d instead of 2). Syntax:\n%s <height> <width>\n", argc - 1, argv[0]);
+        MPI_Finalize();
         exit(-1);
     }
 
@@ -31,24 +33,36 @@ int main (int argc, char** argv)
  
     if (x_max != y_max){
         printf("We consider square matrix only! %d, %d not valid.\n", x_max, y_max);
+        MPI_Finalize();
         exit(-1);
     }
 
-
-    int i, rc;
+    int i, j, k, id;
     int dim = x_max;
     int arr_bytes = x_max * y_max * sizeof(double);
-
+    int minRow, minCol;
+    int dimSq = dim * dim;
+    int sqrtNumtasks = sqrt(numtasks);
+    int steps = dim / sqrtNumtasks;
     double t_start, t_end, t_delta;
     t_delta = 0.0;
     double bytes = 0;
     double flops = 0;   
     double alpha = 0.1;
     double beta = 0.5;
+   
+    // char multiplyOrder[numtasks][2 * sqrt(numtasks)];
+    char *multiplyOrder = (char *) malloc(2 * sqrtNumtasks * numtasks * sizeof(char));
+    char filename[20];
+    sprintf(filename, "%d", numtasks);
+    strcat(filename, ".txt");
+    readFromFile(filename, multiplyOrder);
+
+
     //Allocate matrix
     double *A = (double *) malloc(arr_bytes);
     double *B = (double *) malloc(arr_bytes);
-    
+    double *C1;
     // double *localC = (double *) malloc(arr_bytes / sqrt(numtasks));
     double *localC  = (double *) malloc(arr_bytes);
     
@@ -60,65 +74,33 @@ int main (int argc, char** argv)
 
         // run matrix multiplication
         t_start = timer();
-        if (rank == 1) {
-            // printf("%d of %d, %d x %d matrix multiplication\n", rank, numtasks, x_max, y_max);
-            multiply(A, B, localC, 'B', 'D', 0, dim / sqrt(numtasks), dim, numtasks, alpha, beta);
-            multiply(A, B, localC, 'A', 'B', 0, dim / sqrt(numtasks), dim, numtasks, alpha, beta);
-
-        } else if (rank == 2) {
-            // printf("%d of %d, %d x %d matrix multiplication\n", rank, numtasks, x_max, y_max);
-            multiply(A, B, localC, 'D', 'C', dim / sqrt(numtasks), 0, dim, numtasks, alpha, beta);
-            multiply(A, B, localC, 'C', 'A', dim / sqrt(numtasks), 0, dim, numtasks, alpha, beta);
         
-        } else if (rank == 3) {
-            // printf("%d of %d, %d x %d matrix multiplication\n", rank, numtasks, x_max, y_max);
-            multiply(A, B, localC, 'C', 'B', dim / sqrt(numtasks), dim / sqrt(numtasks), dim, numtasks, alpha, beta);
-            multiply(A, B, localC, 'D', 'D', dim / sqrt(numtasks), dim / sqrt(numtasks), dim, numtasks, alpha, beta);
-
-        
-        } else if (rank == 0) {
-            // printf("%d of %d, %d x %d matrix multiplication\n", rank, numtasks, x_max, y_max);
-            multiply(A, B, localC, 'A', 'A', 0, 0, dim, numtasks, alpha, beta);
-            multiply(A, B, localC, 'B', 'C', 0, 0, dim, numtasks, alpha, beta);
+        for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
+            minRow = steps * (rank / sqrtNumtasks);
+            minCol = steps * (rank % sqrtNumtasks);
+            // printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
+            multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
+                     minRow, minCol, dim, numtasks, alpha, beta);
         }
 
-        if (rank != 0) {
+        if (rank != 0){
             MPI_Send(localC, x_max * y_max, MPI_DOUBLE, 0, 42, MPI_COMM_WORLD);
-
         } else {
-            int j;
-            double *C1 = (double *) malloc(arr_bytes);
-            double *C2 = (double *) malloc(arr_bytes);
-            double *C3 = (double *) malloc(arr_bytes);
             MPI_Status status;
+            C1 = (double *) malloc((numtasks - 1) * arr_bytes);
 
-            MPI_Recv(C1, x_max * y_max, MPI_DOUBLE, MPI_ANY_SOURCE, 42, MPI_COMM_WORLD, &status);
-            MPI_Recv(C2, x_max * y_max, MPI_DOUBLE, MPI_ANY_SOURCE, 42, MPI_COMM_WORLD, &status);
-            MPI_Recv(C3, x_max * y_max, MPI_DOUBLE, MPI_ANY_SOURCE, 42, MPI_COMM_WORLD, &status);
-                // printf("%d received from %d\n", rank, status.MPI_SOURCE);
-                
-            for (i = 0; i < y_max; i++) {
-                for (j = 0; j < x_max; j++) {
-                    localC[i * x_max + j] += C1[i * x_max + j] + C2[i * x_max + j] + C3[i * x_max + j];
-                }
+            for(id = 1; id < numtasks; id++) {
+                MPI_Recv(&C1[(id - 1) * dimSq], x_max * y_max, MPI_DOUBLE, id, 42, MPI_COMM_WORLD, &status);
+                // for (i = 0; i < y_max; i++){
+                //     for (j = 0; j < x_max; j++) {
+                //     printf("rank: %d, C1[%d] = %1.5lf\n", id, (id - 1) * dimSq + i * x_max + j,
+                //         C1[(id - 1) * dimSq + i * x_max + j]);
+                //     }
+                // }
             }
-
-            free(C1);
-            free(C2);
-            free(C3);
 
         }
             
-            // free memory space
-            // free(C1);
-        
-        // MPI_Gather (&sendbuf,sendcnt,sendtype,&recvbuf,recvcount,recvtype,root,comm);
-        /*MPI_Gather (&localC, 250 * 250, MPI_DOUBLE,
-                    globalC, 250 * 250, MPI_DOUBLE,
-                    0, MPI_COMM_WORLD);
-        */
-
-
         t_end = timer();
         t_delta = t_end - t_start;
 
@@ -126,7 +108,7 @@ int main (int argc, char** argv)
         bytes = (double)x_max * (double)y_max * (double)4 * (double)sizeof(double);
         flops = (double)x_max * (double)y_max * (double)x_max * 2;
         // printf("chunk: %d\t", i);
-        printf("time elapsed: %lf\t", t_delta * 1.0e-9); 
+        printf("rank: %2d, time elapsed: %lf\t", rank, t_delta * 1.0e-9); 
         printf("gflops: %lf\t", flops / t_delta);
         printf("bandwidth: %lf\n", bytes/t_delta);
 
@@ -136,6 +118,18 @@ int main (int argc, char** argv)
         // }
 
         if (rank == 0) {
+            for (i = 0; i < y_max; i++) {
+                k = i * x_max;
+                for (j = 0; j < x_max; j++) {
+                    // k = i * x_max + j;
+                    for(id = 1; id < numtasks; id++) {
+                        localC[k] += C1[(id - 1) * dimSq + k];
+                    }
+                    // printf("C[%d] = localC[%d] + C1[%d] + C1[%d] + C1[%d]\n", k, k,
+                    //     k, dimSq + k, 2 * dimSq + k);
+                    k++;
+                }
+            }
            write_to_file("C.txt" , x_max, y_max, localC);
         }
 
@@ -231,4 +225,17 @@ void multiply(double* A, double* B, double* localC, char subA, char subB, int mi
             }
         }
     }
+}
+
+void readFromFile(char* filename, char* multiplyOrder) {
+    int i = 0;
+    char letter;
+    FILE *f = fopen(filename, "r");
+    while (fscanf(f, "%c", &letter) != EOF) {
+        if(letter >= 'A' && letter <= 'Z'){
+            multiplyOrder[i++] = letter;
+            // printf("%c\n", letter);
+        }
+    }
+    fclose(f);
 }
