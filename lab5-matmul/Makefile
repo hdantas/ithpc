@@ -1,4 +1,5 @@
-DIM = 5000 5000
+DIM = 1000 1000
+P = 4
 FLAGS = -lrt -lm -Wall
 
 all: run-par
@@ -19,13 +20,19 @@ par: lab5par.c
 	mpicc $^ -o $@.out $(FLAGS) -fopenmp
 
 run-par: par
-	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out 4 $(DIM)
+	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P) $(DIM)
 
 scatter: scatter.c
 	mpicc $^ -o $@.out $(FLAGS) -fopenmp
 
 run-scatter: scatter
-	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out 4
+	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P)
+
+writeFile: writeFile.c
+	gcc $^ -o $@.out $(FLAGS)
+
+run-writeFile: writeFile
+	./$^.out $(P)	
 
 diffA: originalA.txt A.txt
 	diff $^
