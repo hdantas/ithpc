@@ -1,0 +1,16 @@
+A * A + B * E + C * I + D * M
+B * F + C * J + D * N + A * B
+C * K + D * O + A * C + B * G
+D * P + A * D + B * H + C * L
+F * E + G * I + H * M + E * A
+G * J + H * N + E * B + F * F
+H * O + E * C + F * G + G * K
+E * D + F * H + G * L + H * P
+K * I + L * M + I * A + J * E
+L * N + I * B + J * F + K * J
+I * C + J * G + K * K + L * O
+J * H + K * L + L * P + I * D
+P * M + M * A + N * E + O * I
+M * B + N * F + O * J + P * N
+N * G + O * K + P * O + M * C
+O * L + P * P + M * D + N * H

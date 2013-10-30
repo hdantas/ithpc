@@ -1,4 +1,4 @@
-DIM = 500 500
+DIM = 5000 5000
 FLAGS = -lrt -lm -Wall
 
 all: run-par
@@ -19,7 +19,13 @@ par: lab5par.c
 	mpicc $^ -o $@.out $(FLAGS) -fopenmp
 
 run-par: par
-	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out 2 2 $(DIM)
+	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out 4 $(DIM)
+
+scatter: scatter.c
+	mpicc $^ -o $@.out $(FLAGS) -fopenmp
+
+run-scatter: scatter
+	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out 4
 
 diffA: originalA.txt A.txt
 	diff $^
@@ -36,6 +42,11 @@ upload:
 	scp lab5par.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make"
+
+test:
+	scp scatter.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-scatter"
 
 clean:
 	rm -rfv *~ *.out

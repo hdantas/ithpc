@@ -1,2 +1,1 @@
-Use MPI to convert the letter scheme to send the submatrices to the different nodes
-
+replace (global) A and B by localA and localB so to optimize data locality???
