@@ -1,4 +1,0 @@
-A * A + B * C
-B * D + A * B
-D * C + C * A
-C * B + D * D
