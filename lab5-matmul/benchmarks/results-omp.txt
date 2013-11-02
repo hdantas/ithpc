@@ -1,0 +1,9 @@
+size(A) = (1024, 1024)
+size(B) = (1024, 1024)
+	nthreads: 1	time elapsed: 112.686947	gflops: 0.019057	bandwidth: 0.000298
+	nthreads: 2	time elapsed: 60.834366	gflops: 0.035301	bandwidth: 0.000552
+	nthreads: 4	time elapsed: 20.803629	gflops: 0.103226	bandwidth: 0.001613
+	nthreads: 8	time elapsed: 20.805875	gflops: 0.103215	bandwidth: 0.001613
+	nthreads: 16	time elapsed: 20.710675	gflops: 0.103690	bandwidth: 0.001620
+	nthreads: 32	time elapsed: 20.743759	gflops: 0.103524	bandwidth: 0.001618
+	nthreads: 64	time elapsed: 20.792729	gflops: 0.103281	bandwidth: 0.001614

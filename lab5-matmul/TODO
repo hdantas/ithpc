@@ -1,7 +1,6 @@
-introduce beta on the multiplication
 reduce message sizes: each node only sends data he changed and not the complete localC array
-Check on startup if number of processors is square rootable and if the dimensions of the matrices can be divided by this value
+vectorization??
+Strassen's matrix multiplication?
 
 Not sure
-	replace (global) A and B by localA and localB so to optimize data locality???
 	change char to int on file writing??
