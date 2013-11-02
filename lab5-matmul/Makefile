@@ -1,4 +1,4 @@
-DIM = 1024 1024
+DIM = 1000 1000
 BLOCKDIM = 6 4
 P = 4
 FLAGS = -lrt -lm -Wall
