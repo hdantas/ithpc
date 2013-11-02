@@ -1,4 +1,5 @@
-DIM = 1000 1000
+DIM = 1024 1024
+BLOCKDIM = 6 4
 P = 4
 FLAGS = -lrt -lm -Wall
 
@@ -22,11 +23,11 @@ par: lab5par.c
 run-par: par
 	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P) $(DIM)
 
-scatter: scatter.c
-	mpicc $^ -o $@.out $(FLAGS) -fopenmp
+block: mmul_block.c
+	gcc $^ -o $@.out $(FLAGS) -fopenmp
 
-run-scatter: scatter
-	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P)
+run-block: block
+	./$^.out
 
 writeFile: writeFile.c
 	gcc $^ -o $@.out $(FLAGS)
@@ -45,15 +46,20 @@ diffC: originalC.txt C.txt
 
 compare: diffA diffB diffC
 
-upload:
+remote-mpi:
 	scp lab5par.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
-	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make"
+	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-par"
+
+remote-omp:
+	scp lab5.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-omp"
 
 test:
-	scp scatter.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	scp mmul_block.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
-	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-scatter"
+	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-block"
 
 clean:
 	rm -rfv *~ *.out
