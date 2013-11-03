@@ -8,7 +8,7 @@
 #include "mpi.h"
 
 #define MAXTHREADS 32
-#define BLOCK_SIZE 250
+#define BLOCK_SIZE 4
 #define N 1
 #define HA N * BLOCK_SIZE // height matrix A
 #define WA N * BLOCK_SIZE // width matrix A
@@ -22,7 +22,9 @@ double timer();
 void write_to_file(const char *txt, int x_max, int y_max, double* array);
 void readFromFile(char* filename, char* multiplyOrder);
 void multiply(double* A, double* B, double* localC, char subA, char subB, int minRowC, int minColC, int dim, int numberOfProcessors, double alpha, double beta, int nthreads);
-void matrixMul_block_par (double* C, double* A, double* B, const int hA, int wA, int wB, const int hA_grid, const int wA_grid, const int wB_grid, const int nthreads);
+void matrixMul_block_par(double* C, double* A, double* B, const int hA, int wA, int wB,
+    const int hA_grid, const int wA_grid, const int wB_grid,
+    int minRowC, int minColC, const int nthreads);
 
 int main (int argc, char** argv)
 {
@@ -94,7 +96,7 @@ int main (int argc, char** argv)
     // double *localC = (double *) malloc(arr_bytes / sqrt(numtasks));
     double *localC  = (double *) malloc(arr_bytes);
     
-    int nthreads = 8;
+    int nthreads = 1;
     // for (i = 4; i < 100; i *= 4) {
         
 
@@ -118,7 +120,7 @@ int main (int argc, char** argv)
         for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
             minRow = steps * (rank / sqrtNumtasks);
             minCol = steps * (rank % sqrtNumtasks);
-            // printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
+            printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
             multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
                      minRow, minCol, dim, numtasks, alpha, beta, nthreads);
         }
@@ -133,12 +135,12 @@ int main (int argc, char** argv)
 
             for(id = 1; id < numtasks; id++) {
                 MPI_Recv(&C1[(id - 1) * dimSq], x_max * y_max, MPI_DOUBLE, id, 42, MPI_COMM_WORLD, &status);
-                // for (i = 0; i < y_max; i++){
-                //     for (j = 0; j < x_max; j++) {
-                //     printf("rank: %d, C1[%d] = %1.5lf\n", id, (id - 1) * dimSq + i * x_max + j,
-                //         C1[(id - 1) * dimSq + i * x_max + j]);
-                //     }
-                // }
+                for (i = 0; i < y_max; i++){
+                    for (j = 0; j < x_max; j++) {
+                    printf("rank: %d, C1[%d] = %1.5lf\n", id, (id - 1) * dimSq + i * x_max + j,
+                        C1[(id - 1) * dimSq + i * x_max + j]);
+                    }
+                }
             }
 
         }
@@ -253,7 +255,7 @@ void multiply(double* A, double* B, double* localC,
     int wA_grid = WA / BLOCK_SIZE;
     int wB_grid = WB / BLOCK_SIZE;
 
-    matrixMul_block_par (localC, A, B, increment, increment, increment, hA_grid, wA_grid, wB_grid, nthreads);
+    matrixMul_block_par (localC, A, B, increment, increment, increment, hA_grid, wA_grid, wB_grid, minRowC, minColC, nthreads);
     
 }
 
@@ -274,6 +276,7 @@ void readFromFile(char* filename, char* multiplyOrder) {
 void matrixMul_block_par (double* C, double* A, double* B,
     const int hA, int wA, int wB,
     const int hA_grid, const int wA_grid, const int wB_grid,
+    int minRowC, int minColC,
     const int nthreads)
 {
     // store the sub-matrix A
@@ -324,7 +327,7 @@ void matrixMul_block_par (double* C, double* A, double* B,
 
                 // Multiply the two matrices togethers
                 #pragma omp parallel for default(none) num_threads(nthreads) \
-                    shared(As, Bs, C, bx, by, wB) private(ty, tx, k, c, Asub, Bsub, Csub) \
+                    shared(As, Bs, C, bx, by, wB, minColC, minRowC) private(ty, tx, k, c, Asub, Bsub, Csub) \
                     schedule(static)
                         for (ty = 0; ty < BLOCK_SIZE; ty++) {
                             for (tx = 0; tx < BLOCK_SIZE; tx++) {
@@ -335,7 +338,7 @@ void matrixMul_block_par (double* C, double* A, double* B,
                                     Csub += Asub * Bsub;
                                 }
                                 c = wB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-                                C[c + wB * ty + tx] += (double) Csub;
+                                C[c + wB * ty + tx + minColC + minRowC * wB] += (double) Csub;
                             }// for tx
                         }// for ty
             }// for each submatrix A and B

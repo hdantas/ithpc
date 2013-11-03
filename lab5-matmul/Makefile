@@ -1,4 +1,4 @@
-DIM = 1000 1000
+DIM = 4 4
 BLOCKDIM = 6 4
 P = 4
 FLAGS = -lrt -lm -Wall
@@ -60,6 +60,9 @@ test:
 	scp mmul_block.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-block"
+
+download:
+	scp in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul/C.txt ~/repos/ithpc/lab5-matmul/txts
 
 clean:
 	rm -rfv *~ *.out
