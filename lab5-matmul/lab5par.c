@@ -7,24 +7,12 @@
 #include <omp.h>
 #include "mpi.h"
 
-#define MAXTHREADS 32
-#define BLOCK_SIZE 4
-#define N 1
-#define HA N * BLOCK_SIZE // height matrix A
-#define WA N * BLOCK_SIZE // width matrix A
-#define HB N * BLOCK_SIZE // height matrix B
-#define WB N * BLOCK_SIZE // width matrix B
-#define HC N * BLOCK_SIZE // height matrix C
-#define WC N * BLOCK_SIZE // width matrix C
 
 void init_mat(double *A, double *B, double *C, int x_max, int y_max, int numtasks);
 double timer();
 void write_to_file(const char *txt, int x_max, int y_max, double* array);
+void multiply(double* A, double* B, double* localC, char subA, char subB, int minRowC, int minColC, int dim, int numberOfProcessors, double alpha, double beta);
 void readFromFile(char* filename, char* multiplyOrder);
-void multiply(double* A, double* B, double* localC, char subA, char subB, int minRowC, int minColC, int dim, int numberOfProcessors, double alpha, double beta, int nthreads);
-void matrixMul_block_par(double* C, double* A, double* B, const int hA, int wA, int wB,
-    const int hA_grid, const int wA_grid, const int wB_grid,
-    int minRowC, int minColC, const int nthreads);
 
 int main (int argc, char** argv)
 {
@@ -63,8 +51,7 @@ int main (int argc, char** argv)
         exit(-1);
     }
 
-    // MPI_Finalize();
-    // return 0;
+    
     int i, j, k, id;
     int dim = x_max;
     int arr_bytes = x_max * y_max * sizeof(double);
@@ -96,7 +83,6 @@ int main (int argc, char** argv)
     // double *localC = (double *) malloc(arr_bytes / sqrt(numtasks));
     double *localC  = (double *) malloc(arr_bytes);
     
-    int nthreads = 1;
     // for (i = 4; i < 100; i *= 4) {
         
 
@@ -120,9 +106,9 @@ int main (int argc, char** argv)
         for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
             minRow = steps * (rank / sqrtNumtasks);
             minCol = steps * (rank % sqrtNumtasks);
-            printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
+            // printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
             multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
-                     minRow, minCol, dim, numtasks, alpha, beta, nthreads);
+                     minRow, minCol, dim, numtasks, alpha, beta);
         }
         t_end_cpu = timer();
 
@@ -135,12 +121,12 @@ int main (int argc, char** argv)
 
             for(id = 1; id < numtasks; id++) {
                 MPI_Recv(&C1[(id - 1) * dimSq], x_max * y_max, MPI_DOUBLE, id, 42, MPI_COMM_WORLD, &status);
-                for (i = 0; i < y_max; i++){
-                    for (j = 0; j < x_max; j++) {
-                    printf("rank: %d, C1[%d] = %1.5lf\n", id, (id - 1) * dimSq + i * x_max + j,
-                        C1[(id - 1) * dimSq + i * x_max + j]);
-                    }
-                }
+                // for (i = 0; i < y_max; i++){
+                //     for (j = 0; j < x_max; j++) {
+                //     printf("rank: %d, C1[%d] = %1.5lf\n", id, (id - 1) * dimSq + i * x_max + j,
+                //         C1[(id - 1) * dimSq + i * x_max + j]);
+                //     }
+                // }
             }
 
         }
@@ -232,30 +218,48 @@ void write_to_file(const char *txt, int x_max, int y_max, double* array) {
     fclose(f);
 }
 
-void multiply(double* A, double* B, double* localC,
-    char subA, char subB, int minRowC, int minColC,
-    int dim, int numberOfProcessors, double alpha, double beta, int nthreads)
-{
+void multiply(double* A, double* B, double* localC, char subA, char subB, int minRowC, int minColC, int dim, int numberOfProcessors, double alpha, double beta) {
     int i, j, ka, kb;
     double a, b, c;
     int numberOfLetters = sqrt(numberOfProcessors);
     int increment = dim / numberOfLetters;
 
-    // int min_rowA = ((subA - 'A') / numberOfLetters) * increment;
-    // int max_rowA = min_rowA + increment - 1;
-    // int min_colA = ((subA - 'A') % numberOfLetters) * increment;
-    // int max_colA = min_colA + increment - 1;
+    int min_rowA = ((subA - 'A') / numberOfLetters) * increment;
+    int max_rowA = min_rowA + increment - 1;
+    int min_colA = ((subA - 'A') % numberOfLetters) * increment;
+    int max_colA = min_colA + increment - 1;
 
-    // int min_rowB = ((subB - 'A') / numberOfLetters) * increment;
-    // int max_rowB = min_rowB + increment - 1;
-    // int min_colB = ((subB - 'A') % numberOfLetters) * increment;
-    // int max_colB = min_colB + increment - 1;
+    int min_rowB = ((subB - 'A') / numberOfLetters) * increment;
+    int max_rowB = min_rowB + increment - 1;
+    int min_colB = ((subB - 'A') % numberOfLetters) * increment;
+    int max_colB = min_colB + increment - 1;
+
+    // #pragma omp parallel default(none) private(a, b, c, i, j, ka, kb) shared(A, B, localC, alpha, dim, min_rowA, max_rowA, min_colA, max_colA, min_colB, max_colB, min_rowB, max_rowB, minRowC, minColC)
     
-    int hA_grid = HA / BLOCK_SIZE;
-    int wA_grid = WA / BLOCK_SIZE;
-    int wB_grid = WB / BLOCK_SIZE;
-
-    matrixMul_block_par (localC, A, B, increment, increment, increment, hA_grid, wA_grid, wB_grid, minRowC, minColC, nthreads);
+        // #pragma omp for schedule(dynamic) nowait
+        // #pragma omp for schedule(dynamic, chunk) nowait
+        // #pragma omp for schedule(runtime) nowait
+        // omp_set_num_threads(16);
+        #pragma omp parallel for default(none) private(a, b, c, i, j, ka, kb) shared(A, B, localC, alpha, dim, min_rowA, max_rowA, min_colA, max_colA, min_colB, max_colB, min_rowB, max_rowB, minRowC, minColC)
+        for(i = min_rowA; i <= max_rowA; i++) // rowA
+        {
+           for(j = min_colB; j <= max_colB; j++) // colB
+           {
+                c = 0.0f;
+                for(ka = min_colA, kb = min_rowB; ka <= max_colA && kb <= max_rowB; ka++, kb++)
+                {
+                    a = A[i * dim + ka];
+                    b = B[kb * dim + j];
+                    c += a * b;
+                    // printf("\ta = A[%d][%d] = %lf", i, ka, a);
+                    // printf(", b = B[%d][%d] = %lf\n", kb, j, b);
+                    // printf("\tc = %lf\n",c);
+                }
+                // localC[minRowC + i - min_rowA][minColC + j - min_colB] += alpha * c;
+                localC[(minRowC + i - min_rowA) * dim + minColC + j - min_colB] += alpha * c;
+                // printf("C[%d] = %lf\n", (minRowC + i - min_rowA) * dim + minColC + j - min_colB, localC[(minRowC + i - min_rowA) * dim + minColC + j - min_colB]);
+            }
+        }
     
 }
 
@@ -270,80 +274,4 @@ void readFromFile(char* filename, char* multiplyOrder) {
         }
     }
     fclose(f);
-}
-
-// Matrix multiplication on the device C = A * B
-void matrixMul_block_par (double* C, double* A, double* B,
-    const int hA, int wA, int wB,
-    const int hA_grid, const int wA_grid, const int wB_grid,
-    int minRowC, int minColC,
-    const int nthreads)
-{
-    // store the sub-matrix A
-    double As[BLOCK_SIZE][BLOCK_SIZE];
-    // store the sub-matrix B
-    double Bs[BLOCK_SIZE][BLOCK_SIZE];
-    
-    int bx, by; // Block index
-    int tx, ty;
-    int aBegin, aEnd, aStep, bBegin, bStep;
-    int a, b, c, k;
-    double Asub, Bsub, Csub;
-
-    unsigned long int i;
-    unsigned long int size = hA * wB; //size of matrix C
-    memset(C, 0, size * sizeof(double));
-    
-    for (by = 0; by < hA_grid; by++) {
-        for (bx = 0; bx < wB_grid; bx++) {
-            // Index of the first sub-matrix of A processed by the block
-            aBegin = wA * BLOCK_SIZE * by;
-            // Index of the last sub-matrix of A processed by the block
-            aEnd = aBegin + wA - 1;
-            // Step size used to iterate through the sub-matrices of A
-            aStep = BLOCK_SIZE;
-            // Index of the first sub-matrix of B processed by the block
-            bBegin = BLOCK_SIZE * bx;
-            // Step size used to iterate through the sub-matrices of B
-            bStep = BLOCK_SIZE * wB;
-
-            // Loop over all the sub-matrices of A and B
-            // required to compute the block sub-matrix
-            for (a = aBegin, b = bBegin;
-                 a < aEnd;
-                 a += aStep, b += bStep) {
-            // Load the matrices from main memory
-                #pragma omp parallel for default(none) num_threads(nthreads) \
-                    shared(A, B, As, Bs, a, b, wA, wB) private(ty, tx) \
-                    schedule(static)
-                        for (ty = 0; ty < BLOCK_SIZE; ty++) {
-                            for (tx = 0; tx < BLOCK_SIZE; tx++) {
-                                // printf("As[%d][%d] = A[%d] = %lf\n", ty, tx, a + wA * ty + tx, A[a + wA * ty + tx]);
-                                // printf("Bs[%d][%d] = B[%d] = %lf\n", ty, tx, b + wB * ty + tx, B[b + wB * ty + tx]);
-                                As[ty][tx] = A[a + wA * ty + tx];
-                                Bs[ty][tx] = B[b + wB * ty + tx];
-                            }// for tx
-                        }// for ty
-
-                // Multiply the two matrices togethers
-                #pragma omp parallel for default(none) num_threads(nthreads) \
-                    shared(As, Bs, C, bx, by, wB, minColC, minRowC) private(ty, tx, k, c, Asub, Bsub, Csub) \
-                    schedule(static)
-                        for (ty = 0; ty < BLOCK_SIZE; ty++) {
-                            for (tx = 0; tx < BLOCK_SIZE; tx++) {
-                                Csub = 0.0;
-                                for (k = 0; k < BLOCK_SIZE; ++k) {
-                                    Asub = As[ty][k ];
-                                    Bsub = Bs[k ][tx];
-                                    Csub += Asub * Bsub;
-                                }
-                                c = wB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-                                C[c + wB * ty + tx + minColC + minRowC * wB] += (double) Csub;
-                            }// for tx
-                        }// for ty
-            }// for each submatrix A and B
-        
-        }// for bx
-    }// for by
-
 }

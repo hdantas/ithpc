@@ -5,9 +5,9 @@
 #include <time.h>
 #include <assert.h>
 
-#define MAXTHREADS 32
-#define BLOCK_SIZE 4
-#define N 250
+#define MAXTHREADS 4
+#define BLOCK_SIZE 2
+#define N 2
 #define HA N * BLOCK_SIZE // height matrix A
 #define WA N * BLOCK_SIZE // width matrix A
 #define HB N * BLOCK_SIZE // height matrix B
@@ -143,6 +143,7 @@ void runTest(int argc, char** argv)
 	
 	for (nthreads = 1; nthreads <= MAXTHREADS; nthreads *= 2) {
 		t_start = timer();
+		printf("hA_grid = %d, wA_grid = %d, wB_grid = %d\n", hA_grid, wA_grid, wB_grid);
 		matrixMul_block_par(h_C, h_A, h_B, HA, WA, WB, hA_grid, wA_grid, wB_grid, nthreads);
 		t_end = timer();
 		t_delta = t_end - t_start;
@@ -178,11 +179,11 @@ void runTest(int argc, char** argv)
 	// }
 	// printf("    ];\n");
 	
-	// for(i = 0; i < HC; i++) {
-	// 	for(j = 0; j < WC; j++) {
-	// 		printf("C.txt[%d] = %lf\n", i * WC + j, h_C[i * WC + j]);
-	// 	}
-	// }
+	for(i = 0; i < HC; i++) {
+		for(j = 0; j < WC; j++) {
+			printf("C.txt[%d] = %lf\n", i * WC + j, h_C[i * WC + j]);
+		}
+	}
 
 	// clean up memory
 	free(h_A);
