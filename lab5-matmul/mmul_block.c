@@ -7,7 +7,7 @@
 
 #define MAXTHREADS 32
 #define BLOCK_SIZE 4
-#define N 256
+#define N 250
 #define HA N * BLOCK_SIZE // height matrix A
 #define WA N * BLOCK_SIZE // width matrix A
 #define HB N * BLOCK_SIZE // height matrix B
