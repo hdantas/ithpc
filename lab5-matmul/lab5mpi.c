@@ -117,12 +117,14 @@ int main (int argc, char** argv)
             }
         }
 
-        for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
-            minRow = steps * (rank / sqrtNumtasks);
-            minCol = steps * (rank % sqrtNumtasks);
-            // printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
-            multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
-                     minRow, minCol, dim, numtasks, alpha, beta, nthreads);
+        if (rank == 1) { //FOR DEBUGGING ONLY
+            for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
+                minRow = steps * (rank / sqrtNumtasks);
+                minCol = steps * (rank % sqrtNumtasks);
+                printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
+                multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
+                         minRow, minCol, dim, numtasks, alpha, beta, nthreads);
+            }
         }
         t_end_cpu = timer();
 
@@ -316,20 +318,20 @@ void matrixMul_block_par (double* C, double* A, double* B, int numberOfProcessor
                  a += aStep, b += bStep) {
             // Load the matrices from main memory
                 #pragma omp parallel for default(none) num_threads(nthreads) \
-                    shared(A, B, As, Bs, a, b, wA, wB) private(ty, tx) \
+                    shared(A, B, As, Bs, a, b, sub_matrix_dim) private(ty, tx) \
                     schedule(static)
                         for (ty = 0; ty < BLOCK_SIZE; ty++) {
                             for (tx = 0; tx < BLOCK_SIZE; tx++) {
-                                printf("As[%d][%d] = A[%d] = %lf\n", ty, tx, a + wA * ty + tx, A[a + wA * ty + tx]);
-                                printf("Bs[%d][%d] = B[%d] = %lf\n", ty, tx, b + wB * ty + tx, B[b + wB * ty + tx]);
-                                As[ty][tx] = A[a + wA * ty + tx];
-                                Bs[ty][tx] = B[b + wB * ty + tx];
+                                printf("As[%d][%d] = A[%d] = %lf\n", ty, tx, a + sub_matrix_dim * ty + tx, A[a + sub_matrix_dim * ty + tx]);
+                                printf("Bs[%d][%d] = B[%d] = %lf\n", ty, tx, b + sub_matrix_dim * ty + tx, B[b + sub_matrix_dim * ty + tx]);
+                                As[ty][tx] = A[a + sub_matrix_dim * ty + tx];
+                                Bs[ty][tx] = B[b + sub_matrix_dim * ty + tx];
                             }// for tx
                         }// for ty
 
                 // Multiply the two matrices togethers
                 #pragma omp parallel for default(none) num_threads(nthreads) \
-                    shared(As, Bs, C, bx, by, wB, minColC, minRowC) private(ty, tx, k, c, Asub, Bsub, Csub) \
+                    shared(As, Bs, C, bx, by, sub_matrix_dim, minColC, minRowC) private(ty, tx, k, c, Asub, Bsub, Csub) \
                     schedule(static)
                         for (ty = 0; ty < BLOCK_SIZE; ty++) {
                             for (tx = 0; tx < BLOCK_SIZE; tx++) {
@@ -339,8 +341,9 @@ void matrixMul_block_par (double* C, double* A, double* B, int numberOfProcessor
                                     Bsub = Bs[k ][tx];
                                     Csub += Asub * Bsub;
                                 }
-                                c = wB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-                                C[c + wB * ty + tx + minColC + minRowC * wB] += (double) alpha * Csub;
+                                c = sub_matrix_dim * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+                                C[c + sub_matrix_dim * ty + tx + minColC + minRowC * sub_matrix_dim] += (double) alpha * Csub;
+                                printf("C[%d] = %lf\n", c + sub_matrix_dim * ty + tx + minColC + minRowC * sub_matrix_dim, C[c + sub_matrix_dim * ty + tx + minColC + minRowC * sub_matrix_dim]);
                             }// for tx
                         }// for ty
             }// for each submatrix A and B
