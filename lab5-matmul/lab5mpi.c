@@ -7,9 +7,9 @@
 #include <omp.h>
 #include "mpi.h"
 
-#define MAXTHREADS 32
-#define BLOCK_SIZE 2
-#define N 2
+#define MAXTHREADS 64
+#define BLOCK_SIZE 1
+#define N 4
 #define HA N * BLOCK_SIZE // height matrix A
 #define WA N * BLOCK_SIZE // width matrix A
 #define HB N * BLOCK_SIZE // height matrix B
@@ -22,9 +22,8 @@ double timer();
 void write_to_file(const char *txt, int x_max, int y_max, double* array);
 void readFromFile(char* filename, char* multiplyOrder);
 void multiply(double* A, double* B, double* localC, char subA, char subB, int minRowC, int minColC, int dim, int numberOfProcessors, double alpha, double beta, int nthreads);
-void matrixMul_block_par(double* C, double* A, double* B, const int hA, int wA, int wB,
-    const int hA_grid, const int wA_grid, const int wB_grid,
-    int minRowC, int minColC, const int nthreads);
+void matrixMul_block_par (double* C, double* A, double* B, double alpha, int numberOfProcessors, int dim, 
+    int minRowA, int minColA, int minRowB, int minColB, int minRowC, int minColC, int nthreads);
 
 int main (int argc, char** argv)
 {
@@ -95,8 +94,9 @@ int main (int argc, char** argv)
     double *C1;
     // double *localC = (double *) malloc(arr_bytes / sqrt(numtasks));
     double *localC  = (double *) malloc(arr_bytes);
+    memset(localC, 0, arr_bytes);
     
-    int nthreads = 1;
+    int nthreads = MAXTHREADS;
     // for (i = 4; i < 100; i *= 4) {
         
 
@@ -117,14 +117,12 @@ int main (int argc, char** argv)
             }
         }
 
-        if (rank == 1) { //FOR DEBUGGING ONLY
-            for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
-                minRow = steps * (rank / sqrtNumtasks);
-                minCol = steps * (rank % sqrtNumtasks);
-                printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
-                multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
-                         minRow, minCol, dim, numtasks, alpha, beta, nthreads);
-            }
+        for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
+            minRow = steps * (rank / sqrtNumtasks);
+            minCol = steps * (rank % sqrtNumtasks);
+            printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
+            multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
+                     minRow, minCol, dim, numtasks, alpha, beta, nthreads);
         }
         t_end_cpu = timer();
 
@@ -135,15 +133,15 @@ int main (int argc, char** argv)
             MPI_Status status;
             C1 = (double *) malloc((numtasks - 1) * arr_bytes);
 
-            // for(id = 1; id < numtasks; id++) {
-            //     MPI_Recv(&C1[(id - 1) * dimSq], x_max * y_max, MPI_DOUBLE, id, 42, MPI_COMM_WORLD, &status);
-            //     for (i = 0; i < y_max; i++){
-            //         for (j = 0; j < x_max; j++) {
-            //         printf("rank: %d, C1[%d] = %1.5lf\n", id, (id - 1) * dimSq + i * x_max + j,
-            //             C1[(id - 1) * dimSq + i * x_max + j]);
-            //         }
-            //     }
-            // }
+            for(id = 1; id < numtasks; id++) {
+                MPI_Recv(&C1[(id - 1) * dimSq], x_max * y_max, MPI_DOUBLE, id, 42, MPI_COMM_WORLD, &status);
+                // for (i = 0; i < y_max; i++){
+                //     for (j = 0; j < x_max; j++) {
+                //     printf("rank: %d, C1[%d] = %1.5lf\n", id, (id - 1) * dimSq + i * x_max + j,
+                //         C1[(id - 1) * dimSq + i * x_max + j]);
+                //     }
+                // }
+            }
 
         }
         t_end_comm = timer();
@@ -157,15 +155,10 @@ int main (int argc, char** argv)
         // statistics
         bytes = (double)x_max * (double)y_max * (double)4 * (double)sizeof(double);
         flops = (double)x_max * (double)y_max * (double)x_max * 2;
-        // printf("chunk: %d\t", i);
-        // printf("rank: %2d, Total time: %lf, Comm time: %lf, CPU time: %lf", rank, t_delta * 1.0e-9, t_delta_comm * 1.0e-9, t_delta_cpu * 1.0e-9); 
-        // printf(", gflops: %lf", flops / t_delta);
-        // printf(", bandwidth: %lf\n", bytes/t_delta);
-
-        // Write results to a file
-        // if (rank == 0) {
-        //     write_to_file("C.txt" , x_max, y_max, 'C');
-        // }
+        printf("chunk: %d\t", i);
+        printf("rank: %2d, Total time: %lf, Comm time: %lf, CPU time: %lf", rank, t_delta * 1.0e-9, t_delta_comm * 1.0e-9, t_delta_cpu * 1.0e-9); 
+        printf(", gflops: %lf", flops / t_delta);
+        printf(", bandwidth: %lf\n", bytes/t_delta);
 
         if (rank == 0) {
             for (i = 0; i < y_max; i++) { // alpha * AB
@@ -179,7 +172,7 @@ int main (int argc, char** argv)
                     k++;
                 }
             }
-           write_to_file("C.txt" , x_max, y_max, localC);
+           write_to_file("C.txt" , x_max, y_max, localC); // Write results to a file
         }
 
     free(A);
@@ -239,25 +232,25 @@ void multiply(double* A, double* B, double* localC,
 {
     int i, j, ka, kb;
     double a, b, c;
-    int increment = dim / sqrt(numberOfProcessors);
+    int sqrtNumberOfProcessors = sqrt(numberOfProcessors);
+    int increment = dim / sqrtNumberOfProcessors;
 
-    // int min_rowA = ((subA - 'A') / numberOfLetters) * increment;
-    // int max_rowA = min_rowA + increment - 1;
-    // int min_colA = ((subA - 'A') % numberOfLetters) * increment;
-    // int max_colA = min_colA + increment - 1;
+    int minRowA = (subA - 'A') / sqrtNumberOfProcessors * increment;
+    // int maxRowA = minRowA + increment - 1;
+    int minColA = (subA - 'A') % sqrtNumberOfProcessors * increment;
+    // int maxColA = minColA + increment - 1;
 
-    // int min_rowB = ((subB - 'A') / numberOfLetters) * increment;
-    // int max_rowB = min_rowB + increment - 1;
-    // int min_colB = ((subB - 'A') % numberOfLetters) * increment;
-    // int max_colB = min_colB + increment - 1;
+    int minRowB = (subB - 'A') / sqrtNumberOfProcessors * increment;
+    // int maxRowB = minRowB + increment - 1;
+    int minColB = (subB - 'A') % sqrtNumberOfProcessors * increment;
+    // int maxColB = minColB + increment - 1;
     
-    int hA_grid = HA / (BLOCK_SIZE * sqrt(numberOfProcessors));
-    int wA_grid = WA / (BLOCK_SIZE * sqrt(numberOfProcessors));
-    int wB_grid = WB / (BLOCK_SIZE * sqrt(numberOfProcessors));
+    int hA_grid = HA / (BLOCK_SIZE * sqrtNumberOfProcessors);
+    int wA_grid = WA / (BLOCK_SIZE * sqrtNumberOfProcessors);
+    int wB_grid = WB / (BLOCK_SIZE * sqrtNumberOfProcessors);
 
-    printf("minRowC = %d, minColC = %d, hA_grid = %d, wA_grid = %d, wB_grid = %d;\n", minRowC, minColC, hA_grid, wA_grid, wB_grid);
-    matrixMul_block_par (localC, A, B, increment, increment, increment, hA_grid, wA_grid, wB_grid, minRowC, minColC, nthreads);
-    
+    printf("dim = %d, minRowA = %d, minColA = %d, minRowB = %d, minColB = %d, minRowC = %d, minColC = %d;\n", dim, minRowA, minColA, minRowB, minColB, minRowC, minColC);
+    matrixMul_block_par (localC, A, B, alpha, numberOfProcessors, dim, minRowA, minColA, minRowB, minColB, minRowC, minColC, nthreads);
 }
 
 void readFromFile(char* filename, char* multiplyOrder) {
@@ -274,10 +267,8 @@ void readFromFile(char* filename, char* multiplyOrder) {
 }
 
 // Matrix multiplication on the device C = A * B
-void matrixMul_block_par (double* C, double* A, double* B, int numberOfProcessors
-    int dim, int dim_grid,
-    int minRowA, int minColA, int minRowB, int minColB, int minRowC, int minColC,
-    int nthreads)
+void matrixMul_block_par (double* C, double* A, double* B, double alpha, int numberOfProcessors, int dim, 
+    int minRowA, int minColA, int minRowB, int minColB, int minRowC, int minColC, int nthreads)
 {
     // store the sub-matrix A
     double As[BLOCK_SIZE][BLOCK_SIZE];
@@ -296,6 +287,7 @@ void matrixMul_block_par (double* C, double* A, double* B, int numberOfProcessor
     int wA_grid = grid_dim;
     int wB_grid = grid_dim;
 
+    int tmp_indexA, tmp_indexB, tmp_indexC;
     unsigned long int i;
     
     for (by = 0; by < hA_grid; by++) {
@@ -318,20 +310,22 @@ void matrixMul_block_par (double* C, double* A, double* B, int numberOfProcessor
                  a += aStep, b += bStep) {
             // Load the matrices from main memory
                 #pragma omp parallel for default(none) num_threads(nthreads) \
-                    shared(A, B, As, Bs, a, b, sub_matrix_dim) private(ty, tx) \
+                    shared(A, B, As, Bs, a, b, dim, sub_matrix_dim, minColA, minRowA, minRowB, minColB) private(ty, tx, tmp_indexA, tmp_indexB) \
                     schedule(static)
                         for (ty = 0; ty < BLOCK_SIZE; ty++) {
                             for (tx = 0; tx < BLOCK_SIZE; tx++) {
-                                printf("As[%d][%d] = A[%d] = %lf\n", ty, tx, a + sub_matrix_dim * ty + tx, A[a + sub_matrix_dim * ty + tx]);
-                                printf("Bs[%d][%d] = B[%d] = %lf\n", ty, tx, b + sub_matrix_dim * ty + tx, B[b + sub_matrix_dim * ty + tx]);
-                                As[ty][tx] = A[a + sub_matrix_dim * ty + tx];
-                                Bs[ty][tx] = B[b + sub_matrix_dim * ty + tx];
+                                tmp_indexB = b + dim * ty + tx + minColB + minRowB * dim;
+                                tmp_indexA = a + dim * ty + tx + minColA + minRowA * dim;
+                                printf("As[%d][%d] = A[%d] = %lf\n", ty, tx, tmp_indexA, A[tmp_indexA]);
+                                printf("Bs[%d][%d] = B[%d] = %lf\n", ty, tx, tmp_indexB, B[tmp_indexB]);
+                                As[ty][tx] = A[tmp_indexA];
+                                Bs[ty][tx] = B[tmp_indexB];
                             }// for tx
                         }// for ty
 
                 // Multiply the two matrices togethers
                 #pragma omp parallel for default(none) num_threads(nthreads) \
-                    shared(As, Bs, C, bx, by, sub_matrix_dim, minColC, minRowC) private(ty, tx, k, c, Asub, Bsub, Csub) \
+                    shared(As, Bs, C, bx, by, dim, sub_matrix_dim, minColC, minRowC, alpha) private(ty, tx, k, c, Asub, Bsub, Csub, tmp_indexC) \
                     schedule(static)
                         for (ty = 0; ty < BLOCK_SIZE; ty++) {
                             for (tx = 0; tx < BLOCK_SIZE; tx++) {
@@ -342,8 +336,9 @@ void matrixMul_block_par (double* C, double* A, double* B, int numberOfProcessor
                                     Csub += Asub * Bsub;
                                 }
                                 c = sub_matrix_dim * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-                                C[c + sub_matrix_dim * ty + tx + minColC + minRowC * sub_matrix_dim] += (double) alpha * Csub;
-                                printf("C[%d] = %lf\n", c + sub_matrix_dim * ty + tx + minColC + minRowC * sub_matrix_dim, C[c + sub_matrix_dim * ty + tx + minColC + minRowC * sub_matrix_dim]);
+                                tmp_indexC = c + dim * ty + tx + minColC + minRowC * dim;
+                                C[tmp_indexC] += (double) alpha * Csub;
+                                printf("C[%d] = %lf\n", tmp_indexC, C[tmp_indexC]);
                             }// for tx
                         }// for ty
             }// for each submatrix A and B
