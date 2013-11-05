@@ -23,6 +23,12 @@ par: lab5par.c
 run-par: par
 	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P) $(DIM)
 
+mpi: lab5mpi.c
+	mpicc $^ -o $@.out $(FLAGS) -fopenmp
+
+run-mpi: mpi
+	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P) $(DIM)
+
 block: mmul_block.c
 	gcc $^ -o $@.out $(FLAGS) -fopenmp
 
@@ -47,9 +53,9 @@ diffC: originalC.txt C.txt
 compare: diffA diffB diffC
 
 remote-mpi:
-	scp lab5par.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	scp lab5mpi.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
-	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-par"
+	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-mpi"
 
 remote-omp:
 	scp lab5.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
