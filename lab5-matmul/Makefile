@@ -1,4 +1,4 @@
-DIM = 64 64
+DIM = 2048 2048
 P = 4
 FLAGS = -lrt -lm -Wall
 
