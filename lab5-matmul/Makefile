@@ -1,5 +1,4 @@
-DIM = 4 4
-BLOCKDIM = 6 4
+DIM = 64 64
 P = 4
 FLAGS = -lrt -lm -Wall
 
@@ -50,7 +49,7 @@ diffB: originalB.txt B.txt
 diffC: originalC.txt C.txt
 	diff $^	
 
-compare: diffA diffB diffC
+diff: diffA diffB diffC
 
 remote-mpi:
 	scp lab5mpi.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
@@ -62,13 +61,18 @@ remote-omp:
 	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-omp"
 
+remote-original:
+	scp matmul.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-original"
+
 test:
 	scp mmul_block.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-block"
 
 download:
-	scp in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul/C.txt ~/repos/ithpc/lab5-matmul/txts
+	scp in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul/C.txt ~/repos/ithpc/lab5-matmul/txts/C.txt
 
 clean:
 	rm -rfv *~ *.out
