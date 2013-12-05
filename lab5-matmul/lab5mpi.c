@@ -5,11 +5,12 @@
 #include <time.h>
 #include <math.h>
 #include <omp.h>
+#include <unistd.h>
 #include "mpi.h"
 
 #define MAXTHREADS 64
-#define BLOCK_SIZE 1
-#define N 4
+#define BLOCK_SIZE 8
+#define N 8 // = DIM / BLOCK_SIZE
 #define HA N * BLOCK_SIZE // height matrix A
 #define WA N * BLOCK_SIZE // width matrix A
 #define HB N * BLOCK_SIZE // height matrix B
@@ -117,14 +118,17 @@ int main (int argc, char** argv)
             }
         }
 
-        for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
-            minRow = steps * (rank / sqrtNumtasks);
-            minCol = steps * (rank % sqrtNumtasks);
-            printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
-            multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
-                     minRow, minCol, dim, numtasks, alpha, beta, nthreads);
-        }
+        // if (rank == 2) {
+            for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
+                minRow = steps * (rank / sqrtNumtasks);
+                minCol = steps * (rank % sqrtNumtasks);
+                printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
+                multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
+                         minRow, minCol, dim, numtasks, alpha, beta, nthreads);
+            }
+        // }
         t_end_cpu = timer();
+
 
         t_start_comm = timer();
         if (rank != 0) {
@@ -155,10 +159,10 @@ int main (int argc, char** argv)
         // statistics
         bytes = (double)x_max * (double)y_max * (double)4 * (double)sizeof(double);
         flops = (double)x_max * (double)y_max * (double)x_max * 2;
-        printf("chunk: %d\t", i);
-        printf("rank: %2d, Total time: %lf, Comm time: %lf, CPU time: %lf", rank, t_delta * 1.0e-9, t_delta_comm * 1.0e-9, t_delta_cpu * 1.0e-9); 
-        printf(", gflops: %lf", flops / t_delta);
-        printf(", bandwidth: %lf\n", bytes/t_delta);
+        // printf("chunk: %d\t", i);
+        // printf("rank: %2d, Total time: %lf, Comm time: %lf, CPU time: %lf", rank, t_delta * 1.0e-9, t_delta_comm * 1.0e-9, t_delta_cpu * 1.0e-9); 
+        // printf(", gflops: %lf", flops / t_delta);
+        // printf(", bandwidth: %lf\n", bytes/t_delta);
 
         if (rank == 0) {
             for (i = 0; i < y_max; i++) { // alpha * AB
@@ -172,7 +176,9 @@ int main (int argc, char** argv)
                     k++;
                 }
             }
-           write_to_file("C.txt" , x_max, y_max, localC); // Write results to a file
+            write_to_file("A.txt" , x_max, y_max, A); // Write results to a file
+            write_to_file("B.txt" , x_max, y_max, B); // Write results to a file
+            write_to_file("C.txt" , x_max, y_max, localC); // Write results to a file
         }
 
     free(A);
@@ -281,68 +287,55 @@ void matrixMul_block_par (double* C, double* A, double* B, double alpha, int num
     int a, b, c, k;
     double Asub, Bsub, Csub;
 
-    int sub_matrix_dim = dim / sqrt(numberOfProcessors);
-    int grid_dim = (sub_matrix_dim / BLOCK_SIZE);
-    int hA_grid = grid_dim;
-    int wA_grid = grid_dim;
-    int wB_grid = grid_dim;
+    int sub_matrix_dim = dim / sqrt(numberOfProcessors); // submatrix assign to this processor
+    int subgrid_dim = (sub_matrix_dim / BLOCK_SIZE);        // number of subgrids. Dimensions of the subgrid are (BLOCK_SIZE, BLOCK_SIZE).
+    int hA_grid = subgrid_dim;                              // number of A subgrids along the y axis
+    // int wA_grid = subgrid_dim;                              // number of A subgrids along the x axis
+    int wB_grid = subgrid_dim;                              // number of B subgrids along the x axis
 
     int tmp_indexA, tmp_indexB, tmp_indexC;
-    unsigned long int i;
+    unsigned int i;
     
-    for (by = 0; by < hA_grid; by++) {
+    for (by = 0; by < hA_grid; by++) { // go through all the subgrids for this processor
         for (bx = 0; bx < wB_grid; bx++) {
-            // Index of the first sub-matrix of A processed by the block
-            aBegin = grid_dim * BLOCK_SIZE * by;
-            // Index of the last sub-matrix of A processed by the block
-            aEnd = aBegin + sub_matrix_dim - 1;
-            // Step size used to iterate through the sub-matrices of A
-            aStep = BLOCK_SIZE;
-            // Index of the first sub-matrix of B processed by the block
-            bBegin = BLOCK_SIZE * bx;
-            // Step size used to iterate through the sub-matrices of B
-            bStep = BLOCK_SIZE * sub_matrix_dim;
+            
+            // Loop over all the subsubgrid operations required to compute the subgrid
+            for (i = 0; i < subgrid_dim; i++) { // travel on the subsubgrid
+                    
+                    // Load the matrices from main memory
+                    #pragma omp parallel for default(none) num_threads(nthreads) \
+                        shared(A, B, As, Bs, by, bx, i, dim, subgrid_dim, minColA, minRowA, minRowB, minColB) private(ty, tx, tmp_indexA, tmp_indexB) \
+                        schedule(static)
+                            for (ty = 0; ty < BLOCK_SIZE; ty++) {
+                                for (tx = 0; tx < BLOCK_SIZE; tx++) {
+                                    tmp_indexA = i * BLOCK_SIZE + by * BLOCK_SIZE * dim + dim * ty + tx + minColA + minRowA * dim;
+                                    tmp_indexB = i * BLOCK_SIZE * dim + bx * BLOCK_SIZE + dim * ty + tx + minColB + minRowB * dim;
+                                    printf("As[%d][%d] = A[%d] = %lf\n", ty, tx, tmp_indexA, A[tmp_indexA]);
+                                    printf("Bs[%d][%d] = B[%d] = %lf\n", ty, tx, tmp_indexB, B[tmp_indexB]);
+                                    As[ty][tx] = A[tmp_indexA];
+                                    Bs[ty][tx] = B[tmp_indexB];
+                                }// for tx
+                            }// for ty
 
-            // Loop over all the sub-matrices of A and B
-            // required to compute the block sub-matrix
-            for (a = aBegin, b = bBegin;
-                 a < aEnd;
-                 a += aStep, b += bStep) {
-            // Load the matrices from main memory
-                #pragma omp parallel for default(none) num_threads(nthreads) \
-                    shared(A, B, As, Bs, a, b, dim, sub_matrix_dim, minColA, minRowA, minRowB, minColB) private(ty, tx, tmp_indexA, tmp_indexB) \
-                    schedule(static)
-                        for (ty = 0; ty < BLOCK_SIZE; ty++) {
-                            for (tx = 0; tx < BLOCK_SIZE; tx++) {
-                                tmp_indexB = b + dim * ty + tx + minColB + minRowB * dim;
-                                tmp_indexA = a + dim * ty + tx + minColA + minRowA * dim;
-                                printf("As[%d][%d] = A[%d] = %lf\n", ty, tx, tmp_indexA, A[tmp_indexA]);
-                                printf("Bs[%d][%d] = B[%d] = %lf\n", ty, tx, tmp_indexB, B[tmp_indexB]);
-                                As[ty][tx] = A[tmp_indexA];
-                                Bs[ty][tx] = B[tmp_indexB];
-                            }// for tx
-                        }// for ty
-
-                // Multiply the two matrices togethers
-                #pragma omp parallel for default(none) num_threads(nthreads) \
-                    shared(As, Bs, C, bx, by, dim, sub_matrix_dim, minColC, minRowC, alpha) private(ty, tx, k, c, Asub, Bsub, Csub, tmp_indexC) \
-                    schedule(static)
-                        for (ty = 0; ty < BLOCK_SIZE; ty++) {
-                            for (tx = 0; tx < BLOCK_SIZE; tx++) {
-                                Csub = 0.0;
-                                for (k = 0; k < BLOCK_SIZE; ++k) {
-                                    Asub = As[ty][k ];
-                                    Bsub = Bs[k ][tx];
-                                    Csub += Asub * Bsub;
-                                }
-                                c = sub_matrix_dim * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-                                tmp_indexC = c + dim * ty + tx + minColC + minRowC * dim;
-                                C[tmp_indexC] += (double) alpha * Csub;
-                                printf("C[%d] = %lf\n", tmp_indexC, C[tmp_indexC]);
-                            }// for tx
-                        }// for ty
-            }// for each submatrix A and B
-        
+                    // Multiply the two matrices togethers
+                    #pragma omp parallel for default(none) num_threads(nthreads) \
+                        shared(As, Bs, C, bx, by, dim, sub_matrix_dim, minColC, minRowC, alpha) private(ty, tx, k, c, Asub, Bsub, Csub, tmp_indexC) \
+                        schedule(static)
+                            for (ty = 0; ty < BLOCK_SIZE; ty++) {
+                                for (tx = 0; tx < BLOCK_SIZE; tx++) {
+                                    Csub = 0.0;
+                                    for (k = 0; k < BLOCK_SIZE; ++k) {
+                                        Asub = As[ty][k ];
+                                        Bsub = Bs[k ][tx];
+                                        Csub += Asub * Bsub;
+                                    }
+                                    c = dim * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+                                    tmp_indexC = c + dim * ty + tx + minColC + minRowC * dim;
+                                    C[tmp_indexC] += (double) alpha * Csub;
+                                    printf("C[%d] = %lf\n", tmp_indexC, C[tmp_indexC]);
+                                }// for tx
+                            }// for ty
+            }// for subsubgrids
         }// for bx
     }// for by
 
