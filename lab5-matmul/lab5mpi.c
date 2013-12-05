@@ -9,8 +9,8 @@
 #include "mpi.h"
 
 #define MAXTHREADS 64
-#define BLOCK_SIZE 8
-#define N 8 // = DIM / BLOCK_SIZE
+#define BLOCK_SIZE 64
+#define N 32 // = DIM / BLOCK_SIZE
 #define HA N * BLOCK_SIZE // height matrix A
 #define WA N * BLOCK_SIZE // width matrix A
 #define HB N * BLOCK_SIZE // height matrix B
@@ -122,7 +122,7 @@ int main (int argc, char** argv)
             for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
                 minRow = steps * (rank / sqrtNumtasks);
                 minCol = steps * (rank % sqrtNumtasks);
-                printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
+                // printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
                 multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
                          minRow, minCol, dim, numtasks, alpha, beta, nthreads);
             }
@@ -159,10 +159,10 @@ int main (int argc, char** argv)
         // statistics
         bytes = (double)x_max * (double)y_max * (double)4 * (double)sizeof(double);
         flops = (double)x_max * (double)y_max * (double)x_max * 2;
-        // printf("chunk: %d\t", i);
-        // printf("rank: %2d, Total time: %lf, Comm time: %lf, CPU time: %lf", rank, t_delta * 1.0e-9, t_delta_comm * 1.0e-9, t_delta_cpu * 1.0e-9); 
-        // printf(", gflops: %lf", flops / t_delta);
-        // printf(", bandwidth: %lf\n", bytes/t_delta);
+        printf("chunk: %d\t", i);
+        printf("rank: %2d, Total time: %lf, Comm time: %lf, CPU time: %lf", rank, t_delta * 1.0e-9, t_delta_comm * 1.0e-9, t_delta_cpu * 1.0e-9); 
+        printf(", gflops: %lf", flops / t_delta);
+        printf(", bandwidth: %lf\n", bytes/t_delta);
 
         if (rank == 0) {
             for (i = 0; i < y_max; i++) { // alpha * AB
@@ -255,7 +255,7 @@ void multiply(double* A, double* B, double* localC,
     int wA_grid = WA / (BLOCK_SIZE * sqrtNumberOfProcessors);
     int wB_grid = WB / (BLOCK_SIZE * sqrtNumberOfProcessors);
 
-    printf("dim = %d, minRowA = %d, minColA = %d, minRowB = %d, minColB = %d, minRowC = %d, minColC = %d;\n", dim, minRowA, minColA, minRowB, minColB, minRowC, minColC);
+    // printf("dim = %d, minRowA = %d, minColA = %d, minRowB = %d, minColB = %d, minRowC = %d, minColC = %d;\n", dim, minRowA, minColA, minRowB, minColB, minRowC, minColC);
     matrixMul_block_par (localC, A, B, alpha, numberOfProcessors, dim, minRowA, minColA, minRowB, minColB, minRowC, minColC, nthreads);
 }
 
@@ -310,8 +310,8 @@ void matrixMul_block_par (double* C, double* A, double* B, double alpha, int num
                                 for (tx = 0; tx < BLOCK_SIZE; tx++) {
                                     tmp_indexA = i * BLOCK_SIZE + by * BLOCK_SIZE * dim + dim * ty + tx + minColA + minRowA * dim;
                                     tmp_indexB = i * BLOCK_SIZE * dim + bx * BLOCK_SIZE + dim * ty + tx + minColB + minRowB * dim;
-                                    printf("As[%d][%d] = A[%d] = %lf\n", ty, tx, tmp_indexA, A[tmp_indexA]);
-                                    printf("Bs[%d][%d] = B[%d] = %lf\n", ty, tx, tmp_indexB, B[tmp_indexB]);
+                                    // printf("As[%d][%d] = A[%d] = %lf\n", ty, tx, tmp_indexA, A[tmp_indexA]);
+                                    // printf("Bs[%d][%d] = B[%d] = %lf\n", ty, tx, tmp_indexB, B[tmp_indexB]);
                                     As[ty][tx] = A[tmp_indexA];
                                     Bs[ty][tx] = B[tmp_indexB];
                                 }// for tx
@@ -332,7 +332,7 @@ void matrixMul_block_par (double* C, double* A, double* B, double alpha, int num
                                     c = dim * BLOCK_SIZE * by + BLOCK_SIZE * bx;
                                     tmp_indexC = c + dim * ty + tx + minColC + minRowC * dim;
                                     C[tmp_indexC] += (double) alpha * Csub;
-                                    printf("C[%d] = %lf\n", tmp_indexC, C[tmp_indexC]);
+                                    // printf("C[%d] = %lf\n", tmp_indexC, C[tmp_indexC]);
                                 }// for tx
                             }// for ty
             }// for subsubgrids
