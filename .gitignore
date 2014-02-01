@@ -3,6 +3,7 @@
 *.bak
 *.out
 *.o
+*.DS_Store
 output*.dat
 lab5-matmul/A.txt
 lab5-matmul/originalA.txt
