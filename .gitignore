@@ -6,7 +6,8 @@
 *.DS_Store
 *.aux
 *.log
-output*.dat
+*.dat
+PI*
 lab5-matmul/A.txt
 lab5-matmul/originalA.txt
 lab5-matmul/B.txt
