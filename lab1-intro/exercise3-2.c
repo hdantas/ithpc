@@ -7,8 +7,8 @@ int np, rank;
 int main(int argc, char **argv)
 {
   int dest;
-  float f = 1.0;
-  float g = 0.0;
+  float f;
+  float g;
   MPI_Status status;
 
   MPI_Init(&argc, &argv);
@@ -22,7 +22,6 @@ int main(int argc, char **argv)
   }
   
   MPI_Bcast(&f, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
-  f = pow(f, rank);
   MPI_Reduce(&f, &g, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
 
   if (rank == 0) {

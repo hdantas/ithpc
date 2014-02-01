@@ -6,7 +6,7 @@ int np, rank;
 int main(int argc, char **argv)
 {
   int dest;
-  float f = 1.0;
+  float f = 4.2;
   MPI_Status status;
 
   MPI_Init(&argc, &argv);

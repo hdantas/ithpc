@@ -6,7 +6,7 @@
 #include "mpi.h"
 
 // #define N 128
-#define N 8388608
+#define N 65536
 #define ORIGINAL_VERSION 0
 #define MODIFIED_VERSION 1
 
@@ -159,7 +159,6 @@ int main(int argc, char **argv)
 
   do_work(ORIGINAL_VERSION);
   do_work(MODIFIED_VERSION);
- 
   MPI_Finalize();
   return 0;
 }

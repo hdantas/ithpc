@@ -1,6 +1,7 @@
 /***
 * template33.c
 ***/
+
 #include <stdio.h>
 #include <math.h>
 #include "mpi.h"

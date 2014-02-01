@@ -329,7 +329,7 @@ void matrixMul_block_par (double* C, double* A, double* B, double alpha, int num
                                     }
                                     c = dim * BLOCK_SIZE * by + BLOCK_SIZE * bx;
                                     tmp_indexC = c + dim * ty + tx + minColC + minRowC * dim;
-                                    C[tmp_indexC] += alpha * Csub;
+                                    C[tmp_indexC] += (double) alpha * Csub;
                                     // printf("C[%d] = %lf\n", tmp_indexC, C[tmp_indexC]);
                                 }// for tx
                             }// for ty

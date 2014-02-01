@@ -6,7 +6,7 @@ int np, rank;
 int main(int argc, char **argv)
 {
   int source;
-  float f = 1.0;
+  float f = 4.2;
   MPI_Status status;
 
   MPI_Init(&argc, &argv);
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
       printf("%f from node %i\n", f, source);
     }
   } else {
-    f += 2;
+    f = f * rank;
     MPI_Send(&f, 1, MPI_FLOAT, 0, 42, MPI_COMM_WORLD);
   }
   
