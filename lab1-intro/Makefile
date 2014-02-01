@@ -1,6 +1,6 @@
 all: run_ex2-2
 
-compile: helloworld.c
+compile_hw: helloworld.c
 	mpicc -o helloworld.out helloworld.c
 
 compile_ex2-2: exercise2-2.c
@@ -21,7 +21,7 @@ compile_ex3-3: exercise3-3.c
 compile_ex4-1: exercise4-1.c
 	mpicc -o exercise4-1.out exercise4-1.c -lm
 
-run: compile
+run_hw: compile_hw
 	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/helloworld.out 2
 
 run_ex2-2: compile_ex2-2
