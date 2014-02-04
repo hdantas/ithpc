@@ -29,7 +29,7 @@ MPI_Datatype border_type[2];
 /* benchmark related variables */
 clock_t ticks;      /* number of systemticks */
 int timer_on = 0;   /* is timer running? */
-double wtime;                   /* wallclock time */
+double wtime;       /* wallclock time */
 
 /* local grid related variables */
 double **phi;     /* grid */
@@ -208,7 +208,6 @@ void Setup_Grid()
         source[x][y] = 1;
       }
     }
-
   } while (s == 3);
 
   if (proc_rank == 0) /* only process 0 may close the file */
