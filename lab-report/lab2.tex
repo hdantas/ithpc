@@ -1,1 +1,123 @@
-\section{Lab 2: Poisson}
+\section{Lab 2: Poisson's equation}
+
+% One can thus implement the different schemes like red-black Gauss-Seidel iteration. This leads to
+% a parallel program. However, there are numerous questions or problems that are worth to investigate.
+% For instance, is it worth to make more than 1 iteration in each domain between two communication
+% steps? The convergence of the algorithm will be slower if measured in the number of iteration steps,
+% but if measured in real time it may or may not be advantageous. How much data should one transfer
+% in a communication step? Just the data along the border, or maybe more layers at once? What is
+% the best way to partition the grid points in to domains? Should these domains be as close to a square
+% as possible, horizontal strips or vertical strips? How does the performance scale with problem size, or
+% with increasing number of processes?
+
+\subsection{Part 1}
+\subsubsection{Step 1}
+
+It is simple to understand that the program was indeed executed twice since two pairs of statements are written to the terminal in comparison to one pair before the modifications. Since we are now running the same program in two different nodes this behavior is expected.  
+
+The result is the following
+\begin{lstlisting}
+    Number of iterations  : 2355
+    Elapsed processortime : 1.350000 s
+    Number of iterations  : 2355
+    Elapsed processortime : 1.360000 s
+\end{lstlisting}
+
+\subsubsection{Step 2}
+
+After adding the global variable and the necessary call to \texttt{MPI\_Comm\_rank} using the predefined communicator \texttt{MPI\_COMM\_WORLD}.
+\begin{lstlisting}
+    MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
+\end{lstlisting}
+
+The following is printed to the standard output:
+\begin{lstlisting}
+    (1)     Number of iterations  : 2355
+    (1)     Elapsed processortime : 1.360000 s
+    (0)     Number of iterations  : 2355
+    (0)     Elapsed processortime : 1.360000 s
+\end{lstlisting}
+
+\subsubsection{Step 3}
+
+After rewriting the timing functions mentioned in the exercise description, the new output is as follows:
+\begin{lstlisting}
+    (1)     Number of iterations : 2355
+    (1)     Elapsed Wtime        : 1.468750 s ( 94.0% CPU)
+    (0)     Number of iterations : 2355
+    (0)     Elapsed Wtime        : 1.410156 s ( 97.2% CPU)
+\end{lstlisting}
+
+\subsubsection{Step 4}
+
+Adjusting the code so each process writes to a separate file does not affect the text displayed, so there is no need to repeat it here. In addition by executing the command
+
+\begin{lstlisting}
+    diff output0.dat output1.dat
+\end{lstlisting}
+
+I was able to confirm the files are indeed identical.
+
+\subsubsection{Step 5}
+
+On this step, responsible to ensure correct distribution of information originated from an input file, several statements had to be rewritten. Below is a summary of those changes, in particular the parts that were not completely specified in the exercise manual.
+
+To ensure only process 0 opens the file a simple comparison suffices
+\begin{lstlisting}
+    /* only process 0 may execute this if */
+    if (proc_rank == 0)
+    { ... }
+\end{lstlisting}
+
+To broadcast the data read from the file it is first necessary to explain which fields the \texttt{MPI\_Bcast(void *buffer, int count, MPI\_Datatype datatype, int root, MPI\_Comm comm))} function requires. 
+
+For our situation the \texttt{buffer} pointer should refer to the address of the variable we want to broadcast. The \texttt{count} relates to the number of entries in the buffer. The \texttt{datatype} should describe the type of data the buffer points to, \eg for integers this should be \texttt{MPI\_INT}. The \texttt{root} is the message broadcaster, in our case node 0. Finally we will use the usual predefined communicator for the last argument \texttt{comm}.
+
+Thus the broadcast calls are as follows
+\begin{lstlisting}
+    /* broadcast the array gridsize in one call */
+    MPI_Bcast(&gridsize      , 2, MPI_INT   , 0, MPI_COMM_WORLD);
+    /* broadcast precision_goal */
+    MPI_Bcast(&precision_goal, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    /* broadcast max_iter */  
+    MPI_Bcast(&max_iter      , 1, MPI_INT   , 0, MPI_COMM_WORLD);
+(...)
+    /* The return value of this scan is broadcast even though it is no input data */
+    MPI_Bcast(&s, 1, MPI_INT, 0, MPI_COMM_WORLD);
+(...)
+    /* broadcast source_x */
+    MPI_Bcast(&source_x  , 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    /* broadcast source_y */
+    MPI_Bcast(&source_y  , 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    /* broadcast source_val */
+    MPI_Bcast(&source_val, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+\end{lstlisting}
+
+\subsubsection{Step 6}
+
+Following the same approach as in the previous section, only the finished version of incomplete code from the manual will be shown in the excerpt.
+\begin{lstlisting}
+    MPI_Comm_size(MPI_COMM_WORLD, &P);
+    (...)
+    MPI_Cart_create(MPI_COMM_WORLD, 2, P_grid, wrap_around, reorder, &grid_comm);
+    (...)
+    /* Rank of process in new communicator */
+    MPI_Comm_rank(grid_comm, &proc_rank);
+    /* Coordinates of process in new communicator */
+    MPI_Cart_coords(grid_comm, proc_rank, 2, proc_coord);
+    (...)
+    /* rank of processes proc_top and proc_bottom */
+    MPI_Cart_shift(grid_comm, Y_DIR, 1, &proc_top, &proc_bottom);
+    /* rank of processes proc_left and proc_right */
+    MPI_Cart_shift(grid_comm, X_DIR, 1, &proc_left, &proc_right);
+\end{lstlisting}
+
+There a couple new function calls on this code whose arguments I will explain next.
+
+\texttt{int MPI\_Cart\_create(MPI\_Comm comm\_old, int ndims, int *dims, int *periods, int reorder, MPI\_Comm *comm\_cart)}
+
+\texttt{int MPI\_Cart\_coords(MPI\_Comm comm, int rank, int maxdims, int *coords)}
+
+\texttt{int MPI\_Cart\_shift(MPI\_Comm comm, int direction, int displ, int *source, int *dest)}
+
+\subsection{Part 2}
