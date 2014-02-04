@@ -113,11 +113,21 @@ Following the same approach as in the previous section, only the finished versio
 \end{lstlisting}
 
 There a couple new function calls on this code whose arguments I will explain next.
+As explained in the exercise description MPI uses the \texttt{MPI\_Cart\_*} function calls to arrange tasks in a virtual process grid.
 
-\texttt{int MPI\_Cart\_create(MPI\_Comm comm\_old, int ndims, int *dims, int *periods, int reorder, MPI\_Comm *comm\_cart)}
+To create one the API calls needs the previous communicator, in our case we were using \texttt{MPI\_COMM\_WORLD}. \texttt{ndims} and \texttt{dims} define the number of dimensions of the grid and the number of processors in each, respectively. For our example these are 2 and \texttt{P\_grid}. Thereafter the periods specifies if the grid is periodic or not per dimension, and finally if the ranking is reordered or not. These are replaced by the self-explanatory variables \texttt{wrap\_around} and \texttt{reorder}. The new communicator is stored in the address of \texttt{comm\_cart}. From now on all pointers to communicators refer to this one.
 
-\texttt{int MPI\_Cart\_coords(MPI\_Comm comm, int rank, int maxdims, int *coords)}
+\begin{lstlisting}
+int MPI_Cart_create(MPI_Comm comm_old, int ndims, int *dims, int *periods, int reorder, MPI_Comm *comm_cart)
+int MPI_Cart_coords(MPI_Comm comm, int rank, int maxdims, int *coords)
+int MPI_Cart_shift(MPI_Comm comm, int direction, int displ, int *source, int *dest)
+\end{lstlisting}
 
-\texttt{int MPI\_Cart\_shift(MPI\_Comm comm, int direction, int displ, int *source, int *dest)}
+To define the coordinates of the process in the new communicator we use \texttt{MPI\_Cart\_coords}. Here the rank is necessarily the processor rank (\texttt{proc\_rank}), the maximum dimensions is 2. The coordinates of each specified process are stored in the \texttt{proc\_coord} array.
+
+Finally the shift operation returns the shifted source and destination ranks. The direction and displacement quantity arguments are self-evident and are replaced in the program by \texttt{X\_DIR} or \texttt{Y\_DIR} and 1 respectively for horizontal and vertical displacements. In accordance to the outputs source and destination are stored in \texttt{proc\_top} and \texttt{proc\_bottom} or \texttt{proc\_left} and \texttt{proc\_right} depending on the direction. 
+
+\subsubsection{Step 7}
+
 
 \subsection{Part 2}
