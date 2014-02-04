@@ -310,7 +310,7 @@ void Setup_Proc_Grid(int argc, char **argv)
       Debug("ERROR : Proces grid dimensions do not match with P", 1);
   }
   else
-    Debug("ERROR : Wrong parameterinput", 1);
+    Debug("ERROR : Wrong parameter input", 1);
 
   /* Create process topology (2D grid) */
   wrap_around[X_DIR] = 0;
