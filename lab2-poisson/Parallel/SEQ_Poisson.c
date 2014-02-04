@@ -227,6 +227,8 @@ void Clean_Up()
 
 int main(int argc, char **argv)
 {
+  MPI_Init(&argc, &argv);
+
   start_timer();
 
   Setup_Grid();
@@ -239,5 +241,6 @@ int main(int argc, char **argv)
 
   Clean_Up();
 
+  MPI_Finalize();
   return 0;
 }
