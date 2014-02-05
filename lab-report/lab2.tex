@@ -127,7 +127,55 @@ To define the coordinates of the process in the new communicator we use \texttt{
 
 Finally the shift operation returns the shifted source and destination ranks. The direction and displacement quantity arguments are self-evident and are replaced in the program by \texttt{X\_DIR} or \texttt{Y\_DIR} and 1 respectively for horizontal and vertical displacements. In accordance to the outputs source and destination are stored in \texttt{proc\_top} and \texttt{proc\_bottom} or \texttt{proc\_left} and \texttt{proc\_right} depending on the direction. 
 
+
+The text written to the standard output now features the coordinate of each processor.
+
+\begin{lstlisting}
+(1) (x,y)=(1,0)
+(1)	Number of iterations : 2355
+(1) Elapsed Wtime:       1.464844 s ( 95.6% CPU)
+(0) (x,y)=(0,0)
+(0)	Number of iterations : 2355
+(0) Elapsed Wtime:       1.414062 s ( 96.9% CPU)
+\end{lstlisting}
+
+As one can observe since there are two processor, number 0 is allocated the left half of the grid, and processor with rank 1 deals with the right half.
+
 \subsubsection{Step 7}
+After adjusting the \texttt{Setup\_Grid()} function as described the following results were obtained for three different setups. The first has two processors, the second three and the third four. The results can be seen below.
+
+\begin{lstlisting}
+(1) (x,y)=(1,0)
+(1)	Number of iterations : 945
+(1) Elapsed Wtime:       0.347656 s ( 83.4% CPU)
+(0) (x,y)=(0,0)
+(0)	Number of iterations : 1195
+(0) Elapsed Wtime:       0.394531 s ( 86.2% CPU)
+
+(1) (x,y)=(1,0)
+(1)	Number of iterations : 695
+(1) Elapsed Wtime:       0.214844 s ( 79.1% CPU)
+(2) (x,y)=(2,0)
+(2)	Number of iterations : 1
+(2) Elapsed Wtime:       0.046875 s (106.7% CPU)
+(0) (x,y)=(0,0)
+(0)	Number of iterations : 1
+(0) Elapsed Wtime:       0.007812 s (  0.0% CPU)
+
+(2) (x,y)=(1,0)
+(2)	Number of iterations : 1
+(2) Elapsed Wtime:       0.058594 s ( 68.3% CPU)
+(1) (x,y)=(0,1)
+(1)	Number of iterations : 792
+(1) Elapsed Wtime:       0.160156 s ( 99.9% CPU)
+(3) (x,y)=(1,1)
+(3)	Number of iterations : 791
+(3) Elapsed Wtime:       0.164062 s ( 97.5% CPU)
+(0) (x,y)=(0,0)
+(0)	Number of iterations : 791
+(0) Elapsed Wtime:       0.128906 s ( 85.3% CPU)
+\end{lstlisting}
+
 
 
 \subsection{Part 2}
