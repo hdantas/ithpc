@@ -9,7 +9,7 @@
 #include <time.h>
 #include "mpi.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define max(a,b) ((a)>(b)?a:b)
 
@@ -44,6 +44,7 @@ int P_grid[2];                  /* processgrid dimensions */
 MPI_Comm grid_comm;             /* grid COMMUNICATOR */
 MPI_Status status;
 
+int offset[2];
 
 void Setup_Grid();
 double Do_Step(int parity);
@@ -111,6 +112,7 @@ void Debug(char *mesg, int terminate)
 void Setup_Grid()
 {
   int x, y, s;
+  int upper_offset[2];
   double source_x, source_y, source_val;
   FILE *f;
 
@@ -132,9 +134,19 @@ void Setup_Grid()
   MPI_Bcast(&max_iter, 1, MPI_INT, 0, grid_comm); /* broadcast max_iter */  
 
 
-  /* Calculate dimensions of local subgrid */
-  dim[X_DIR] = gridsize[X_DIR] + 2;
-  dim[Y_DIR] = gridsize[Y_DIR] + 2;
+  /* Calculate top left corner coordinates of local grid */
+  offset[X_DIR] = gridsize[X_DIR] * proc_coord[X_DIR] / P_grid[X_DIR];
+  offset[Y_DIR] = gridsize[Y_DIR] * proc_coord[Y_DIR] / P_grid[Y_DIR];
+  upper_offset[X_DIR] = gridsize[X_DIR] * (proc_coord[X_DIR] + 1) / P_grid[X_DIR];
+  upper_offset[Y_DIR] = gridsize[Y_DIR] * (proc_coord[Y_DIR] + 1) / P_grid[Y_DIR];
+
+  /* Calculate dimensions of local grid */
+  dim[Y_DIR] = upper_offset[Y_DIR] - offset[Y_DIR];
+  dim[X_DIR] = upper_offset[X_DIR] - offset[X_DIR];
+
+  /* Add space for rows/columns of neighboring grid */
+  dim[Y_DIR] += 2;
+  dim[X_DIR] += 2;
 
   /* allocate memory */
   if ((phi = malloc(dim[X_DIR] * sizeof(*phi))) == NULL)
@@ -177,8 +189,13 @@ void Setup_Grid()
       x += 1;
       y += 1;
 
-      phi[x][y] = source_val;
-      source[x][y] = 1;
+      x = x - offset[X_DIR];
+      y = y - offset[Y_DIR];
+      if ( x > 0 && x < dim[X_DIR] -1 && y > 0 && y < dim[Y_DIR] - 1)
+      { /* indices in domain of this process */
+        phi[x][y] = source_val;
+        source[x][y] = 1;
+      }
     }
   } while (s == 3);
 
