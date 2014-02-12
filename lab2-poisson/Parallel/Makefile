@@ -1,13 +1,13 @@
 all: run-par
 
 seq: SEQ_Poisson.c
-	mpicc -o $@.out $^ -lm -Wall
+	gcc -o $@.out $^
 
 par: MPI_Poisson.c
 	mpicc -o $@.out $^ -lm -Wall
 
 run-seq: seq
-	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script ./$^.out 2 2 1
+	./$^.out
 	
 run-par: par
 	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script ./$^.out 2 2 1
