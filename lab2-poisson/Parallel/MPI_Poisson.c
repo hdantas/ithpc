@@ -22,22 +22,19 @@ enum
 int gridsize[2];
 double precision_goal;    /* precision_goal of solution */
 int max_iter;     /* maximum number of iterations alowed */
-int offset[2];
 double global_delta;
 MPI_Datatype border_type[2];
 
 /* benchmark related variables */
 clock_t ticks;      /* number of systemticks */
 int timer_on = 0;   /* is timer running? */
-double wtime;       /* wallclock time */
 
 /* local grid related variables */
-double **phi;     /* grid */
-int **source;     /* TRUE if subgrid element is a source */
+double **phi;   /* grid */
+int **source;   /* TRUE if subgrid element is a source */
 int dim[2];     /* grid dimensions */
 
-/* MPI related variables*/
-// int np;
+double wtime; /* wallclock time */
 
 /* process specific variables */
 int proc_rank;                  /* rank of current process */
@@ -49,6 +46,7 @@ int P_grid[2];                  /* processgrid dimensions */
 MPI_Comm grid_comm;             /* grid COMMUNICATOR */
 MPI_Status status;
 
+int offset[2];
 
 void Setup_Grid();
 void Setup_Proc_Grid(int argc, char **argv);
@@ -101,19 +99,18 @@ void print_timer()
   if (timer_on)
   {
     stop_timer();
-    printf("(%i) Elapsed Wtime: %14.6f s (%5.1f%% CPU)\n", proc_rank, wtime, 100.0 * ticks * (1.0 / 
-CLOCKS_PER_SEC) / wtime);
+    printf("(%i) Elapsed Wtime: %14.6f s (%5.1f%% CPU)\n", proc_rank, wtime, 100.0 * ticks * (1.0 / CLOCKS_PER_SEC) / wtime);
     resume_timer();    
   }
   else
-    printf("(%i) Elapsed Wtime: %14.6f s (%5.1f%% CPU)\n", proc_rank, wtime, 100.0 * ticks * (1.0 / 
-CLOCKS_PER_SEC) / wtime);
+    printf("(%i) Elapsed Wtime: %14.6f s (%5.1f%% CPU)\n", proc_rank, wtime, 100.0 * ticks * (1.0 / CLOCKS_PER_SEC) / wtime);
 }
+
 
 void Debug(char *mesg, int terminate)
 {
   if (DEBUG || terminate)
-    printf("%s\n", mesg);
+    printf("(%i)\t%s\n", proc_rank, mesg);
   if (terminate)
     exit(1);
 }
@@ -132,7 +129,6 @@ void Setup_Grid()
     f = fopen("input.dat", "r");
     if (f == NULL)
       Debug("Error opening input.dat", 1);
-    
     fscanf(f, "nx: %i\n", &gridsize[X_DIR]);
     fscanf(f, "ny: %i\n", &gridsize[Y_DIR]);
     fscanf(f, "precision goal: %lf\n", &precision_goal);
@@ -142,6 +138,10 @@ void Setup_Grid()
   MPI_Bcast(&gridsize, 2, MPI_INT, 0, grid_comm); /* broadcast the array gridsize in one call */
   MPI_Bcast(&precision_goal, 1, MPI_DOUBLE, 0, grid_comm); /* broadcast precision_goal */
   MPI_Bcast(&max_iter, 1, MPI_INT, 0, grid_comm); /* broadcast max_iter */  
+  if (DEBUG) {
+    printf("(%d) gridsize[X_DIR] = %d\tgridsize[Y_DIR] = %d\n", proc_rank, gridsize[X_DIR], gridsize[Y_DIR]);
+    printf("(%d) precision_goal = %lf\tmax_iter = %d\n", proc_rank, precision_goal, max_iter);
+  }
 
 
   /* Calculate top left corner coordinates of local grid */
@@ -157,6 +157,9 @@ void Setup_Grid()
   /* Add space for rows/columns of neighboring grid */
   dim[Y_DIR] += 2;
   dim[X_DIR] += 2;
+  
+  if (DEBUG)
+    printf("(%d) dim[X_DIR] = %d\tdim[Y_DIR] = %d\n", proc_rank, dim[X_DIR], dim[Y_DIR]);
 
 
   /* allocate memory */
@@ -191,9 +194,11 @@ void Setup_Grid()
     
     if (s == 3)
     {
-      MPI_Bcast(&source_x, 1, MPI_DOUBLE, 0, grid_comm); /* broadcast source_x */
-      MPI_Bcast(&source_y, 1, MPI_DOUBLE, 0, grid_comm); /* broadcast source_y */
+      MPI_Bcast(&source_x  , 1, MPI_DOUBLE, 0, grid_comm); /* broadcast source_x */
+      MPI_Bcast(&source_y  , 1, MPI_DOUBLE, 0, grid_comm); /* broadcast source_y */
       MPI_Bcast(&source_val, 1, MPI_DOUBLE, 0, grid_comm); /* broadcast source_val */
+      if (DEBUG)
+        printf("(%d) source_x = %1.2lf, source_y = %1.2lf, source_val = %1.2lf\n", proc_rank, source_x, source_y, source_val);
 
       x = gridsize[X_DIR] * source_x;
       y = gridsize[Y_DIR] * source_y;
@@ -202,6 +207,12 @@ void Setup_Grid()
 
       x = x - offset[X_DIR];
       y = y - offset[Y_DIR];
+
+      if (DEBUG) {
+        printf("(%d) x = %d, dim[X_DIR] = %d\n", proc_rank, x, dim[X_DIR]);
+        printf("(%d) y = %d, dim[Y_DIR] = %d\n", proc_rank, y, dim[Y_DIR]);
+      }
+
       if ( x > 0 && x < dim[X_DIR] -1 && y > 0 && y < dim[Y_DIR] - 1)
       { /* indices in domain of this process */
         phi[x][y] = source_val;
@@ -223,7 +234,8 @@ double Do_Step(int parity)
   /* calculate interior of grid */
   for (x = 1; x < dim[X_DIR] - 1; x++)
     for (y = 1; y < dim[Y_DIR] - 1; y++)
-      if ((x + y) % 2 == parity && source[x][y] != 1)
+      /* use global coordinates for parity */
+      if ((x + offset[X_DIR] + y + offset[Y_DIR]) % 2 == parity && source[x][y] != 1)
       {
         old_phi = phi[x][y];
         phi[x][y] = (phi[x + 1][y] + phi[x - 1][y] + phi[x][y + 1] + phi[x][y - 1]) * 0.25;
@@ -245,21 +257,27 @@ void Solve()
 
   /* give global_delta a higher value then precision_goal */
   global_delta = 2 * precision_goal;
-  MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
 
   while (global_delta > precision_goal && count < max_iter)
   {
-    Debug("Do_Step 0", 0);
+    // Debug("Do_Step 0", 0);
     delta1 = Do_Step(0);
+    Exchange_Borders();
 
-    Debug("Do_Step 1", 0);
+    // Debug("Do_Step 1", 0);
     delta2 = Do_Step(1);
+    Exchange_Borders();
 
     delta = max(delta1, delta2);
+    MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
+    
+    if (DEBUG)
+      printf("delta = %lf\tglobal_delta = %lf\n", delta, global_delta);
+    
     count++;
   }
-
-  printf("Processor %i\tNumber of iterations : %i\n", proc_rank, count);
+  if (DEBUG)
+    printf("(%i)\tNumber of iterations : %i\n", proc_rank, count);
 }
 
 void Write_Grid()
@@ -267,6 +285,7 @@ void Write_Grid()
   int x, y;
   FILE *f;
   char filename[40];
+
   sprintf(filename, "output%i.dat", proc_rank);
 
   if ((f = fopen(filename, "w")) == NULL)
@@ -276,7 +295,7 @@ void Write_Grid()
 
   for (x = 1; x < dim[X_DIR] - 1; x++)
     for (y = 1; y < dim[Y_DIR] - 1; y++)
-      fprintf(f, "%i %i %f\n", x, y, phi[x][y]);
+      fprintf(f, "%i %i %f\n", x + offset[X_DIR], y + offset[Y_DIR], phi[x][y]);
 
   fclose(f);
 }
@@ -322,13 +341,12 @@ void Setup_Proc_Grid(int argc, char **argv)
   MPI_Comm_rank(grid_comm, &proc_rank); /* Rank of process in new communicator */
   MPI_Cart_coords(grid_comm, proc_rank, 2, proc_coord); /* Coordinates of process in new communicator */
 
-  printf("(%i) (x,y)=(%i,%i)\n", proc_rank, proc_coord[X_DIR], proc_coord[Y_DIR]);
+  if (DEBUG)
+    printf("(%i) (x,y)=(%i,%i)\n", proc_rank, proc_coord[X_DIR], proc_coord[Y_DIR]);
 
   /* calculate ranks of neighbouring processes */
-  MPI_Cart_shift(grid_comm, Y_DIR, 1, &proc_top, &proc_bottom); /* rank of processes proc_top and 
-proc_bottom */
-  MPI_Cart_shift(grid_comm, X_DIR, 1, &proc_left, &proc_right); /* rank of processes proc_left and 
-proc_right */
+  MPI_Cart_shift(grid_comm, Y_DIR, 1, &proc_top, &proc_bottom); /* rank of processes proc_top and proc_bottom */
+  MPI_Cart_shift(grid_comm, X_DIR, 1, &proc_left, &proc_right); /* rank of processes proc_left and proc_right */
 
   if (DEBUG)
     printf("(%i) top %i, right %i, bottom %i, left %i\n", proc_rank, proc_top, proc_right, proc_bottom, 
@@ -358,7 +376,7 @@ void Exchange_Borders()
                 border_type[Y_DIR],     // sendtype  - type of elements in send buffer (handle)
                 proc_top,               // dest      - rank of destination (integer)
                 0,                      // sendtag   - send tag (integer)
-                &phi[1][offset[Y_DIR]], // recvbuf   - initial address of receive buffer (choice)
+                &phi[1][dim[Y_DIR] - 1],             // recvbuf   - initial address of receive buffer (choice)
                 1,                      // recvcount - number of elements in receive buffer (integer)
                 border_type[Y_DIR],     // recvtype  - type of elements in receive buffer (handle)
                 proc_bottom,            // source    - rank of source (integer)
@@ -367,7 +385,7 @@ void Exchange_Borders()
                 &status);               // status    - status object (Status).  This refers to the receive operation.
 
   // all traffic in direction "bottom"
-  MPI_Sendrecv( &phi[1][offset[Y_DIR]], // sendbuf   - initial address of send buffer (choice)
+  MPI_Sendrecv( &phi[1][dim[Y_DIR] - 1],    // sendbuf   - initial address of send buffer (choice)
                 1,                      // sendcount - number of elements in send buffer (integer)
                 border_type[Y_DIR],     // sendtype  - type of elements in send buffer (handle)
                 proc_bottom,            // dest      - rank of destination (integer)
@@ -386,7 +404,7 @@ void Exchange_Borders()
                 border_type[X_DIR],     // sendtype  - type of elements in send buffer (handle)
                 proc_left,              // dest      - rank of destination (integer)
                 0,                      // sendtag   - send tag (integer)
-                &phi[offset[X_DIR]][1], // recvbuf   - initial address of receive buffer (choice)
+                &phi[dim[X_DIR] - 1][1],    // recvbuf   - initial address of receive buffer (choice)
                 1,                      // recvcount - number of elements in receive buffer (integer)
                 border_type[X_DIR],     // recvtype  - type of elements in receive buffer (handle)
                 proc_right,             // source    - rank of source (integer)
@@ -395,8 +413,7 @@ void Exchange_Borders()
                 &status);               // status    - status object (Status).  This refers to the receive operation.
   
   // all traffic in direction "right"
-
-  MPI_Sendrecv( &phi[1][offset[X_DIR]], // sendbuf   - initial address of send buffer (choice)
+  MPI_Sendrecv( &phi[dim[X_DIR] - 1][1], // sendbuf   - initial address of send buffer (choice)
                 1,                      // sendcount - number of elements in send buffer (integer)
                 border_type[X_DIR],     // sendtype  - type of elements in send buffer (handle)
                 proc_right,             // dest      - rank of destination (integer)
@@ -414,9 +431,8 @@ void Exchange_Borders()
 
 int main(int argc, char **argv)
 {
-
   MPI_Init(&argc, &argv);
-
+   
   Setup_Proc_Grid(argc, argv);
 
   start_timer();
@@ -426,8 +442,6 @@ int main(int argc, char **argv)
   Setup_MPI_Datatypes();
 
   Solve();
-
-  Exchange_Borders();
 
   Write_Grid();
 
