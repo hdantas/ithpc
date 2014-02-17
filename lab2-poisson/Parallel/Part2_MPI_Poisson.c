@@ -10,7 +10,7 @@
 #include "mpi.h"
 
 #define DEBUG 0
-#define OMEGA 1.95
+#define OMEGA 1.91
 
 #define max(a,b) ((a)>(b)?a:b)
 
@@ -139,8 +139,11 @@ void Setup_Grid()
   MPI_Bcast(&gridsize, 2, MPI_INT, 0, grid_comm); /* broadcast the array gridsize in one call */
   MPI_Bcast(&precision_goal, 1, MPI_DOUBLE, 0, grid_comm); /* broadcast precision_goal */
   MPI_Bcast(&max_iter, 1, MPI_INT, 0, grid_comm); /* broadcast max_iter */  
+  
+  if (proc_rank == 0)
+    printf("g: Grid Size = %d x %d\n", gridsize[X_DIR], gridsize[Y_DIR]);
+  
   if (DEBUG) {
-    printf("(%d) gridsize[X_DIR] = %d\tgridsize[Y_DIR] = %d\n", proc_rank, gridsize[X_DIR], gridsize[Y_DIR]);
     printf("(%d) precision_goal = %lf\tmax_iter = %d\n", proc_rank, precision_goal, max_iter);
   }
 
@@ -278,8 +281,8 @@ void Solve()
     
     count++;
   }
-  if (DEBUG)
-    printf("(%i)\tNumber of iterations : %i\n", proc_rank, count);
+  
+  printf("(%i) n: Number of iterations : %i\n", proc_rank, count);
 }
 
 void Write_Grid()
@@ -328,7 +331,7 @@ void Setup_Proc_Grid(int argc, char **argv)
     P_grid[X_DIR] = atoi(argv[1]);
     P_grid[Y_DIR] = atoi(argv[2]);
     if (P_grid[X_DIR] * P_grid[Y_DIR] != P)
-      Debug("ERROR : Proces grid dimensions do not match with P", 1);
+      Debug("ERROR : Process grid dimensions do not match with P", 1);
   }
   else
     Debug("ERROR : Wrong parameter input", 1);
@@ -342,6 +345,9 @@ void Setup_Proc_Grid(int argc, char **argv)
   /* Retrieve new rank and carthesian coordinates of this process */
   MPI_Comm_rank(grid_comm, &proc_rank); /* Rank of process in new communicator */
   MPI_Cart_coords(grid_comm, proc_rank, 2, proc_coord); /* Coordinates of process in new communicator */
+
+  if (proc_rank == 0)
+    printf("pt: Topology: %d %d %d\n", P, P_grid[X_DIR], P_grid[Y_DIR]);
 
   if (DEBUG)
     printf("(%i) (x,y)=(%i,%i)\n", proc_rank, proc_coord[X_DIR], proc_coord[Y_DIR]);
