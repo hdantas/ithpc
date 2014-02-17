@@ -32,20 +32,20 @@ After adding the global variable and the necessary call to \texttt{MPI\_Comm\_ra
 
 The following is printed to the standard output:
 \begin{lstlisting}
-    (1)     Number of iterations  : 2355
-    (1)     Elapsed processortime : 1.360000 s
-    (0)     Number of iterations  : 2355
     (0)     Elapsed processortime : 1.360000 s
+    (0)     Number of iterations  : 2355
+    (1)     Elapsed processortime : 1.360000 s
+    (1)     Number of iterations  : 2355
 \end{lstlisting}
 
 \subsubsection{Step 3}
 
 % After rewriting the timing functions mentioned in the exercise description, the new output is as follows:
 % \begin{lstlisting}
-%     (1)     Number of iterations : 2355
-%     (1)     Elapsed Wtime        : 1.468750 s ( 94.0% CPU)
-%     (0)     Number of iterations : 2355
 %     (0)     Elapsed Wtime        : 1.410156 s ( 97.2% CPU)
+%     (0)     Number of iterations : 2355
+%     (1)     Elapsed Wtime        : 1.468750 s ( 94.0% CPU)
+%     (1)     Number of iterations : 2355
 % \end{lstlisting}
 
 \subsubsection{Step 4}
@@ -131,12 +131,12 @@ Finally the shift operation returns the shifted source and destination ranks. Th
 The text written to the standard output now features the coordinate of each processor.
 
 \begin{lstlisting}
-(1) (x,y)=(1,0)
-(1)	Number of iterations : 2355
-(1) Elapsed Wtime:       1.464844 s ( 95.6% CPU)
-(0) (x,y)=(0,0)
-(0)	Number of iterations : 2355
-(0) Elapsed Wtime:       1.414062 s ( 96.9% CPU)
+    (0) Number of iterations : 2355
+    (0) (x,y)=(0,0)
+    (0) Elapsed Wtime:       1.414062 s ( 96.9% CPU)
+    (1) Number of iterations : 2355
+    (1) (x,y)=(1,0)
+    (1) Elapsed Wtime:       1.464844 s ( 95.6% CPU)
 \end{lstlisting}
 
 As one can observe since there are two processor, number 0 is allocated the left half of the grid, and processor with rank 1 deals with the right half.
@@ -145,35 +145,35 @@ As one can observe since there are two processor, number 0 is allocated the left
 % After adjusting the \texttt{Setup\_Grid()} function as described the following results were obtained for three different setups. The first has two processors, the second three and the third four. The results can be seen below.
 
 % \begin{lstlisting}
-% (1) (x,y)=(1,0)
-% (1)	Number of iterations : 945
-% (1) Elapsed Wtime:       0.347656 s ( 83.4% CPU)
-% (0) (x,y)=(0,0)
-% (0)	Number of iterations : 1195
-% (0) Elapsed Wtime:       0.394531 s ( 86.2% CPU)
+    % (0)   Number of iterations : 1195
+    % (0) (x,y)=(0,0)
+    % (0) Elapsed Wtime:       0.394531 s ( 86.2% CPU)
+    % (1)   Number of iterations : 945
+    % (1) (x,y)=(1,0)
+    % (1) Elapsed Wtime:       0.347656 s ( 83.4% CPU)
 
-% (1) (x,y)=(1,0)
-% (1)	Number of iterations : 695
-% (1) Elapsed Wtime:       0.214844 s ( 79.1% CPU)
-% (2) (x,y)=(2,0)
-% (2)	Number of iterations : 1
-% (2) Elapsed Wtime:       0.046875 s (106.7% CPU)
-% (0) (x,y)=(0,0)
-% (0)	Number of iterations : 1
-% (0) Elapsed Wtime:       0.007812 s (  0.0% CPU)
+    % (0)   Number of iterations : 1
+    % (0) (x,y)=(0,0)
+    % (0) Elapsed Wtime:       0.007812 s (  0.0% CPU)
+    % (1)   Number of iterations : 695
+    % (1) (x,y)=(1,0)
+    % (1) Elapsed Wtime:       0.214844 s ( 79.1% CPU)
+    % (2)   Number of iterations : 1
+    % (2) (x,y)=(2,0)
+    % (2) Elapsed Wtime:       0.046875 s (106.7% CPU)
 
-% (2) (x,y)=(1,0)
-% (2)	Number of iterations : 1
-% (2) Elapsed Wtime:       0.058594 s ( 68.3% CPU)
-% (1) (x,y)=(0,1)
-% (1)	Number of iterations : 792
-% (1) Elapsed Wtime:       0.160156 s ( 99.9% CPU)
-% (3) (x,y)=(1,1)
-% (3)	Number of iterations : 791
-% (3) Elapsed Wtime:       0.164062 s ( 97.5% CPU)
-% (0) (x,y)=(0,0)
-% (0)	Number of iterations : 791
-% (0) Elapsed Wtime:       0.128906 s ( 85.3% CPU)
+    % (0)   Number of iterations : 791
+    % (0) (x,y)=(0,0)
+    % (0) Elapsed Wtime:       0.128906 s ( 85.3% CPU)
+    % (1)   Number of iterations : 792
+    % (1) (x,y)=(0,1)
+    % (1) Elapsed Wtime:       0.160156 s ( 99.9% CPU)
+    % (2)   Number of iterations : 1
+    % (2) (x,y)=(1,0)
+    % (2) Elapsed Wtime:       0.058594 s ( 68.3% CPU)
+    % (3)   Number of iterations : 791
+    % (3) (x,y)=(1,1)
+    % (3) Elapsed Wtime:       0.164062 s ( 97.5% CPU)
 % \end{lstlisting}
 
 When there are three processors the work can not be evenly split between them. This can be confirmed by inspecting the \texttt{x} and \texttt{y} variables in the \texttt{Setup\_grid function}.
@@ -181,33 +181,99 @@ When there are three processors the work can not be evenly split between them. T
 For example for processor 2 (in a 3 processor configuration) it is visible that \texttt{x} is always negative.
 
 \begin{lstlisting}
-(2) x = -30, dim[X_DIR] = 36
-(2) y = 71, dim[Y_DIR] = 102
+    (2) x = -30, dim[X_DIR] = 36
+    (2) y =  71,  dim[Y_DIR] = 102
 
-(2) x = -3, dim[X_DIR] = 36
-(2) y = 76, dim[Y_DIR] = 102
+    (2) x = -3, dim[X_DIR] = 36
+    (2) y = 76, dim[Y_DIR] = 102
 
-(2) x = -28, dim[X_DIR] = 36
-(2) y = 26, dim[Y_DIR] = 102
+    (2) x = -28, dim[X_DIR] = 36
+    (2) y =  26, dim[Y_DIR] = 102
 \end{lstlisting}
 
 
 \subsubsection{Step 8}
 \subsubsection{Step 9}
 
-After implementing the collective reduction operation the total number of iterations is reduce, as confirmed by the program's output.
+After implementing the collective reduction operation the total number of iterations is indeed the same, as confirmed by the program's output.
 
 \begin{lstlisting}
-(0) Elapsed Wtime:       0.460938 s ( 88.9% CPU)
-(0) Number of iterations : 695
-(1) Elapsed Wtime:       0.460938 s ( 88.9% CPU)
-(1) Number of iterations : 695
-(2) Elapsed Wtime:       0.460938 s ( 88.9% CPU)
-(2) Number of iterations : 695
+    (0) Number of iterations : 2355
+    (0) Elapsed Wtime:       1.507812 s ( 96.2% CPU)
+    (1) Number of iterations : 2355
+    (1) Elapsed Wtime:       1.496094 s ( 97.6% CPU)
+    (2) Number of iterations : 2355
+    (2) Elapsed Wtime:       1.507812 s ( 96.8% CPU)
 \end{lstlisting}
+
 \subsubsection{Step 10}
 
 
 \subsection{Part 2}
 
+\subsubsection{2.1}
+\subsubsection{2.2}
 
+After changing the code to accommodate for the algorithmic improvement, 5 tests were performed to compare different values for the relaxation parameter $\omega$. The results are summarized in table~\ref{tbl:omega}.
+From this data we concluded that 1.93 is the optimal value for the relaxation parameter, accomplishing almost 18 times less iterations than the original with $\omega$ equal to one.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+ \toprule
+$\omega$ & Maximum \texttt{Wtime}\tablefootnote{The maximum time was computed over the four individual processor times for each $\omega$ value.} (\si{s}) & Iterations & Reduction\\ \midrule
+    1.00 &        1.500000 &        2355 &        1.00 \\    
+    1.90 &        0.222656 &        220  &        10.7 \\
+    1.92 &        0.199219 &        165  &        14.3 \\
+\bf 1.93 &    \bf 0.175781 &    \bf 131  &    \bf 18.0 \\
+    1.94 &        0.289062 &        142  &        16.6 \\
+    1.98 &        0.351562 &        419  &        5.62 \\
+\bottomrule
+\end{tabular}
+\caption{Time, number of iterations obtained and respective iteration reduction for different $\omega$ values. The topology used was \texttt{pt:~4~4~1} with a grid size of \texttt{g:~100~x~100}.}
+\label{tbl:omega}
+\end{table}
+
+
+\subsubsection{2.3}
+
+The goal of this exercise is to investigate the scaling behavior of the code with a fixed relaxation parameter. To accomplish that analysis several runs were measured with various grid sizes. In addition different \emph{slices} were also tested.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+ \toprule
+Grid Size & \texttt{Wtime} for 4~4~1 (\si{s}) & \texttt{Wtime} for 4~2~2 (\si{s}) & $\Delta$ (\%)\\ \midrule
+200~x~200   &     0.464844 &     0.699219 &    50.42 \\
+400~x~400   &     1.054688 &     1.054688 &     0.00 \\
+800~x~800   &     3.742188 &     3.726562 &    -0.42 \\
+2000~x~2000 &    21.351562 &    21.328125 &    -0.11 \\
+\bottomrule
+\end{tabular}
+\caption{The maximum time for different grid sizes and different \emph{slicing} arrangements. The $\Delta$ column compares the relative difference in performance between the two previous columns. The number of iterations for each run was fixed at 300.}
+\label{tbl:slices}
+\end{table}
+
+The results of the aforementioned experience are shown in table~\ref{tbl:slices}. As one can see as the grid size increase the difference in the different topologies become negligible. Nonetheless for small sizes the 4~4~1 topology is significantly faster.
+
+To to determine the average time per iteration the time will be parametrized as follows
+\[
+t(n) = \alpha + \beta \cdot n
+\]
+
+Where $\alpha$ and $\beta$ are arbitrary constants.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+ \toprule
+Grid Size & $\alpha$ & $\beta$ \\ \midrule
+200~x~200   &     0.464844 &     0.699219 &    50.42 \\
+400~x~400   &     1.054688 &     1.054688 &     0.00 \\
+800~x~800   &     3.742188 &     3.726562 &    -0.42 \\
+2000~x~2000 &    21.351562 &    21.328125 &    -0.11 \\
+\bottomrule
+\end{tabular}
+\caption{The maximum time for different grid sizes and different \emph{slicing} arrangements. The $\Delta$ column compares the relative difference in performance between the two previous columns. The number of iterations for each run was fixed at 300.}
+\label{tbl:alphabeta}
+\end{table}
