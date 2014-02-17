@@ -10,7 +10,7 @@
 #include "mpi.h"
 
 #define DEBUG 0
-#define OMEGA 1.91
+#define OMEGA 1.95
 
 #define max(a,b) ((a)>(b)?a:b)
 
@@ -140,8 +140,12 @@ void Setup_Grid()
   MPI_Bcast(&precision_goal, 1, MPI_DOUBLE, 0, grid_comm); /* broadcast precision_goal */
   MPI_Bcast(&max_iter, 1, MPI_INT, 0, grid_comm); /* broadcast max_iter */  
   
+  if (proc_rank == 0){
+    // printf("OMEGA = %1.2lf\n", OMEGA);
+    printf("g: Grid Size = %d x %d\n", gridsize[X_DIR], gridsize[Y_DIR]);
+  }
+
   if (DEBUG) {
-    printf("(%d) gridsize[X_DIR] = %d\tgridsize[Y_DIR] = %d\n", proc_rank, gridsize[X_DIR], gridsize[Y_DIR]);
     printf("(%d) precision_goal = %lf\tmax_iter = %d\n", proc_rank, precision_goal, max_iter);
   }
 

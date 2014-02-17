@@ -13,10 +13,10 @@ run-seq: seq
 	./$^.out
 	
 run-par: par
-	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script ./$^.out 2 2 1
+	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script ./$^.out 3 3 1
 
 run-par2: par2
-	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script ./$^.out 2 1 2
+	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script ./$^.out 4 2 2
 
 clean:
 	rm -rfv *.o *.out output*.dat
