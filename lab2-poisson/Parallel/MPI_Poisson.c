@@ -276,8 +276,8 @@ void Solve()
     
     count++;
   }
-  if (DEBUG)
-    printf("(%i)\tNumber of iterations : %i\n", proc_rank, count);
+  
+  printf("(%i)\tNumber of iterations : %i\n", proc_rank, count);
 }
 
 void Write_Grid()
