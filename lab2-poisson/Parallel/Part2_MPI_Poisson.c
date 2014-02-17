@@ -140,10 +140,8 @@ void Setup_Grid()
   MPI_Bcast(&precision_goal, 1, MPI_DOUBLE, 0, grid_comm); /* broadcast precision_goal */
   MPI_Bcast(&max_iter, 1, MPI_INT, 0, grid_comm); /* broadcast max_iter */  
   
-  if (proc_rank == 0)
-    printf("g: Grid Size = %d x %d\n", gridsize[X_DIR], gridsize[Y_DIR]);
-  
   if (DEBUG) {
+    printf("(%d) gridsize[X_DIR] = %d\tgridsize[Y_DIR] = %d\n", proc_rank, gridsize[X_DIR], gridsize[Y_DIR]);
     printf("(%d) precision_goal = %lf\tmax_iter = %d\n", proc_rank, precision_goal, max_iter);
   }
 
@@ -379,60 +377,60 @@ void Exchange_Borders()
   Debug("Exchange_Borders", 0);
 
   // all traffic in direction "top"
-  MPI_Sendrecv( &phi[1][1],             // sendbuf   - initial address of send buffer (choice)
-                1,                      // sendcount - number of elements in send buffer (integer)
-                border_type[Y_DIR],     // sendtype  - type of elements in send buffer (handle)
-                proc_top,               // dest      - rank of destination (integer)
-                0,                      // sendtag   - send tag (integer)
-                &phi[1][dim[Y_DIR] - 1],             // recvbuf   - initial address of receive buffer (choice)
-                1,                      // recvcount - number of elements in receive buffer (integer)
-                border_type[Y_DIR],     // recvtype  - type of elements in receive buffer (handle)
-                proc_bottom,            // source    - rank of source (integer)
-                0,                      // recvtag   - receive tag (integer)
-                grid_comm,              // comm      - communicator (handle)
-                &status);               // status    - status object (Status).  This refers to the receive operation.
+  MPI_Sendrecv( &phi[1][1],              // sendbuf   - initial address of send buffer (choice)
+                1,                       // sendcount - number of elements in send buffer (integer)
+                border_type[Y_DIR],      // sendtype  - type of elements in send buffer (handle)
+                proc_top,                // dest      - rank of destination (integer)
+                0,                       // sendtag   - send tag (integer)
+                &phi[1][dim[Y_DIR] - 1], // recvbuf   - initial address of receive buffer (choice)
+                1,                       // recvcount - number of elements in receive buffer (integer)
+                border_type[Y_DIR],      // recvtype  - type of elements in receive buffer (handle)
+                proc_bottom,             // source    - rank of source (integer)
+                0,                       // recvtag   - receive tag (integer)
+                grid_comm,               // comm      - communicator (handle)
+                &status);                // status    - status object (Status).  This refers to the receive operation.
 
   // all traffic in direction "bottom"
-  MPI_Sendrecv( &phi[1][dim[Y_DIR] - 1],    // sendbuf   - initial address of send buffer (choice)
-                1,                      // sendcount - number of elements in send buffer (integer)
-                border_type[Y_DIR],     // sendtype  - type of elements in send buffer (handle)
-                proc_bottom,            // dest      - rank of destination (integer)
-                0,                      // sendtag   - send tag (integer)
-                &phi[1][1],             // recvbuf   - initial address of receive buffer (choice)
-                1,                      // recvcount - number of elements in receive buffer (integer)
-                border_type[Y_DIR],     // recvtype  - type of elements in receive buffer (handle)
-                proc_top,               // source    - rank of source (integer)
-                0,                      // recvtag   - receive tag (integer)
-                grid_comm,              // comm      - communicator (handle)
-                &status);               // status    - status object (Status).  This refers to the receive operation.
+  MPI_Sendrecv( &phi[1][dim[Y_DIR] - 2], // sendbuf   - initial address of send buffer (choice)
+                1,                       // sendcount - number of elements in send buffer (integer)
+                border_type[Y_DIR],      // sendtype  - type of elements in send buffer (handle)
+                proc_bottom,             // dest      - rank of destination (integer)
+                0,                       // sendtag   - send tag (integer)
+                &phi[1][0],              // recvbuf   - initial address of receive buffer (choice)
+                1,                       // recvcount - number of elements in receive buffer (integer)
+                border_type[Y_DIR],      // recvtype  - type of elements in receive buffer (handle)
+                proc_top,                // source    - rank of source (integer)
+                0,                       // recvtag   - receive tag (integer)
+                grid_comm,               // comm      - communicator (handle)
+                &status);                // status    - status object (Status).  This refers to the receive operation.
 
   // all traffic in direction "left"
-  MPI_Sendrecv( &phi[1][1],             // sendbuf   - initial address of send buffer (choice)
-                1,                      // sendcount - number of elements in send buffer (integer)
-                border_type[X_DIR],     // sendtype  - type of elements in send buffer (handle)
-                proc_left,              // dest      - rank of destination (integer)
-                0,                      // sendtag   - send tag (integer)
-                &phi[dim[X_DIR] - 1][1],    // recvbuf   - initial address of receive buffer (choice)
-                1,                      // recvcount - number of elements in receive buffer (integer)
-                border_type[X_DIR],     // recvtype  - type of elements in receive buffer (handle)
-                proc_right,             // source    - rank of source (integer)
-                0,                      // recvtag   - receive tag (integer)
-                grid_comm,              // comm      - communicator (handle)
-                &status);               // status    - status object (Status).  This refers to the receive operation.
+  MPI_Sendrecv( &phi[1][1],              // sendbuf   - initial address of send buffer (choice)
+                1,                       // sendcount - number of elements in send buffer (integer)
+                border_type[X_DIR],      // sendtype  - type of elements in send buffer (handle)
+                proc_left,               // dest      - rank of destination (integer)
+                0,                       // sendtag   - send tag (integer)
+                &phi[dim[X_DIR] - 1][1], // recvbuf   - initial address of receive buffer (choice)
+                1,                       // recvcount - number of elements in receive buffer (integer)
+                border_type[X_DIR],      // recvtype  - type of elements in receive buffer (handle)
+                proc_right,              // source    - rank of source (integer)
+                0,                       // recvtag   - receive tag (integer)
+                grid_comm,               // comm      - communicator (handle)
+                &status);                // status    - status object (Status).  This refers to the receive operation.
   
   // all traffic in direction "right"
-  MPI_Sendrecv( &phi[dim[X_DIR] - 1][1], // sendbuf   - initial address of send buffer (choice)
-                1,                      // sendcount - number of elements in send buffer (integer)
-                border_type[X_DIR],     // sendtype  - type of elements in send buffer (handle)
-                proc_right,             // dest      - rank of destination (integer)
-                0,                      // sendtag   - send tag (integer)
-                &phi[1][1],             // recvbuf   - initial address of receive buffer (choice)
-                1,                      // recvcount - number of elements in receive buffer (integer)
-                border_type[X_DIR],     // recvtype  - type of elements in receive buffer (handle)
-                proc_left,              // source    - rank of source (integer)
-                0,                      // recvtag   - receive tag (integer)
-                grid_comm,              // comm      - communicator (handle)
-                &status);               // status    - status object (Status).  This refers to the receive operation.
+  MPI_Sendrecv( &phi[dim[X_DIR] - 2][1], // sendbuf   - initial address of send buffer (choice)
+                1,                       // sendcount - number of elements in send buffer (integer)
+                border_type[X_DIR],      // sendtype  - type of elements in send buffer (handle)
+                proc_right,              // dest      - rank of destination (integer)
+                0,                       // sendtag   - send tag (integer)
+                &phi[0][1],              // recvbuf   - initial address of receive buffer (choice)
+                1,                       // recvcount - number of elements in receive buffer (integer)
+                border_type[X_DIR],      // recvtype  - type of elements in receive buffer (handle)
+                proc_left,               // source    - rank of source (integer)
+                0,                       // recvtag   - receive tag (integer)
+                grid_comm,               // comm      - communicator (handle)
+                &status);                // status    - status object (Status).  This refers to the receive operation.
 
 }
 
