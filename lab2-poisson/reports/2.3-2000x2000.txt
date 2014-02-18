@@ -1,0 +1,92 @@
+g: Grid Size = 2000 x 2000
+pt: Topology: 4 4 1
+	(0) Elapsed Wtime:       8.207031 s ( 89.6% CPU)
+	(0) n: Number of iterations : 100
+	(1) Elapsed Wtime:       8.214844 s ( 89.7% CPU)
+	(1) n: Number of iterations : 100
+	(2) Elapsed Wtime:       8.218750 s ( 89.9% CPU)
+	(2) n: Number of iterations : 100
+	(3) Elapsed Wtime:       8.210938 s ( 89.5% CPU)
+	(3) n: Number of iterations : 100
+
+g: Grid Size = 2000 x 2000
+pt: Topology: 4 4 1
+	(0) Elapsed Wtime:      21.347656 s ( 96.1% CPU)
+	(0) n: Number of iterations : 300
+	(1) Elapsed Wtime:      21.339844 s ( 96.3% CPU)
+	(1) n: Number of iterations : 300
+	(2) Elapsed Wtime:      21.351562 s ( 96.3% CPU)
+	(2) n: Number of iterations : 300
+	(3) Elapsed Wtime:      21.339844 s ( 96.1% CPU)
+	(3) n: Number of iterations : 300
+
+g: Grid Size = 2000 x 2000
+pt: Topology: 4 4 1
+	(0) Elapsed Wtime:      34.925781 s ( 97.3% CPU)
+	(0) n: Number of iterations : 500
+	(1) Elapsed Wtime:      34.929688 s ( 97.3% CPU)
+	(1) n: Number of iterations : 500
+	(2) Elapsed Wtime:      34.933594 s ( 97.2% CPU)
+	(2) n: Number of iterations : 500
+	(3) Elapsed Wtime:      34.917969 s ( 97.2% CPU)
+	(3) n: Number of iterations : 500
+
+
+g: Grid Size = 2000 x 2000
+pt: Topology: 4 4 1
+	(0) Elapsed Wtime:      68.300781 s ( 98.6% CPU)
+	(0) n: Number of iterations : 1000
+	(1) Elapsed Wtime:      68.281250 s ( 98.4% CPU)
+	(1) n: Number of iterations : 1000
+	(2) Elapsed Wtime:      68.296875 s ( 98.6% CPU)
+	(2) n: Number of iterations : 1000
+	(3) Elapsed Wtime:      68.304688 s ( 98.6% CPU)
+	(3) n: Number of iterations : 1000
+
+
+***********************************************************************************
+
+
+g: Grid Size = 2000 x 2000
+pt: Topology: 4 2 2
+	(0) Elapsed Wtime:       8.218750 s ( 88.9% CPU)
+	(0) n: Number of iterations : 100
+	(1) Elapsed Wtime:       8.226562 s ( 89.5% CPU)
+	(1) n: Number of iterations : 100
+	(2) Elapsed Wtime:       8.226562 s ( 89.0% CPU)
+	(2) n: Number of iterations : 100
+	(3) Elapsed Wtime:       8.234375 s ( 88.9% CPU)
+	(3) n: Number of iterations : 100
+
+g: Grid Size = 2000 x 2000
+pt: Topology: 4 2 2
+	(0) Elapsed Wtime:      21.312500 s ( 96.4% CPU)
+	(0) n: Number of iterations : 300
+	(1) Elapsed Wtime:      21.328125 s ( 96.3% CPU)
+	(1) n: Number of iterations : 300
+	(2) Elapsed Wtime:      21.308594 s ( 96.1% CPU)
+	(2) n: Number of iterations : 300
+	(3) Elapsed Wtime:      21.324219 s ( 96.3% CPU)
+	(3) n: Number of iterations : 300
+
+g: Grid Size = 2000 x 2000
+pt: Topology: 4 2 2
+	(0) Elapsed Wtime:      35.488281 s ( 95.7% CPU)
+	(0) n: Number of iterations : 500
+	(1) Elapsed Wtime:      35.492188 s ( 95.6% CPU)
+	(1) n: Number of iterations : 500
+	(2) Elapsed Wtime:      35.476562 s ( 95.6% CPU)
+	(2) n: Number of iterations : 500
+	(3) Elapsed Wtime:      35.492188 s ( 95.5% CPU)
+	(3) n: Number of iterations : 500
+
+g: Grid Size = 2000 x 2000
+pt: Topology: 4 2 2
+	(0) Elapsed Wtime:      67.820312 s ( 98.6% CPU)
+	(0) n: Number of iterations : 1000
+	(1) Elapsed Wtime:      67.824219 s ( 98.7% CPU)
+	(1) n: Number of iterations : 1000
+	(2) Elapsed Wtime:      67.820312 s ( 98.7% CPU)
+	(2) n: Number of iterations : 1000
+	(3) Elapsed Wtime:      67.824219 s ( 98.7% CPU)
+	(3) n: Number of iterations : 1000
