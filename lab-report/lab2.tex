@@ -221,7 +221,7 @@ From this data we concluded that 1.93 is the optimal value for the relaxation pa
 \centering
 \begin{tabular}{cccc}
  \toprule
-$\omega$ & Maximum \texttt{Wtime}\tablefootnote{The maximum time was computed over the four individual processor times for each $\omega$ value.} (\si{s}) & Iterations & Reduction\\ \midrule
+$\omega$ & \texttt{Wtime}\tablefootnote{This value was computed as the maximum \texttt{Wtime} over the four individual processor times for each $\omega$ value.} (\si{s}) & $n$ & Reduction\\ \midrule
     1.00 &        1.500000 &        2355 &        1.00 \\    
     1.90 &        0.222656 &        220  &        10.7 \\
     1.92 &        0.199219 &        165  &        14.3 \\
@@ -230,7 +230,7 @@ $\omega$ & Maximum \texttt{Wtime}\tablefootnote{The maximum time was computed ov
     1.98 &        0.351562 &        419  &        5.62 \\
 \bottomrule
 \end{tabular}
-\caption{Time, number of iterations obtained and respective iteration reduction for different $\omega$ values. The topology used was \texttt{pt:~4~4~1} with a grid size of \texttt{g:~100~x~100}.}
+\caption{Time, number of iterations obtained and respective iteration reduction for different $\omega$ values. The topology used was \texttt{pt:}441 with a grid size of \texttt{g:}100x100.}
 \label{tbl:omega}
 \end{table}
 
@@ -241,39 +241,145 @@ The goal of this exercise is to investigate the scaling behavior of the code wit
 
 \begin{table}[H]
 \centering
-\begin{tabular}{cccc}
+\begin{tabular}{*{5}{c}}
  \toprule
-Grid Size & \texttt{Wtime} for 4~4~1 (\si{s}) & \texttt{Wtime} for 4~2~2 (\si{s}) & $\Delta$ (\%)\\ \midrule
-200~x~200   &     0.464844 &     0.699219 &    50.42 \\
-400~x~400   &     1.054688 &     1.054688 &     0.00 \\
-800~x~800   &     3.742188 &     3.726562 &    -0.42 \\
-2000~x~2000 &    21.351562 &    21.328125 &    -0.11 \\
+          &     & \multicolumn{2}{c}{\texttt{Wtime} (\si{s})} & \\
+Grid Size & $n$ & \texttt{pt:}441 & \texttt{pt:}422           & $\Delta$ (\%)\\ \midrule
+\multirow{4}{*}{200}
+    &    50   &     0.164 &     0.164 &     0.00 \\
+    &    100  &     0.226 &     0.246 &     8.62 \\
+    &    200  &     0.343 &     0.335 &    -2.27 \\
+    &    300  &     0.464 &     0.449 &    -3.36 \\\\
+\multirow{4}{*}{400}                                        
+    &    100  &     0.437 &     0.460 &     5.36 \\
+    &    300  &     1.054 &     1.054 &     0.00 \\
+    &    500  &     1.746 &     1.667 &    -4.47 \\
+    &    1000 &     3.308 &     3.304 &    -0.12 \\\\
+\multirow{4}{*}{800}
+    &    100  &     1.414 &     1.445 &     2.21 \\
+    &    300  &     3.742 &     3.726 &    -0.42 \\
+    &    500  &     5.976 &     5.988 &     0.20 \\
+    &    1000 &    11.625 &    11.617 &    -0.07 \\\\
+\multirow{4}{*}{2000}
+    &    100  &     8.218 &     8.234 &     0.19 \\
+    &    300  &    21.351 &    21.328 &    -0.11 \\
+    &    500  &    34.933 &    35.492 &     1.60 \\
+    &    1000 &    68.304 &    67.824 &    -0.70 \\
 \bottomrule
 \end{tabular}
-\caption{The maximum time for different grid sizes and different \emph{slicing} arrangements. The $\Delta$ column compares the relative difference in performance between the two previous columns. The number of iterations for each run was fixed at 300.}
+\caption{The maximum time for different grid sizes and different \emph{slicing} arrangements. The $\Delta$ column compares the relative difference in performance between the two previous columns. The number of iterations for each run was fixed to enable a more accurate comparison. The 200x200 grid size measurements were performed in different conditions in regards to the iteration count since the program converges after 382 iterations.}
 \label{tbl:slices}
 \end{table}
 
-The results of the aforementioned experience are shown in table~\ref{tbl:slices}. As one can see as the grid size increase the difference in the different topologies become negligible. Nonetheless for small sizes the 4~4~1 topology is significantly faster.
+The results of the aforementioned experiment are shown in table~\ref{tbl:slices}. As one can obverse the different domain partitions have little impact in the overall performance of the program, even as the grid size increases.
 
-To to determine the average time per iteration the time will be parametrized as follows
-\[
+
+As explained in the exercise manual the (average) time $t$ per iteration $n$ can be parametrized as follows
+\begin{equation}
 t(n) = \alpha + \beta \cdot n
-\]
+\label{eq:alphabeta}
+\end{equation}
 
-Where $\alpha$ and $\beta$ are arbitrary constants.
+Where $\alpha$ and $\beta$ are arbitrary constants. To determine these constants we will use the least-squares method. The results of applying this technique\tablefootnote{The Google Drive implementation of least-squares, \emph{LINEST} function, was used for this computation. For more information please see \url{https://support.google.com/drive/answer/3094249}.} to the available dataset are shown in table~\ref{tbl:alphabeta}
 
 \begin{table}[H]
 \centering
-\begin{tabular}{cccc}
+\begin{tabular}{*{5}{c}}
  \toprule
-Grid Size & $\alpha$ & $\beta$ \\ \midrule
-200~x~200   &     0.464844 &     0.699219 &    50.42 \\
-400~x~400   &     1.054688 &     1.054688 &     0.00 \\
-800~x~800   &     3.742188 &     3.726562 &    -0.42 \\
-2000~x~2000 &    21.351562 &    21.328125 &    -0.11 \\
+            &    \multicolumn{2}{c}{\texttt{pt:}441} & \multicolumn{2}{c}{\texttt{pt:}422} \\
+Grid Size   &    $\alpha$ &    $\beta$                & $\alpha$    & $\beta$ \\ \midrule
+200         &    0.105    &    0.001                  & 0.120       & 0.001   \\
+400         &    0.116    &    0.003                  & 0.115       & 0.003   \\
+800         &    0.310    &    0.011                  & 0.329       & 0.011   \\
+2000        &    1.449    &    0.067                  & 1.721       & 0.066   \\
 \bottomrule
 \end{tabular}
-\caption{The maximum time for different grid sizes and different \emph{slicing} arrangements. The $\Delta$ column compares the relative difference in performance between the two previous columns. The number of iterations for each run was fixed at 300.}
+\caption{Using least-squares method we estimated $\alpha$ and $\beta$ as defined in equation~\ref{eq:alphabeta}. The dataset adopted for this computation is present in table~\ref{tbl:slices}.}
 \label{tbl:alphabeta}
 \end{table}
+
+In order to improve the quality of this an estimation a thorougher study should be performed with more runs. In addition considering other (non-linear) parametrization functions, \eg exponential, may also yield interesting results.
+
+To conclude this question we plotted the estimated functions along with the actual data points to facilitate a visual comparison of the estimation.
+
+% \begin{tikzpicture}
+%     \begin{axis}[
+%         xlabel=$n$,
+%         ylabel=$t$
+%         % xmin=0,xmax=300,
+%         title=http://cryogenics.nist.gov/,
+%         legend style={at={(0.95,0.05)},anchor=south east},
+%     ]
+%     \addplot[mark=x, color=blue] plot coordinates {
+%         (50,  0.164062)
+%         (100, 0.226562)
+%         (200, 0.343750)
+%         (300, 0.464844)
+%     };
+%     \addlegendentry{441}
+
+%     \addplot[mark=x, color=red] plot coordinates {
+%         (50, 0.164062)
+%         (100, 0.246094)
+%         (200, 0.335938)
+%         (300, 0.449219)
+%     };
+%     \addlegendentry{422}
+%     \end{axis}
+% \end{tikzpicture}
+
+\begin{tikzpicture}[y=1.1cm, x=1.0cm]
+    \draw[step=1.0,black,thin] (-1,-1) grid (11,11);
+    %axis
+    \draw (0,0) -- coordinate (x axis mid) (10,0);
+        \draw (0,0) -- coordinate (y axis mid) (0,10);
+        %ticks
+        \foreach \x in {0,...,10}
+            \draw (\x,1pt) -- (\x,-3pt)
+            node[anchor=north] {\x};
+        \foreach \y in {0,1,...,10}
+            \draw (1pt,\y) -- (-3pt,\y) 
+                node[anchor=east] {\y}; 
+    %labels      
+    \node[below=0.8cm] at (x axis mid) {$n \cdot 100$};
+    \node[rotate=90, above=0.8cm] at (y axis mid) {$t$ (\si{s})};
+
+    %plots
+\begin{scope}
+    \clip (-1,-1) rectangle (13,11);
+
+    \draw[color=red]             plot[only marks, mark=*]         file {441-200x200.data};
+    \draw[color=red!50!black]    plot[only marks, mark=triangle*] file {422-200x200.data};
+    \draw[color=blue]            plot[only marks, mark=*]         file {441-400x400.data};
+    \draw[color=blue!50!black]   plot[only marks, mark=triangle*] file {422-400x400.data};
+    \draw[color=green]           plot[only marks, mark=*]         file {441-800x800.data};
+    \draw[color=green!50!black]  plot[only marks, mark=triangle*] file {422-800x800.data};
+    \draw[color=yellow]          plot[only marks, mark=*]         file {441-2000x2000.data};
+    \draw[color=yellow!50!black] plot[only marks, mark=triangle*] file {422-2000x2000.data};
+
+    \draw[color=red, domain=0:10]             plot (\x, {0.001198*100*\x+0.105071}) node[above right] {441-200x200};
+    \draw[color=red!50!black, domain=0:10]    plot (\x, {0.00110*100*\x+0.12023})   node[below right] {422-200x200};
+    \draw[color=blue, domain=0:10]            plot (\x, {0.003200*100*\x+0.116686}) node[above right] {441-400x400};
+    \draw[color=blue!50!black, domain=0:10]   plot (\x, {0.00317*100*\x+0.11562})   node[below right] {422-400x400};
+    \draw[color=green, domain=0:10]           plot (\x, {0.011324*100*\x+0.310667}) node[above right] {441-800x800};
+    \draw[color=green!50!black, domain=0:10]  plot (\x, {0.01130*100*\x+0.32913})   node[below right] {422-800x800};
+    \draw[color=yellow, domain=0:10]          plot (\x, {0.066849*100*\x+1.449066}) node[below] {441-2000x2000};
+    \draw[color=yellow!50!black, domain=0:10] plot (\x, {0.06631*100*\x+1.72143})   node[below left] {422-2000x2000};
+\end{scope}
+    
+    % legend
+    \begin{scope}[shift={(4,4)}] 
+    \draw (0,0) -- 
+        plot[mark=*, mark options={fill=white}] (0.25,0) -- (0.5,0) 
+        node[right]{soft};
+    \draw[yshift=\baselineskip] (0,0) -- 
+        plot[mark=triangle*, mark options={fill=white}] (0.25,0) -- (0.5,0)
+        node[right]{ciu};
+    \draw[yshift=2\baselineskip] (0,0) -- 
+        plot[mark=square*, mark options={fill=white}] (0.25,0) -- (0.5,0)
+        node[right]{ciu + oscar};
+    \draw[yshift=3\baselineskip] (0,0) -- 
+        plot[mark=square*, mark options={fill=black}] (0.25,0) -- (0.5,0)
+        node[right]{ciu + oscar extrapolated};
+    \end{scope}
+\end{tikzpicture}
