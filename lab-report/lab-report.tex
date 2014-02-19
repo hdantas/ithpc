@@ -38,17 +38,19 @@
         pdfkeywords={Cool stuff!},
         pdfproducer={pdfLaTeX},
         bookmarksopen=true,
-        pdfborder={0 0 0}
+        pdfborder={0 0 0},
 }
 
 \numberwithin{equation}{section} %equation number include section
 \numberwithin{figure}{section} %figure number include section
 \numberwithin{table}{section} %table number include section
 
+\setcounter{tocdepth}{4}% Show up to level 4 (\paragraph) in ToC (and bookmarks)
+
 \titleformat{\part}[hang]{\bfseries\Large}{\thepart.}{0.5cm}{}
 \titleformat{\section}[hang]{\normalfont\bfseries\color{NavyBlue}}{\thesection.}{0.3cm}{}
-\titleformat{\subsection}[hang]{\footnotesize\bfseries\color{ProcessBlue}}{\thesubsection.}{0.2cm}{}
-\titleformat{\subsubsection}[hang]{\footnotesize\color{Emerald}}{\thesubsubsection.}{0.1cm}{}
+\titleformat{\subsection}[hang]{\normalfont\bfseries\color{ProcessBlue}}{\thesubsection.}{0.2cm}{}
+\titleformat{\subsubsection}[hang]{\normalfont\color{Emerald}}{}{0.1cm}{}
 % \titlespacing*{\part}{0cm}{-1.5cm}{1cm}
 % \titlespacing*{\section}{0cm}{1cm}{0.6cm}
 % \titlespacing*{\subsection}{0cm}{0.5cm}{0.3cm}
