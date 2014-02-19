@@ -302,84 +302,83 @@ In order to improve the quality of this an estimation a thorougher study should 
 
 To conclude this question we plotted the estimated functions along with the actual data points to facilitate a visual comparison of the estimation.
 
-% \begin{tikzpicture}
-%     \begin{axis}[
-%         xlabel=$n$,
-%         ylabel=$t$
-%         % xmin=0,xmax=300,
-%         title=http://cryogenics.nist.gov/,
-%         legend style={at={(0.95,0.05)},anchor=south east},
-%     ]
-%     \addplot[mark=x, color=blue] plot coordinates {
-%         (50,  0.164062)
-%         (100, 0.226562)
-%         (200, 0.343750)
-%         (300, 0.464844)
-%     };
-%     \addlegendentry{441}
 
-%     \addplot[mark=x, color=red] plot coordinates {
-%         (50, 0.164062)
-%         (100, 0.246094)
-%         (200, 0.335938)
-%         (300, 0.449219)
-%     };
-%     \addlegendentry{422}
-%     \end{axis}
-% \end{tikzpicture}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={
+        group name=my fancy plots,
+        group size=1 by 2,
+        xticklabels at=edge bottom,
+        vertical sep=0pt
+    },
+    width=0.9\textwidth,
+    xmin=0, xmax=13,
+]
 
-\begin{tikzpicture}[y=1.1cm, x=1.0cm]
-    \draw[step=1.0,black,thin] (-1,-1) grid (11,11);
-    %axis
-    \draw (0,0) -- coordinate (x axis mid) (10,0);
-        \draw (0,0) -- coordinate (y axis mid) (0,10);
-        %ticks
-        \foreach \x in {0,...,10}
-            \draw (\x,1pt) -- (\x,-3pt)
-            node[anchor=north] {\x};
-        \foreach \y in {0,1,...,10}
-            \draw (1pt,\y) -- (-3pt,\y) 
-                node[anchor=east] {\y}; 
-    %labels      
-    \node[below=0.8cm] at (x axis mid) {$n \cdot 100$};
-    \node[rotate=90, above=0.8cm] at (y axis mid) {$t$ (\si{s})};
+\nextgroupplot[ymin=-30,ymax=90,
+               ytick={5, 25, 45, 65},
+               axis line style = ultra thin,
+               axis x line=none,
+               axis y line=left,
+               axis y discontinuity=crunch,
+               ylabel=$t(n)$,
+               ylabel style={at={(-0.02,0.05))},rotate=270},
+               height=6.0cm,
+               mark size = 3,
+               very thick]
+\input{figtop.tikz}
 
-    %plots
-\begin{scope}
-    \clip (-1,-1) rectangle (13,11);
+\nextgroupplot[ymin=0,ymax=4,
+               ytick={0, 1, 2, 3},
+               axis line style = ultra thin,
+               axis x line=bottom,
+               axis y line=left,
+               y axis line style=-,
+               xlabel = $n$,
+               height=6.0cm,
+               mark size = 3,
+               very thick]
+\input{figbottom.tikz}
 
-    \draw[color=red]             plot[only marks, mark=*]         file {441-200x200.data};
-    \draw[color=red!50!black]    plot[only marks, mark=triangle*] file {422-200x200.data};
-    \draw[color=blue]            plot[only marks, mark=*]         file {441-400x400.data};
-    \draw[color=blue!50!black]   plot[only marks, mark=triangle*] file {422-400x400.data};
-    \draw[color=green]           plot[only marks, mark=*]         file {441-800x800.data};
-    \draw[color=green!50!black]  plot[only marks, mark=triangle*] file {422-800x800.data};
-    \draw[color=yellow]          plot[only marks, mark=*]         file {441-2000x2000.data};
-    \draw[color=yellow!50!black] plot[only marks, mark=triangle*] file {422-2000x2000.data};
 
-    \draw[color=red, domain=0:10]             plot (\x, {0.001198*100*\x+0.105071}) node[above right] {441-200x200};
-    \draw[color=red!50!black, domain=0:10]    plot (\x, {0.00110*100*\x+0.12023})   node[below right] {422-200x200};
-    \draw[color=blue, domain=0:10]            plot (\x, {0.003200*100*\x+0.116686}) node[above right] {441-400x400};
-    \draw[color=blue!50!black, domain=0:10]   plot (\x, {0.00317*100*\x+0.11562})   node[below right] {422-400x400};
-    \draw[color=green, domain=0:10]           plot (\x, {0.011324*100*\x+0.310667}) node[above right] {441-800x800};
-    \draw[color=green!50!black, domain=0:10]  plot (\x, {0.01130*100*\x+0.32913})   node[below right] {422-800x800};
-    \draw[color=yellow, domain=0:10]          plot (\x, {0.066849*100*\x+1.449066}) node[below] {441-2000x2000};
-    \draw[color=yellow!50!black, domain=0:10] plot (\x, {0.06631*100*\x+1.72143})   node[below left] {422-2000x2000};
-\end{scope}
+\end{groupplot}
     
     % legend
-    \begin{scope}[shift={(4,4)}] 
-    \draw (0,0) -- 
-        plot[mark=*, mark options={fill=white}] (0.25,0) -- (0.5,0) 
-        node[right]{soft};
-    \draw[yshift=\baselineskip] (0,0) -- 
-        plot[mark=triangle*, mark options={fill=white}] (0.25,0) -- (0.5,0)
-        node[right]{ciu};
-    \draw[yshift=2\baselineskip] (0,0) -- 
-        plot[mark=square*, mark options={fill=white}] (0.25,0) -- (0.5,0)
-        node[right]{ciu + oscar};
-    \draw[yshift=3\baselineskip] (0,0) -- 
-        plot[mark=square*, mark options={fill=black}] (0.25,0) -- (0.5,0)
-        node[right]{ciu + oscar extrapolated};
+    \begin{scope}[shift={(1,-1)}, mark size = 3] 
+    \draw[ultra thick, yshift=3\baselineskip, draw=red]            (0,4) -- (0.5,4) ;
+    \draw[ultra thick, yshift=3\baselineskip, draw=red!50!black]   (0.5,4) -- (1,4) node[right]{\texttt{g:}200};
+
+    \draw[ultra thick, yshift=2\baselineskip, draw=blue]           (0,4) -- (0.5,4) ;
+    \draw[ultra thick, yshift=2\baselineskip, draw=blue!50!white]  (0.5,4) -- (1,4) node[right]{\texttt{g:}400};
+    
+    \draw[ultra thick, yshift=1\baselineskip, draw=green]          (0,4) -- (0.5,4) ;
+    \draw[ultra thick, yshift=1\baselineskip, draw=green!70!black] (0.5,4) -- (1,4) node[right]{\texttt{g:}800};
+    
+    \draw[ultra thick, draw=orange]                                (0,4) -- (0.5,4) ;
+    \draw[ultra thick, draw=orange!50!black]                       (0.5,4) -- (1,4) node[right]{\texttt{g:}2000};
+
+    \draw[yshift=1\baselineskip] (0,-0.5) -- plot[mark=triangle*, mark options={fill=white}]        (0.25,-0.5) -- (0.5,-0.5) node[right]{\texttt{pt:}422};
+    \draw                        (0,-0.5) -- plot[mark=square*, mark options={fill=white}]          (0.25,-0.5) -- (0.5,-0.5) node[right]{\texttt{pt:}441};
     \end{scope}
+
 \end{tikzpicture}
+\caption{Visual comparison between the experimental data and respective linear estimation using the least-squares method.}
+\label{fig:plot}
+\end{figure}
+
+As figure~\ref{fig:plot} shows the estimated $\alpha$ and $\beta$ can accurately determine the time necessary to complete the operation. This can be observed by noticing that the measured data points (depicted as`
+\tikz{\draw (0,0) -- plot[mark size = 3, mark=triangle*, mark options={fill=white}] (0.25,0) -- (0.5,0);}
+and
+\tikz{\draw (0,0) -- plot[mark size = 3, mark=square*, mark options={fill=white}] (0.25,0) -- (0.5,0);}
+for the two different partitions)
+are located close to the curves (which represent the predicted values).
+
+
+\subsubsection{2.4}
+
+Based on the results from the previous question it is expected that the division of the domains does not result is significantly different running times. Thus, the choice can be done arbitratily. In order to estimate the times
+
+
+
