@@ -1,9 +1,9 @@
-    \addplot[color=green, domain=0:12]           {0.011324*100*x+0.310667} ; %node[above right] {441-800x800};
-    \addplot[color=green!50!black, domain=0:12]  {0.01130*100*x+0.32913}   ; %node[below right] {422-800x800};
-    \addplot[color=orange, domain=0:12]          {0.066849*100*x+1.449066} ; %node[below left] {441-2000x2000};
-    \addplot[color=orange!70!black, domain=0:12] {0.06631*100*x+1.72143}   ; %node[below left] {422-2000x2000};
+    \addplot[color=green, domain=0:12]           		{0.011324*100*x+0.310667} ; %node[above right] {441-800x800};
+    \addplot[color=green!50!black, domain=0:12,dotted]  {0.01130*100*x+0.32913}   ; %node[below right] {422-800x800};
+    \addplot[color=orange, domain=0:12]          		{0.066849*100*x+1.449066} ; %node[below left] {441-2000x2000};
+    \addplot[color=orange!70!black, domain=0:12,dotted] {0.06631*100*x+1.72143}   ; %node[below left] {422-2000x2000};
     
-    \addplot[color=green, only marks, mark=square*, ]             file {441-800x800.data};
+    \addplot[color=green, only marks, mark=square*, ]           file {441-800x800.data};
     \addplot[color=green!50!black, only marks, mark=triangle*]  file {422-800x800.data};
     \addplot[color=orange, only marks, mark=square*]            file {441-2000x2000.data};
     \addplot[color=orange!70!black, only marks, mark=triangle*] file {422-2000x2000.data};

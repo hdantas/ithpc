@@ -244,7 +244,7 @@ The goal of this exercise is to investigate the scaling behavior of the code wit
 \begin{tabular}{*{5}{c}}
  \toprule
           &     & \multicolumn{2}{c}{\texttt{Wtime} (\si{s})} & \\
-Grid Size & $n$ & \texttt{pt:}441 & \texttt{pt:}422           & $\Delta$ (\%)\\ \midrule
+Grid Size & $n$ & \texttt{pt:}441 & \texttt{pt:}422           & $\delta$ (\%)\\ \midrule
 \multirow{4}{*}{200}
     &    50   &     0.164 &     0.164 &     0.00 \\
     &    100  &     0.226 &     0.246 &     8.62 \\
@@ -267,7 +267,7 @@ Grid Size & $n$ & \texttt{pt:}441 & \texttt{pt:}422           & $\Delta$ (\%)\\ 
     &    1000 &    68.304 &    67.824 &    -0.70 \\
 \bottomrule
 \end{tabular}
-\caption{The maximum time for different grid sizes and different \emph{slicing} arrangements. The $\Delta$ column compares the relative difference in performance between the two previous columns. The number of iterations for each run was fixed to enable a more accurate comparison. The 200x200 grid size measurements were performed in different conditions in regards to the iteration count since the program converges after 382 iterations.}
+\caption{The maximum time for different grid sizes and different \emph{slicing} arrangements. The $\delta$ column compares the relative difference in performance between the two previous columns. The number of iterations for each run was fixed to enable a more accurate comparison. The 200x200 grid size measurements were performed in different conditions in regards to the iteration count since the program converges after 382 iterations.}
 \label{tbl:slices}
 \end{table}
 
@@ -303,13 +303,13 @@ In order to improve the quality of this an estimation a thorougher study should 
 To conclude this question we plotted the estimated functions along with the actual data points to facilitate a visual comparison of the estimation.
 
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=1]
 \begin{groupplot}[
     group style={
         group name=my fancy plots,
-        group size=1 by 2,
+        group size=1 by 3,
         xticklabels at=edge bottom,
         vertical sep=0pt
     },
@@ -317,12 +317,12 @@ To conclude this question we plotted the estimated functions along with the actu
     xmin=0, xmax=13,
 ]
 
-\nextgroupplot[ymin=-30,ymax=90,
+\nextgroupplot[ymin=5.35,ymax=90,
                ytick={5, 25, 45, 65},
                axis line style = ultra thin,
                axis x line=none,
                axis y line=left,
-               axis y discontinuity=crunch,
+               % axis y discontinuity=crunch,
                ylabel=$t(n)$,
                ylabel style={at={(-0.02,0.05))},rotate=270},
                height=6.0cm,
@@ -330,37 +330,54 @@ To conclude this question we plotted the estimated functions along with the actu
                very thick]
 \input{figtop.tikz}
 
+\nextgroupplot[ymin=4,ymax=5,
+               height=2.5cm,
+               ymajorticks=false,
+               axis line style = ultra thin,
+               axis x line=none,
+               axis y line=left,
+               axis y discontinuity=crunch,
+               y axis line style=-,
+               very thick]
+\input{figtop.tikz}
+
 \nextgroupplot[ymin=0,ymax=4,
                ytick={0, 1, 2, 3},
+               xtick={1, 2, 3, 5, 10},
                axis line style = ultra thin,
                axis x line=bottom,
                axis y line=left,
                y axis line style=-,
-               xlabel = $n$,
+               xlabel = $n/100$,
                height=6.0cm,
                mark size = 3,
                very thick]
+\input{figtop.tikz}
 \input{figbottom.tikz}
 
 
 \end{groupplot}
     
     % legend
-    \begin{scope}[shift={(1,-1)}, mark size = 3] 
-    \draw[ultra thick, yshift=3\baselineskip, draw=red]            (0,4) -- (0.5,4) ;
-    \draw[ultra thick, yshift=3\baselineskip, draw=red!50!black]   (0.5,4) -- (1,4) node[right]{\texttt{g:}200};
+    \begin{scope}[shift={(0, 0)}, mark size = 3] 
 
-    \draw[ultra thick, yshift=2\baselineskip, draw=blue]           (0,4) -- (0.5,4) ;
-    \draw[ultra thick, yshift=2\baselineskip, draw=blue!50!white]  (0.5,4) -- (1,4) node[right]{\texttt{g:}400};
+    \draw[yshift=3\baselineskip]                                  (5.5, 4) -- plot[mark=triangle*, mark options={fill=white}] (6.0, 4) -- (6.5, 4) node[right]{\texttt{pt:}422};
+    \draw[yshift=3\baselineskip] (0, 4) node[right]{data points:} (2.5, 4) -- plot[mark=square*, mark options={fill=white}]   (3.0, 4) -- (3.5, 4) node[right]{\texttt{pt:}441};
     
-    \draw[ultra thick, yshift=1\baselineskip, draw=green]          (0,4) -- (0.5,4) ;
-    \draw[ultra thick, yshift=1\baselineskip, draw=green!70!black] (0.5,4) -- (1,4) node[right]{\texttt{g:}800};
-    
-    \draw[ultra thick, draw=orange]                                (0,4) -- (0.5,4) ;
-    \draw[ultra thick, draw=orange!50!black]                       (0.5,4) -- (1,4) node[right]{\texttt{g:}2000};
+    \draw[ultra thick, yshift=2\baselineskip, dotted]                        (5.5, 4) -- (6.5, 4) node[right]{\texttt{pt:}422};
+    \draw[ultra thick, yshift=2\baselineskip] (0,4) node[right]{estimation:} (2.5, 4) -- (3.5, 4) node[right]{\texttt{pt:}441};
 
-    \draw[yshift=1\baselineskip] (0,-0.5) -- plot[mark=triangle*, mark options={fill=white}]        (0.25,-0.5) -- (0.5,-0.5) node[right]{\texttt{pt:}422};
-    \draw                        (0,-0.5) -- plot[mark=square*, mark options={fill=white}]          (0.25,-0.5) -- (0.5,-0.5) node[right]{\texttt{pt:}441};
+    \draw[ultra thick, yshift=1\baselineskip, draw=blue]                  (5.5,4) -- (6.0,4) ;
+    \draw[ultra thick, yshift=1\baselineskip, draw=blue!50!white, dotted] (6.0,4) -- (6.5,4) node[right]{\texttt{g:}400};
+
+    \draw[ultra thick, yshift=1\baselineskip, draw=red]                   (2.5, 4) -- (3.0, 4) ;
+    \draw[ultra thick, yshift=1\baselineskip, draw=red!50!black, dotted]  (3.0, 4) -- (3.5, 4) node[right]{\texttt{g:}200};
+    
+    \draw[ultra thick, draw=orange]                                       (5.5,4) -- (6.0,4) ;
+    \draw[ultra thick, draw=orange!70!black, dotted]                      (6.0,4) -- (6.5,4) node[right]{\texttt{g:}2000};
+    
+    \draw[ultra thick, draw=green]                                        (2.5, 4) -- (3.0, 4) ;
+    \draw[ultra thick, draw=green!50!black, dotted]                       (3.0, 4) -- (3.5, 4) node[right]{\texttt{g:}800};
     \end{scope}
 
 \end{tikzpicture}
@@ -368,7 +385,7 @@ To conclude this question we plotted the estimated functions along with the actu
 \label{fig:plot}
 \end{figure}
 
-As figure~\ref{fig:plot} shows the estimated $\alpha$ and $\beta$ can accurately determine the time necessary to complete the operation. This can be observed by noticing that the measured data points (depicted as`
+As figure~\ref{fig:plot} shows the estimated $\alpha$ and $\beta$ can accurately determine the time necessary to complete the operation. This can be observed by noticing that the measured data points (depicted as
 \tikz{\draw (0,0) -- plot[mark size = 3, mark=triangle*, mark options={fill=white}] (0.25,0) -- (0.5,0);}
 and
 \tikz{\draw (0,0) -- plot[mark size = 3, mark=square*, mark options={fill=white}] (0.25,0) -- (0.5,0);}
@@ -378,7 +395,91 @@ are located close to the curves (which represent the predicted values).
 
 \subsubsection{2.4}
 
-Based on the results from the previous question it is expected that the division of the domains does not result is significantly different running times. Thus, the choice can be done arbitratily. In order to estimate the times
+Based on the results from the previous question it is expected that the division of the domains does not result is significantly different running times. Thus, the choice can be done arbitrarily. In order to estimate the constants without performing further experiments one can extrapolate based on the already calculated values.
 
 
 
+For 8 processors the area allocated to each processor is reduced 4 times in comparison with 4 processors. Therefore it is reasonable to assume that the time per iteration ($\beta$)is reduced by the same ratio. On the other the communication overhead ($\alpha$) is not expected to experience drastic changes. After identifying this assumptions it is trivial to estimate the new constants.
+
+\begin{eqnarray}
+\alpha_8 &=& \alpha_4 \label{eq:newalpha}\\
+\beta_8  &=& \beta_4 / 4 \label{eq:newbeta}
+\end{eqnarray}
+
+Table~\ref{tbl:newalphabeta} incorporates equations~\ref{eq:newalpha} and~\ref{eq:newbeta} to predict the new constants.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{*{5}{c}}
+ \toprule
+            &    \multicolumn{2}{c}{\texttt{pt:}441} & \multicolumn{2}{c}{\texttt{pt:}422} \\
+Grid Size   &    $\alpha_8$ &    $\beta_8$           & $\alpha_8$    & $\beta_8$ \\ \midrule
+200         &    0.105      &    0.00029             & 0.120         & 0.00027   \\
+400         &    0.116      &    0.00080             & 0.115         & 0.00079   \\
+800         &    0.310      &    0.00283             & 0.329         & 0.00282   \\
+2000        &    1.449      &    0.01671             & 1.721         & 0.01657   \\
+\bottomrule
+\end{tabular}
+\caption{The estimated $\alpha$ and $\beta$ constants for an 8 processor configuration. These results are based on the data from table~\ref{tbl:alphabeta} and equations~\ref{eq:newalpha} and \ref{eq:newbeta}.}
+\label{tbl:newalphabeta}
+\end{table}
+
+\subsubsection{2.5}
+
+Table~\ref{tbl:iterations} features the number of iterations necessary for several grid sizes.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{*{2}{c}}
+ \toprule
+$g$   &    $n$   \\ \midrule
+200   &    382   \\
+300   &    771   \\
+400   &   1206   \\
+500   &   1664   \\
+\bottomrule
+\end{tabular}
+\caption{Number of iterations necessary to solve the Poisson equation for various grid sizes. The topology used was \texttt{pt:}441.}
+\label{tbl:iterations}
+\end{table}
+
+Using the same technique as before we can parametrize the iteration evolution according to grid size to a linear equation.
+For the aforementioned data we obtained the following constants $\alpha = -492.6$ and $\beta = 4.281$.
+Thus equation~\ref{eq:iterations} can be used to estimate the number iterations for different grid sizes.
+
+\begin{eqnarray}
+n(g) = \alpha + g \cdot \beta = -492.6 + 4.281 \cdot g\\
+\label{eq:iterations}
+\end{eqnarray}
+
+To finish table~\ref{tbl:est-iterations} highlights the errors between the predictions and the measured values, and estimates the number of iterations for higher grid sizes.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{*{4}{c}}
+ \toprule
+$g$      &    $n$   &   $n_{\text{est}}$   &   $\delta$ (\%) \\ \midrule
+200      &    382   &   364                &    4.82         \\
+300      &    771   &   792                &   -2.68         \\
+400      &   1206   &   1220               &   -1.14         \\
+500      &   1664   &   1648               &    0.97         \\\\
+1000     &    -     &   3788               &     -           \\
+5000     &    -     &   20912              &     -           \\
+10000    &    -     &   42317              &     -           \\
+\bottomrule
+\end{tabular}
+\caption{Comparing empirical and estimated data for iteration evolution with increasing grid sizes.}
+\label{tbl:est-iterations}
+\end{table}
+
+The conclusion that can be drawn from table~\ref{tbl:est-iterations} is that the iteration evolution is approximately linear with the grid size. This claim is supported by the low relative error between predicted and actual data points, in particular as dimensions increase. Nonetheless in order to make a stronger claim it is important to perform a more refined study (\ie increase the data set) as we only consider four point.
+
+
+
+
+\subsubsection{2.6}
+
+\subsubsection{2.8}
+\subsubsection{2.9}
+\subsubsection{2.11}
+\subsubsection{2.12}
