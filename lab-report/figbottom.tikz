@@ -1,0 +1,10 @@
+
+    \addplot[color=red, domain=0:12]             {0.001198*100*x+0.105071}  ;% node[above right] {441-200x200};
+    \addplot[color=red!50!black, domain=0:12]    {0.00110*100*x+0.12023}    ;% node[below right] {422-200x200};
+    \addplot[color=blue, domain=0:12]            {0.003200*100*x+0.116686}  ;% node[above right] {441-400x400};
+    \addplot[color=blue!50!white, domain=0:12]   {0.00317*100*x+0.11562}    ;% node[below right] {422-400x400};
+    
+    \addplot[color=red, only marks, mark=square*]             file {441-200x200.data};
+    \addplot[color=red!50!black, only marks, mark=triangle*]  file {422-200x200.data};
+    \addplot[color=blue, only marks, mark=square*]            file {441-400x400.data};
+    \addplot[color=blue!50!white, only marks, mark=triangle*] file {422-400x400.data};

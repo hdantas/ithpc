@@ -1,0 +1,17 @@
+    \draw[color=red]             plot[only marks, mark=*]         file {441-200x200.data};
+    \draw[color=red!50!black]    plot[only marks, mark=triangle*] file {422-200x200.data};
+    \draw[color=blue]            plot[only marks, mark=*]         file {441-400x400.data};
+    \draw[color=blue!50!black]   plot[only marks, mark=triangle*] file {422-400x400.data};
+    \draw[color=green]           plot[only marks, mark=*]         file {441-800x800.data};
+    \draw[color=green!50!black]  plot[only marks, mark=triangle*] file {422-800x800.data};
+    \draw[color=yellow]          plot[only marks, mark=*]         file {441-2000x2000.data};
+    \draw[color=yellow!50!black] plot[only marks, mark=triangle*] file {422-2000x2000.data};
+
+    \draw[color=red, domain=0:10]             plot (\x, {0.001198*100*\x+0.105071}) node[above right] {441-200x200};
+    \draw[color=red!50!black, domain=0:10]    plot (\x, {0.00110*100*\x+0.12023})   node[below right] {422-200x200};
+    \draw[color=blue, domain=0:10]            plot (\x, {0.003200*100*\x+0.116686}) node[above right] {441-400x400};
+    \draw[color=blue!50!black, domain=0:10]   plot (\x, {0.00317*100*\x+0.11562})   node[below right] {422-400x400};
+    \draw[color=green, domain=0:10]           plot (\x, {0.011324*100*\x+0.310667}) node[above right] {441-800x800};
+    \draw[color=green!50!black, domain=0:10]  plot (\x, {0.01130*100*\x+0.32913})   node[below right] {422-800x800};
+    \draw[color=yellow, domain=0:10]          plot (\x, {0.066849*100*\x+1.449066}) node[below] {441-2000x2000};
+    \draw[color=yellow!50!black, domain=0:10] plot (\x, {0.06631*100*\x+1.72143})   node[below left] {422-2000x2000};
