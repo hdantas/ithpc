@@ -22,31 +22,31 @@ Subsequently subsection~\ref{ssec:results} will be focused on the performance an
 \label{ssec:arch}
 
 The first step is to divide the matrices evenly among the 4 nodes available.
-The subscripts in equation~\ref{eq:partition} indicate the node responsible for the subset. 
+The subscripts in equations \ref{eq:partition}-\ref{eq:partition2} indicate the node responsible for the subset. 
 
 \begin{equation}
 C = \alpha AB + \beta C
 \end{equation}
 \begin{align}
-    \begin{pmatrix}
+    \begin{bmatrix}
       C_0 & C_1 \\
       C_2 & C_3 \\
-    \end{pmatrix}
+    \end{bmatrix}
 = \alpha
-    \begin{pmatrix}
+    \begin{bmatrix}
       A_0 & A_1 \\
       A_2 & A_3 \\
-    \end{pmatrix}
+    \end{bmatrix}
 \cdot
-    \begin{pmatrix}
+    \begin{bmatrix}
       B_0 & B_1 \\
       B_2 & B_3 \\
-    \end{pmatrix}
+    \end{bmatrix}
 + \beta
-    \begin{pmatrix}
+    \begin{bmatrix}
       C_0 & C_1 \\
       C_2 & C_3 \\
-    \end{pmatrix}
+    \end{bmatrix}
 \label{eq:partition}
 \end{align}
 
@@ -55,6 +55,7 @@ C_0 &= \alpha (A_0 B_0 + A_1 B_2) + \beta C_0\\
 C_1 &= \alpha (A_0 B_1 + A_1 B_3) + \beta C_1\\
 C_2 &= \alpha (A_2 B_0 + A_3 B_2) + \beta C_2\\
 C_3 &= \alpha (A_2 B_1 + A_3 B_3) + \beta C_3
+\label{eq:partition2}
 \end{align}
 
 Therefore each node requires two parts from each of A and B to calculate its share of C. Moreover it is not surprising to find that the way A and B are allocated is different, while A is partitioned horizontally, B is sliced vertically. For simplicity purposes, in the actual implementation each node initializes the matrices independently but coherently although it only uses the subsets it needs. Alternatively this could be done using MPI. For example node zero would initialize all matrices and send the respective parts to the remaining three nodes.
@@ -63,16 +64,35 @@ The next step involves three operations per node: two multiplications and one ad
 The following OpenMP directive is responsible for that task.
 
 \begin{lstlisting}
-#pragma omp parallel for default(none) private(...) shared(...)
+#pragma omp parallel for default(none) private(...)
+	shared(...)
 \end{lstlisting}
 
-% // #pragma omp for schedule(dynamic) nowait
-% // #pragma omp for schedule(dynamic, chunk) nowait
-% // #pragma omp for schedule(runtime) nowait
-% // omp_set_num_threads(16);
-        
+Other options for parallelizing the loop, shown below, were studied but with less interesting results.
+
+\begin{lstlisting}
+#pragma omp for schedule(dynamic) nowait
+#pragma omp for schedule(dynamic, chunk) nowait
+#pragma omp for schedule(runtime) nowait
+\end{lstlisting}
+
+The major final step is to aggregate all values back into a single node. This is accomplished through calls to \texttt{MPI\_Send()} and \texttt{MPI\_Recv()}.
+Node zero was elected to collect the data from the remaining nodes. Thereafter it compiles all of it, including its own share, in a single 2D array and writes the result to a text file.
+
+In summary three main steps were necessary to fulfill the task at end:
+\begin{enumerate}
+\item Divide evenly the input matrices A and B between nodes.
+\item Each node computes the required operations over its designated subsets.
+\item Aggregate all results in a single node and write result to a file.
+\end{enumerate}
+
+Although the high level overview is strikingly simple the implementation was not so straightforward. As always the devil is in the details and in particular properly handling the indices of each matrix in an abstract way proved to be quite cumbersome.
+
 \subsection{Results}
 \label{ssec:results}
+
+
+In the text that follows the results of the previously described implementation will be presented and analyzed.
 
 % You need to ensure the parallel version is functional and can give the same output (Matrix C) as the sequential version. 
 % You are allowed to use at most 4 nodes on DAS3.
