@@ -1,1 +1,84 @@
 \section{Lab 5: Matmul}
+
+This section is dedicated to the implementation of the general matrix multiplication (GEMM). Equation~\ref{eq:mmul} describes the operation.
+$A$, $B$ and $C$ are the matrices to be multiplied and the result respectively, while $\alpha$ and $\beta$ are scalar coefficients. 
+The developed code was built upon the provided sequential implementation (\texttt{matmul.c}).
+It uses the Message Passing Interface (MPI) for inter-node communication and Open Multi-Processing (OpenMP) for intra-node computations.
+Unless, specifically specified the code is running on 4 nodes from DAS3. This assumption facilitates the explanation of the proposed solution although in the C code implementation the number of nodes can be chosen arbitrarily as long as the grid can be evenly distributed among them.
+Finally the compiler used was \texttt{gcc 4.3.2} invoked with several optimization flags that shall be enumerated in~\ref{ssec:results}.
+% You are allowed to use at most 4 nodes on DAS3.
+% You are allowed to use gcc 4.3.2, rather than other compilers.
+
+\begin{equation}
+C = \alpha AB + \beta C
+\label{eq:mmul}
+\end{equation}
+
+This section is organized as follows: in subsection~\ref{ssec:arch} the higher level architecture of the code is explained.
+In essence it covers how the matrices are partitioned and divided among processors to enable parallel computation and what communication steps are necessary top obtain the final result.
+Subsequently subsection~\ref{ssec:results} will be focused on the performance analysis of this implementation.
+
+\subsection{Architecture}
+\label{ssec:arch}
+
+The first step is to divide the matrices evenly among the 4 nodes available.
+The subscripts in equation~\ref{eq:partition} indicate the node responsible for the subset. 
+
+\begin{equation}
+C = \alpha AB + \beta C
+\end{equation}
+\begin{align}
+    \begin{pmatrix}
+      C_0 & C_1 \\
+      C_2 & C_3 \\
+    \end{pmatrix}
+= \alpha
+    \begin{pmatrix}
+      A_0 & A_1 \\
+      A_2 & A_3 \\
+    \end{pmatrix}
+\cdot
+    \begin{pmatrix}
+      B_0 & B_1 \\
+      B_2 & B_3 \\
+    \end{pmatrix}
++ \beta
+    \begin{pmatrix}
+      C_0 & C_1 \\
+      C_2 & C_3 \\
+    \end{pmatrix}
+\label{eq:partition}
+\end{align}
+
+\begin{align}
+C_0 &= \alpha (A_0 B_0 + A_1 B_2) + \beta C_0\\
+C_1 &= \alpha (A_0 B_1 + A_1 B_3) + \beta C_1\\
+C_2 &= \alpha (A_2 B_0 + A_3 B_2) + \beta C_2\\
+C_3 &= \alpha (A_2 B_1 + A_3 B_3) + \beta C_3
+\end{align}
+
+Therefore each node requires two parts from each of A and B to calculate its share of C. Moreover it is not surprising to find that the way A and B are allocated is different, while A is partitioned horizontally, B is sliced vertically. For simplicity purposes, in the actual implementation each node initializes the matrices independently but coherently although it only uses the subsets it needs. Alternatively this could be done using MPI. For example node zero would initialize all matrices and send the respective parts to the remaining three nodes.
+
+The next step involves three operations per node: two multiplications and one addition. The multiplication are realized in a similar fashion to the sequential program, \ie with three nested loops. However an OpenMP directive is used to parallelize the outer \texttt{for} loop. After some experimentation it was concluded that applying a single directive to the outer loop yielded the best performance.
+The following OpenMP directive is responsible for that task.
+
+\begin{lstlisting}
+#pragma omp parallel for default(none) private(...) shared(...)
+\end{lstlisting}
+
+% // #pragma omp for schedule(dynamic) nowait
+% // #pragma omp for schedule(dynamic, chunk) nowait
+% // #pragma omp for schedule(runtime) nowait
+% // omp_set_num_threads(16);
+        
+\subsection{Results}
+\label{ssec:results}
+
+% You need to ensure the parallel version is functional and can give the same output (Matrix C) as the sequential version. 
+% You are allowed to use at most 4 nodes on DAS3.
+% You are allowed to use gcc 4.3.2, rather than other compilers.
+% You are allowed to use the given sequential code.
+% You are recommended to use OpenMP (or Pthreads) to maximize performance on a single node. Empirically speaking, programmers need first to implement OpenMP (or Pthreads) on a single and then scale it to multiple nodes with MPI.
+% When measuring the execution time of your parallel code, start your timer after you have distributed the data blocks, and end your timer before gathering the final results (focus on the computation part for now).
+% In-depth optimizations are recommended such as vectorization and data locality.
+% Scalability analysis is recommended, i.e., analyzing your experimental results from using one node to four nodes. 

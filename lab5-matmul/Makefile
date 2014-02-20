@@ -15,7 +15,7 @@ original: matmul.c
 run-original: original
 	./$^.out $(DIM)
 
-omp: lab5.c
+omp: lab5omp.c
 	gcc $^ -o $@.out $(FLAGS) -fopenmp
 
 run-omp: omp
@@ -62,7 +62,7 @@ remote-mpi:
 	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-mpi"
 
 remote-omp:
-	scp lab5.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
+	scp lab5omp.c in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	scp Makefile in404924@fs3.das3.tudelft.nl:~/repos/ithpc/lab5-matmul
 	ssh in404924@fs3.das3.tudelft.nl "cd repos/ithpc/lab5-matmul && make run-omp"
 

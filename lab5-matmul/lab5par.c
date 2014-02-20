@@ -33,7 +33,7 @@ int main (int argc, char** argv)
     int y_max = atoi(argv[2]);    
  
     if (x_max != y_max){
-        printf("We consider square matrix only! %d, %d not valid.\n", x_max, y_max);
+        printf("We consider a square matrix only! %d, %d not valid.\n", x_max, y_max);
         MPI_Finalize();
         exit(-1);
     }
@@ -184,7 +184,7 @@ void init_mat(double *A, double *B, double *C, int x_max, int y_max, int numtask
             B[i * x_max + j] = (double)i * 0.01 + (double)j * 0.1;
             
             // if (i < y_max / sqrt(numtasks) && j < x_max / sqrt(numtasks))
-                C[i * x_max + j] = 0.0;
+            C[i * x_max + j] = 0.0;
         }
     }
 }
