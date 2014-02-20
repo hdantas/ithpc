@@ -17,25 +17,25 @@ It is simple to understand that the program was indeed executed twice since two 
 
 The result is the following
 \begin{lstlisting}
-    Number of iterations  : 2355
-    Elapsed processortime : 1.350000 s
-    Number of iterations  : 2355
-    Elapsed processortime : 1.360000 s
+	Number of iterations  : 2355
+	Elapsed processortime : 1.350000 s
+	Number of iterations  : 2355
+	Elapsed processortime : 1.360000 s
 \end{lstlisting}
 
 \subsubsection{Step 2}
 
 After adding the global variable and the necessary call to \texttt{MPI\_Comm\_rank} using the predefined communicator \texttt{MPI\_COMM\_WORLD}.
 \begin{lstlisting}
-    MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
+	MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
 \end{lstlisting}
 
 The following is printed to the standard output:
 \begin{lstlisting}
-    (0)     Elapsed processortime : 1.360000 s
-    (0)     Number of iterations  : 2355
-    (1)     Elapsed processortime : 1.360000 s
-    (1)     Number of iterations  : 2355
+	(0)     Elapsed processortime : 1.360000 s
+	(0)     Number of iterations  : 2355
+	(1)     Elapsed processortime : 1.360000 s
+	(1)     Number of iterations  : 2355
 \end{lstlisting}
 
 \subsubsection{Step 3}
@@ -53,7 +53,7 @@ The following is printed to the standard output:
 Adjusting the code so each process writes to a separate file does not affect the text displayed, so there is no need to repeat it here. In addition by executing the command
 
 \begin{lstlisting}
-    diff output0.dat output1.dat
+	diff output0.dat output1.dat
 \end{lstlisting}
 
 I was able to confirm the files are indeed identical.
@@ -64,9 +64,9 @@ On this step, responsible to ensure correct distribution of information originat
 
 To ensure only process 0 opens the file a simple comparison suffices
 \begin{lstlisting}
-    /* only process 0 may execute this if */
-    if (proc_rank == 0)
-    { ... }
+	/* only process 0 may execute this if */
+	if (proc_rank == 0)
+	{ ... }
 \end{lstlisting}
 
 To broadcast the data read from the file it is first necessary to explain which fields the \texttt{MPI\_Bcast(void *buffer, int count, MPI\_Datatype datatype, int root, MPI\_Comm comm))} function requires. 
@@ -75,41 +75,41 @@ For our situation the \texttt{buffer} pointer should refer to the address of the
 
 Thus the broadcast calls are as follows
 \begin{lstlisting}
-    /* broadcast the array gridsize in one call */
-    MPI_Bcast(&gridsize      , 2, MPI_INT   , 0, MPI_COMM_WORLD);
-    /* broadcast precision_goal */
-    MPI_Bcast(&precision_goal, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    /* broadcast max_iter */  
-    MPI_Bcast(&max_iter      , 1, MPI_INT   , 0, MPI_COMM_WORLD);
-(...)
-    /* The return value of this scan is broadcast even though it is no input data */
-    MPI_Bcast(&s, 1, MPI_INT, 0, MPI_COMM_WORLD);
-(...)
-    /* broadcast source_x */
-    MPI_Bcast(&source_x  , 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    /* broadcast source_y */
-    MPI_Bcast(&source_y  , 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    /* broadcast source_val */
-    MPI_Bcast(&source_val, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	/* broadcast the array gridsize in one call */
+	MPI_Bcast(&gridsize      , 2, MPI_INT   , 0, MPI_COMM_WORLD);
+	/* broadcast precision_goal */
+	MPI_Bcast(&precision_goal, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	/* broadcast max_iter */  
+	MPI_Bcast(&max_iter      , 1, MPI_INT   , 0, MPI_COMM_WORLD);
+	(...)
+	/* The return value of this scan is broadcast even though it is no input data */
+	MPI_Bcast(&s, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	(...)
+	/* broadcast source_x */
+	MPI_Bcast(&source_x  , 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	/* broadcast source_y */
+	MPI_Bcast(&source_y  , 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	/* broadcast source_val */
+	MPI_Bcast(&source_val, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 \end{lstlisting}
 
 \subsubsection{Step 6}
 
 Following the same approach as in the previous section, only the finished version of incomplete code from the manual will be shown in the excerpt.
 \begin{lstlisting}
-    MPI_Comm_size(MPI_COMM_WORLD, &P);
-    (...)
-    MPI_Cart_create(MPI_COMM_WORLD, 2, P_grid, wrap_around, reorder, &grid_comm);
-    (...)
-    /* Rank of process in new communicator */
-    MPI_Comm_rank(grid_comm, &proc_rank);
-    /* Coordinates of process in new communicator */
-    MPI_Cart_coords(grid_comm, proc_rank, 2, proc_coord);
-    (...)
-    /* rank of processes proc_top and proc_bottom */
-    MPI_Cart_shift(grid_comm, Y_DIR, 1, &proc_top, &proc_bottom);
-    /* rank of processes proc_left and proc_right */
-    MPI_Cart_shift(grid_comm, X_DIR, 1, &proc_left, &proc_right);
+	MPI_Comm_size(MPI_COMM_WORLD, &P);
+	(...)
+	MPI_Cart_create(MPI_COMM_WORLD, 2, P_grid, wrap_around, reorder, &grid_comm);
+	(...)
+	/* Rank of process in new communicator */
+	MPI_Comm_rank(grid_comm, &proc_rank);
+	/* Coordinates of process in new communicator */
+	MPI_Cart_coords(grid_comm, proc_rank, 2, proc_coord);
+	(...)
+	/* rank of processes proc_top and proc_bottom */
+	MPI_Cart_shift(grid_comm, Y_DIR, 1, &proc_top, &proc_bottom);
+	/* rank of processes proc_left and proc_right */
+	MPI_Cart_shift(grid_comm, X_DIR, 1, &proc_left, &proc_right);
 \end{lstlisting}
 
 There a couple new function calls on this code whose arguments I will explain next.
@@ -118,9 +118,9 @@ As explained in the exercise description MPI uses the \texttt{MPI\_Cart\_*} func
 To create one the API calls needs the previous communicator, in our case we were using \texttt{MPI\_COMM\_WORLD}. \texttt{ndims} and \texttt{dims} define the number of dimensions of the grid and the number of processors in each, respectively. For our example these are 2 and \texttt{P\_grid}. Thereafter the periods specifies if the grid is periodic or not per dimension, and finally if the ranking is reordered or not. These are replaced by the self-explanatory variables \texttt{wrap\_around} and \texttt{reorder}. The new communicator is stored in the address of \texttt{comm\_cart}. From now on all pointers to communicators refer to this one.
 
 \begin{lstlisting}
-int MPI_Cart_create(MPI_Comm comm_old, int ndims, int *dims, int *periods, int reorder, MPI_Comm *comm_cart)
-int MPI_Cart_coords(MPI_Comm comm, int rank, int maxdims, int *coords)
-int MPI_Cart_shift(MPI_Comm comm, int direction, int displ, int *source, int *dest)
+	int MPI_Cart_create(MPI_Comm comm_old, int ndims, int *dims, int *periods, int reorder, MPI_Comm *comm_cart)
+	int MPI_Cart_coords(MPI_Comm comm, int rank, int maxdims, int *coords)
+	int MPI_Cart_shift(MPI_Comm comm, int direction, int displ, int *source, int *dest)
 \end{lstlisting}
 
 To define the coordinates of the process in the new communicator we use \texttt{MPI\_Cart\_coords}. Here the rank is necessarily the processor rank (\texttt{proc\_rank}), the maximum dimensions is 2. The coordinates of each specified process are stored in the \texttt{proc\_coord} array.
@@ -131,12 +131,12 @@ Finally the shift operation returns the shifted source and destination ranks. Th
 The text written to the standard output now features the coordinate of each processor.
 
 \begin{lstlisting}
-    (0) Number of iterations : 2355
-    (0) (x,y)=(0,0)
-    (0) Elapsed Wtime:       1.414062 s ( 96.9% CPU)
-    (1) Number of iterations : 2355
-    (1) (x,y)=(1,0)
-    (1) Elapsed Wtime:       1.464844 s ( 95.6% CPU)
+	(0) Number of iterations : 2355
+	(0) (x,y)=(0,0)
+	(0) Elapsed Wtime:       1.414062 s ( 96.9% CPU)
+	(1) Number of iterations : 2355
+	(1) (x,y)=(1,0)
+	(1) Elapsed Wtime:       1.464844 s ( 95.6% CPU)
 \end{lstlisting}
 
 As one can observe since there are two processor, number 0 is allocated the left half of the grid, and processor with rank 1 deals with the right half.
@@ -181,14 +181,14 @@ When there are three processors the work can not be evenly split between them. T
 For example for processor 2 (in a 3 processor configuration) it is visible that \texttt{x} is always negative.
 
 \begin{lstlisting}
-    (2) x = -30, dim[X_DIR] = 36
-    (2) y =  71,  dim[Y_DIR] = 102
+	(2) x = -30, dim[X_DIR] = 36
+	(2) y =  71,  dim[Y_DIR] = 102
 
-    (2) x = -3, dim[X_DIR] = 36
-    (2) y = 76, dim[Y_DIR] = 102
+	(2) x = -3, dim[X_DIR] = 36
+	(2) y = 76, dim[Y_DIR] = 102
 
-    (2) x = -28, dim[X_DIR] = 36
-    (2) y =  26, dim[Y_DIR] = 102
+	(2) x = -28, dim[X_DIR] = 36
+	(2) y =  26, dim[Y_DIR] = 102
 \end{lstlisting}
 
 
@@ -198,12 +198,12 @@ For example for processor 2 (in a 3 processor configuration) it is visible that 
 After implementing the collective reduction operation the total number of iterations is indeed the same, as confirmed by the program's output.
 
 \begin{lstlisting}
-    (0) Number of iterations : 2355
-    (0) Elapsed Wtime:       1.507812 s ( 96.2% CPU)
-    (1) Number of iterations : 2355
-    (1) Elapsed Wtime:       1.496094 s ( 97.6% CPU)
-    (2) Number of iterations : 2355
-    (2) Elapsed Wtime:       1.507812 s ( 96.8% CPU)
+	(0) Number of iterations : 2355
+	(0) Elapsed Wtime:       1.507812 s ( 96.2% CPU)
+	(1) Number of iterations : 2355
+	(1) Elapsed Wtime:       1.496094 s ( 97.6% CPU)
+	(2) Number of iterations : 2355
+	(2) Elapsed Wtime:       1.507812 s ( 96.8% CPU)
 \end{lstlisting}
 
 \subsubsection{Step 10}
@@ -328,7 +328,7 @@ To conclude this question we plotted the estimated functions along with the actu
                height=6.0cm,
                mark size = 3,
                very thick]
-\input{figtop.tikz}
+\input{data/figtop.tikz}
 
 \nextgroupplot[ymin=4,ymax=5,
                height=2.5cm,
@@ -339,7 +339,7 @@ To conclude this question we plotted the estimated functions along with the actu
                axis y discontinuity=crunch,
                y axis line style=-,
                very thick]
-\input{figtop.tikz}
+\input{data/figtop.tikz}
 
 \nextgroupplot[ymin=0,ymax=4,
                ytick={0, 1, 2, 3},
@@ -352,8 +352,8 @@ To conclude this question we plotted the estimated functions along with the actu
                height=6.0cm,
                mark size = 3,
                very thick]
-\input{figtop.tikz}
-\input{figbottom.tikz}
+\input{data/figtop.tikz}
+\input{data/figbottom.tikz}
 
 
 \end{groupplot}
@@ -475,8 +475,6 @@ $g$      &    $n$   &   $n_{\text{est}}$   &   $\delta$ (\%) \\ \midrule
 The conclusion that can be drawn from table~\ref{tbl:est-iterations} is that the iteration evolution is approximately linear with the grid size. This claim is supported by the low relative error between predicted and actual data points, in particular as dimensions increase. Nonetheless in order to make a stronger claim it is important to perform a more refined study (\ie increase the data set) as we only consider four point.
 
 
-
-
 \subsubsection{2.6}
 
 \begin{figure}[ht]
@@ -490,7 +488,7 @@ The conclusion that can be drawn from table~\ref{tbl:est-iterations} is that the
         ylabel style={at={(-.1,0.5)}},
         % restrict y to domain=0:1,
         % restrict x to domain=0:100
-        ymin=0.00005,ymax=9,
+        ymin=0.00005,ymax=20,
         xmin=0,xmax=2000,
         xtick={0, 400, 800, 1200, 1600},
         ytick={0.0001, 0.001, 0.01, 0.1, 1.0},
@@ -500,14 +498,11 @@ The conclusion that can be drawn from table~\ref{tbl:est-iterations} is that the
         colormap={redblue}{color=(red) color=(blue)},
         % axis y discontinuity=crunch,
     ]
-    % use TeX as calculator:
-    \addplot[mesh, very thick] file {global-delta.data};
-    % \draw[ultra thick, draw=orange!70!black, dotted] (0, 0.0001) -- (1663, 0.0001) ;
+    \addplot[scatter,only marks, mark size=0.9, each nth point={1}, filter discard warning=false, scatter src=y, ultra thin] file {data/global-delta.data};
     \end{semilogyaxis}
-    % \end{axis}
 \end{tikzpicture}
 \caption{The evolution of $\delta_{\text{global}}$ for a grid size of 500 and a 41 processor topology. The blue color represents high error while red illustrates errors close to the precision goal, \num{e-4}.
-When this value is reached no more iterations occur. To note that the $y$ scale is logarithmic.}
+When this value is reached no more iterations occur. It is important to note that the $y$ axis is logarithmic.}
 \label{fig:error}
 \end{figure}
 
@@ -515,6 +510,61 @@ Figure~\ref{fig:error} depicts the evolution of the error with increased iterati
 
 
 \subsubsection{2.8}
+
+Changing the number of red/black sweeps between border exchanges has a significant impact both on the total number of iterations and the total running time, as exhibited in table~\ref{tbl:sweeps}. As the work between communication steps increases the number of iterations to converge declines, however the time per iteration augments. The issue, is that the latter rate is higher than the former which results in a global execution time penalty.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l*{2}{c}}
+ \toprule
+Sweeps  &   $n$   &   \texttt{Wtime} (\si{s}) \\ \midrule
+1       &   1664  &   7.945312 \\
+2       &   927   &   8.125000 \\
+3       &   732   &   9.191406 \\
+5       &   624   &  12.808594 \\
+\bottomrule
+\end{tabular}
+\caption{Analyzing the execution time as the number of sweeps between communication steps evolves. $n$ portrays the number of iterations necessary for convergence. These results were obtained with the following configuration \texttt{g:}500x500 and \texttt{pt:}441.}
+\label{tbl:sweeps}
+\end{table}
+
+
 \subsubsection{2.9}
+
+To incorporate the optimization indicated in the question an extra variable, \texttt{aux}, was added.
+The respective code, in particular the inner \texttt{for} loop was updated to the following.
+
+\begin{lstlisting}
+for (x = 1; x < dim[X_DIR] - 1; x++) {
+	aux = (x + offset[X_DIR] + offset[Y_DIR] + parity + 1) % 2;
+	for (y = 1 + aux; y < dim[Y_DIR] - 1; y += 2)  
+		if (source[x][y] != 1)
+		{
+			...
+		}
+	}
+}
+\end{lstlisting}
+
+The added variable along with the adjustment to the increment of \texttt{y} obviates the need to explicitly check the parity in the subsequent \texttt{if} statement.
+More importantly it reduces the number of iterations of the inner loop. Table~\ref{tbl:optimization} compares the running times foe before and after the optimization.
+
+
+\begin{table}[H] %TODO
+\centering
+\begin{tabular}{*{4}{c}}
+ \toprule
+\texttt{gs}  &   \texttt{Wtime\textsubscript{before}} (\si{s})  & \texttt{Wtime\textsubscript{after}} (\si{s})  & $\delta$ (\%) \\ \midrule
+200          &   9.999999                                       & 9.999999                                      &  9.9999       \\
+300          &   9.999999                                       & 9.999999                                      &  9.9999       \\
+500          &   9.999999                                       & 9.999999                                      &  9.9999       \\
+\bottomrule
+\end{tabular}
+\caption{Results before and after implementing the inner loop optimization for various grid sizes.}
+\label{tbl:optimization}
+\end{table}
+
 \subsubsection{2.11}
+
+
 \subsubsection{2.12}

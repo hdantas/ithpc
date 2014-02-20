@@ -22,9 +22,12 @@
 
 %Package Configurations sorted in ALPHABETICAL order
 
+% \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+% \DeclareCaptionFormat{listing}{\colorbox{Gray}{\parbox{\textwidth}{#1#2#3}}}
+
 \epstopdfsetup{update,suffix=,verbose=false}
 \graphicspath{
-{figures/}ƒ
+{figures/}
 }
 \hypersetup
 {
@@ -40,6 +43,22 @@
         bookmarksopen=true,
         pdfborder={0 0 0},
 }
+
+\lstset{
+        backgroundcolor=\color{gray!5!white},
+        basicstyle=\footnotesize\ttfamily,
+        breaklines=true,
+        commentstyle=\color{Gray},
+        keywordstyle=\color{blue},
+        language=C,
+        numbers=none,
+        numbersep=5pt,
+        numberstyle=\tiny,
+        stepnumber=1,
+        tabsize=2,
+        title=\lstname
+}
+
 
 \numberwithin{equation}{section} %equation number include section
 \numberwithin{figure}{section} %figure number include section
