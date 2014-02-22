@@ -1,4 +1,4 @@
-DIM = 2048 2048
+DIM = 256 256
 P = 4
 FLAGS = -lrt -lm -Wall 
 OPTIMIZATION = -O2 -ffast-math -msse -msse2 -msse3 -mmmx -m3dnow -funroll-loops
@@ -83,4 +83,4 @@ clean:
 	rm -rfv *~ *.out
 
 clean-all: clean
-	rm -rfv A.txt B.txt C.txt originalA.txt originalB.txt originalC.txt
+	rm -rfv A.txt B.txt C.txt originalA.txt originalB.txt originalC.tx

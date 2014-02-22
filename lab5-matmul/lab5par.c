@@ -7,12 +7,15 @@
 #include <omp.h>
 #include "mpi.h"
 
+#define ALPHA 0.1
+#define BETA 0.5
 
-void init_mat(double *A, double *B, double *C, int x_max, int y_max, int numtasks);
+void init_mat(double *A, double *B, double *C, int x_max, int y_max, int numtasks, int rank);
 double timer();
 void write_to_file(const char *txt, int x_max, int y_max, double* array);
-void multiply(double* A, double* B, double* localC, char subA, char subB, int minRowC, int minColC, int dim, int numberOfProcessors, double alpha, double beta);
+void multiply(double* A, double* B, double* C, char subA, char subB, int minRowC, int minColC, int dim, int numberOfProcessors);
 void readFromFile(char* filename, char* multiplyOrder);
+
 
 int main (int argc, char** argv)
 {
@@ -65,10 +68,7 @@ int main (int argc, char** argv)
     
     double bytes = 0;
     double flops = 0;   
-    double alpha = 0.1;
-    double beta = 0.5;
    
-    // char multiplyOrder[numtasks][2 * sqrt(numtasks)];
     char *multiplyOrder = (char *) malloc(2 * sqrtNumtasks * numtasks * sizeof(char));
     char filename[20];
     sprintf(filename, "%d", numtasks);
@@ -79,112 +79,83 @@ int main (int argc, char** argv)
     //Allocate matrix
     double *A = (double *) malloc(arr_bytes);
     double *B = (double *) malloc(arr_bytes);
-    double *C1;
-    // double *localC = (double *) malloc(arr_bytes / sqrt(numtasks));
-    double *localC  = (double *) malloc(arr_bytes);
+    double *C = (double *) malloc(arr_bytes);
     
-    // for (i = 4; i < 100; i *= 4) {
+    double *tempC;
         
+    init_mat(A, B, C, x_max, y_max, numtasks, rank);
+    
+    t_start = timer();
+    t_start_cpu = timer();
 
-        init_mat(A, B, localC, x_max, y_max, numtasks);
+    for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
+        minRow = steps * (rank / sqrtNumtasks);
+        minCol = steps * (rank % sqrtNumtasks);
+        multiply(A, B, C, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1], minRow, minCol, dim, numtasks);
+    }
+    t_end_cpu = timer();
+    
+    t_start_comm = timer();
+    if (rank != 0) {
+        MPI_Send(C, x_max * y_max, MPI_DOUBLE, 0, 42, MPI_COMM_WORLD);
+    } else {
+        MPI_Status status;
+        tempC = (double *) malloc((numtasks - 1) * arr_bytes);
 
+        for(id = 1; id < numtasks; id++) {
+            MPI_Recv(&tempC[(id - 1) * dimSq], x_max * y_max, MPI_DOUBLE, id, 42, MPI_COMM_WORLD, &status);
+        }
 
-        // run matrix multiplication
-        t_start = timer();
+    }
+    t_end_comm = timer();
         
-        t_start_cpu = timer();
-        if (rank == 0) {
-            for (i = 0; i < y_max; i++) { // beta * c
-                k = i * x_max;
-                for (j = 0; j < x_max; j++) {
-                    localC[k] *= beta;
-                    k++;
+    t_end = timer();
+
+    t_delta_comm = t_end_comm - t_start_comm;
+    t_delta_cpu = t_end_cpu - t_start_cpu;
+    t_delta = t_end - t_start;
+
+    // statistics
+    bytes = (double)x_max * (double)y_max * (double)4 * (double)sizeof(double);
+    flops = (double)x_max * (double)y_max * (double)x_max * 2;
+    
+    printf("rank: %2d, Total time: %lf, Comm time: %lf, CPU time: %lf", rank, t_delta * 1.0e-9, t_delta_comm * 1.0e-9, t_delta_cpu * 1.0e-9); 
+    printf(", gflops: %lf", flops / t_delta);
+    printf(", bandwidth: %lf\n", bytes/t_delta);
+
+    if (rank == 0) {
+        for (i = 0; i < y_max; i++) {
+            k = i * x_max;
+            for (j = 0; j < x_max; j++) {
+                for(id = 1; id < numtasks; id++) {
+                    C[k] += tempC[(id - 1) * dimSq + k];
                 }
+                C[k] += BETA * ((double)j * 0.11);
+                k++;
             }
         }
+       write_to_file("C.txt" , x_max, y_max, C);
+       free(tempC);
+    }
 
-        for(i = 0; i < 2 * sqrtNumtasks; i += 2) {
-            minRow = steps * (rank / sqrtNumtasks);
-            minCol = steps * (rank % sqrtNumtasks);
-            // printf("%d computes C[%d][%d] = %c * %c\n", rank, minRow, minCol, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1]); 
-            multiply(A, B, localC, multiplyOrder[rank * 2 * sqrtNumtasks + i], multiplyOrder[rank * 2 * sqrtNumtasks + i + 1],
-                     minRow, minCol, dim, numtasks, alpha, beta);
-        }
-        t_end_cpu = timer();
-
-        t_start_comm = timer();
-        if (rank != 0) {
-            MPI_Send(localC, x_max * y_max, MPI_DOUBLE, 0, 42, MPI_COMM_WORLD);
-        } else {
-            MPI_Status status;
-            C1 = (double *) malloc((numtasks - 1) * arr_bytes);
-
-            for(id = 1; id < numtasks; id++) {
-                MPI_Recv(&C1[(id - 1) * dimSq], x_max * y_max, MPI_DOUBLE, id, 42, MPI_COMM_WORLD, &status);
-                // for (i = 0; i < y_max; i++){
-                //     for (j = 0; j < x_max; j++) {
-                //     printf("rank: %d, C1[%d] = %1.5lf\n", id, (id - 1) * dimSq + i * x_max + j,
-                //         C1[(id - 1) * dimSq + i * x_max + j]);
-                //     }
-                // }
-            }
-
-        }
-        t_end_comm = timer();
-            
-        t_end = timer();
-
-        t_delta_comm = t_end_comm - t_start_comm;
-        t_delta_cpu = t_end_cpu - t_start_cpu;
-        t_delta = t_end - t_start;
-
-        // statistics
-        bytes = (double)x_max * (double)y_max * (double)4 * (double)sizeof(double);
-        flops = (double)x_max * (double)y_max * (double)x_max * 2;
-        // printf("chunk: %d\t", i);
-        printf("rank: %2d, Total time: %lf, Comm time: %lf, CPU time: %lf", rank, t_delta * 1.0e-9, t_delta_comm * 1.0e-9, t_delta_cpu * 1.0e-9); 
-        printf(", gflops: %lf", flops / t_delta);
-        printf(", bandwidth: %lf\n", bytes/t_delta);
-
-        // Write results to a file
-        // if (rank == 0) {
-        //     write_to_file("C.txt" , x_max, y_max, 'C');
-        // }
-
-        if (rank == 0) {
-            for (i = 0; i < y_max; i++) { // alpha * AB
-                k = i * x_max;
-                for (j = 0; j < x_max; j++) {
-                    // k = i * x_max + j;
-                    for(id = 1; id < numtasks; id++) {
-                        localC[k] += C1[(id - 1) * dimSq + k];
-                    }
-                    // printf("C[%d] = localC[%d] + C1[%d] + C1[%d] + C1[%d]\n", k, k,
-                    //     k, dimSq + k, 2 * dimSq + k);
-                    k++;
-                }
-            }
-           write_to_file("C.txt" , x_max, y_max, localC);
-        }
 
     free(A);
     free(B);
-    free(localC);
+    free(C);
+    
     MPI_Finalize();
 
     return 0;
 }
 
-void init_mat(double *A, double *B, double *C, int x_max, int y_max, int numtasks)
+void init_mat(double *A, double *B, double *C, int x_max, int y_max, int numtasks, int rank)
 {
     int i, j;
     for(i = 0; i < y_max; i++) {
         for(j = 0; j < x_max; j++) {
             A[i * x_max + j] = (double)i * 0.1 +  (double)j * 0.01;
             B[i * x_max + j] = (double)i * 0.01 + (double)j * 0.1;
-            
-            // if (i < y_max / sqrt(numtasks) && j < x_max / sqrt(numtasks))
-            C[i * x_max + j] = 0.0;
+            C[i * x_max + j] = 0;
         }
     }
 }
@@ -218,7 +189,7 @@ void write_to_file(const char *txt, int x_max, int y_max, double* array) {
     fclose(f);
 }
 
-void multiply(double* A, double* B, double* localC, char subA, char subB, int minRowC, int minColC, int dim, int numberOfProcessors, double alpha, double beta) {
+void multiply(double* A, double* B, double* C, char subA, char subB, int min_rowC, int min_colC, int dim, int numberOfProcessors) {
     int i, j, ka, kb;
     double a, b, c;
     int numberOfLetters = sqrt(numberOfProcessors);
@@ -234,32 +205,23 @@ void multiply(double* A, double* B, double* localC, char subA, char subB, int mi
     int min_colB = ((subB - 'A') % numberOfLetters) * increment;
     int max_colB = min_colB + increment - 1;
 
-    // #pragma omp parallel default(none) private(a, b, c, i, j, ka, kb) shared(A, B, localC, alpha, dim, min_rowA, max_rowA, min_colA, max_colA, min_colB, max_colB, min_rowB, max_rowB, minRowC, minColC)
-    
-        // #pragma omp for schedule(dynamic) nowait
-        // #pragma omp for schedule(dynamic, chunk) nowait
-        // #pragma omp for schedule(runtime) nowait
-        // omp_set_num_threads(16);
-        #pragma omp parallel for default(none) private(a, b, c, i, j, ka, kb) shared(A, B, localC, alpha, dim, min_rowA, max_rowA, min_colA, max_colA, min_colB, max_colB, min_rowB, max_rowB, minRowC, minColC)
-        for(i = min_rowA; i <= max_rowA; i++) // rowA
-        {
-           for(j = min_colB; j <= max_colB; j++) // colB
-           {
-                c = 0.0f;
-                for(ka = min_colA, kb = min_rowB; ka <= max_colA && kb <= max_rowB; ka++, kb++)
-                {
-                    a = A[i * dim + ka];
-                    b = B[kb * dim + j];
-                    c += a * b;
-                    // printf("\ta = A[%d][%d] = %lf", i, ka, a);
-                    // printf(", b = B[%d][%d] = %lf\n", kb, j, b);
-                    // printf("\tc = %lf\n",c);
-                }
-                // localC[minRowC + i - min_rowA][minColC + j - min_colB] += alpha * c;
-                localC[(minRowC + i - min_rowA) * dim + minColC + j - min_colB] += alpha * c;
-                // printf("C[%d] = %lf\n", (minRowC + i - min_rowA) * dim + minColC + j - min_colB, localC[(minRowC + i - min_rowA) * dim + minColC + j - min_colB]);
+
+    #pragma omp parallel for default(none) private(a, b, c, i, j, ka, kb) shared(A, B, C, dim, min_rowA, max_rowA, min_colA, max_colA, min_colB, max_colB, min_rowB, max_rowB, min_rowC, min_colC)
+    for(i = min_rowA; i <= max_rowA; i++) // rowA
+    {
+       for(j = min_colB; j <= max_colB; j++) // colB
+       {
+            c = 0.0f;
+            for(ka = min_colA, kb = min_rowB; ka <= max_colA && kb <= max_rowB; ka++, kb++)
+            {
+                a = A[i * dim + ka];
+                b = B[kb * dim + j];
+                c += a * b;
             }
+
+            C[(min_rowC + i - min_rowA) * dim + min_colC + j - min_colB] += ALPHA * c; // C = alpha * AB
         }
+    }
     
 }
 
@@ -270,7 +232,6 @@ void readFromFile(char* filename, char* multiplyOrder) {
     while (fscanf(f, "%c", &letter) != EOF) {
         if(letter >= 'A' && letter <= 'Z'){
             multiplyOrder[i++] = letter;
-            // printf("%c\n", letter);
         }
     }
     fclose(f);
