@@ -1,9 +1,0 @@
-Why in lab1 exercise 4-1 is the timer not reset as it shoud be?
-
-In lab2 step 6 (page 9)
-"They are the arguments of the run-script run that is provided to facilitate the running of the program 
-on different process grids."
-I cant find the script!
-
-In lab 2 step 8 (page 12) where does Exchange_borders goes exactly?
-Am I using the right coordinates for MPI_Sendrecv?

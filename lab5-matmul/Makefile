@@ -1,4 +1,4 @@
-DIM = 256 256
+DIM = 2048 2048
 P = 4
 FLAGS = -lrt -lm -Wall 
 OPTIMIZATION = -O2 -ffast-math -msse -msse2 -msse3 -mmmx -m3dnow -funroll-loops
@@ -21,7 +21,7 @@ omp: lab5omp.c
 run-omp: omp
 	./$^.out $(DIM)
 
-par: lab5par.c
+par: oldlab5par.c
 	mpicc $^ -o $@.out $(FLAGS) -fopenmp
 
 run-par: par
