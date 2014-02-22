@@ -221,7 +221,7 @@ From this data we concluded that 1.93 is the optimal value for the relaxation pa
 \centering
 \begin{tabular}{cccc}
  \toprule
-$\omega$ & \texttt{Wtime}\tablefootnote{This value was computed as the maximum \texttt{Wtime} over the four individual processor times for each $\omega$ value.} (\si{s}) & $n$ & Reduction\\ \midrule
+$\omega$ & \texttt{Wtime}\tablefootnote{This value was computed as the maximum \texttt{Wtime} over the four individual processor times for each $\omega$ value. In addition, in this report all reported time are determined this way, \ie the maximum reported value over the four nodes.} (\si{s}) & $n$ & Reduction\\ \midrule
     1.00 &        1.500000 &        2355 &        1.00 \\    
     1.90 &        0.222656 &        220  &        10.7 \\
     1.92 &        0.199219 &        165  &        14.3 \\
@@ -549,22 +549,34 @@ for (x = 1; x < dim[X_DIR] - 1; x++) {
 The added variable along with the adjustment to the increment of \texttt{y} obviates the need to explicitly check the parity in the subsequent \texttt{if} statement.
 More importantly it reduces the number of iterations of the inner loop. Table~\ref{tbl:optimization} compares the running times foe before and after the optimization.
 
-
-\begin{table}[H] %TODO
+\begin{table}[H] 
 \centering
-\begin{tabular}{*{4}{c}}
+\begin{tabular}{*{5}{c}}
  \toprule
-\texttt{gs}  &   \texttt{Wtime\textsubscript{before}} (\si{s})  & \texttt{Wtime\textsubscript{after}} (\si{s})  & $\delta$ (\%) \\ \midrule
-200          &   9.999999                                       & 9.999999                                      &  9.9999       \\
-300          &   9.999999                                       & 9.999999                                      &  9.9999       \\
-500          &   9.999999                                       & 9.999999                                      &  9.9999       \\
+\texttt{gs}  &  $n$   &  \texttt{Wtime\textsubscript{before}} (\si{s})  &  \texttt{Wtime\textsubscript{after}} (\si{s})  & $\delta$ (\%) \\ \midrule
+200          &   382  &  0.56                                           &  0.54                                          &  -4.17        \\
+400          &  1206  &  3.80                                           &  3.54                                          &  -6.69        \\
+800          &  3003  &  33.32                                          &  29.44                                         &  -11.65       \\
+2000         &  3770  &  246.54                                         &  210.63                                        &  -14.56       \\
 \bottomrule
 \end{tabular}
-\caption{Results before and after implementing the inner loop optimization for various grid sizes.}
+\caption{Results before and after implementing the inner loop optimization for various grid sizes.
+The same topology as before was used for this measurements: \texttt{pt:}441.}
 \label{tbl:optimization}
 \end{table}
+
+The conclusion from the results presented in table~\ref{tbl:optimization} is that the optimization has a moderate but important impact on the overall performance. This difference becomes more evident as the grid size increases.
+
+For the remaining of this document the ``optimized'' version of the code will be used.
 
 \subsubsection{2.11}
 
 
 \subsubsection{2.12}
+
+
+
+
+
+
+
