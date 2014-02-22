@@ -17,7 +17,7 @@ void init_mat(double *  A, double *  B, double *  C, int x_max, int y_max)
         {
             A[i+j*x_max] = (DT)j*0.1 + (DT)i*0.01;
             B[i+j*x_max] = (DT)j*0.01 + (DT)i*0.1;
-            C[i+j*x_max] = 0.0;
+            C[i+j*x_max] = (DT)i*0.01 + (DT)i*0.1;
         }
     }
     return ;
