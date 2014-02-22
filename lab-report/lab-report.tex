@@ -24,6 +24,7 @@
 
 % \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
 % \DeclareCaptionFormat{listing}{\colorbox{Gray}{\parbox{\textwidth}{#1#2#3}}}
+\addbibresource{ref.bib}
 
 \epstopdfsetup{update,suffix=,verbose=false}
 \graphicspath{
@@ -38,7 +39,7 @@
         pdftitle={\cleantitle},
         pdfauthor={Henrique Dantas},
         pdfsubject={},
-        pdfkeywords={Cool stuff!},
+        pdfkeywords={C00l stuff!},
         pdfproducer={pdfLaTeX},
         bookmarksopen=true,
         pdfborder={0 0 0},
@@ -91,10 +92,16 @@
 \begin{document}
 \maketitle
 
-\include{lab1}
+\input{lab1}
 \include{lab2}
 % \include{lab3}
 % \include{lab4}
 \include{lab5}
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\printbibliography
+\nocite{*}
 
 \end{document}
