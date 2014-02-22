@@ -1,6 +1,7 @@
 #VARIABLES
 TEX    = pdflatex
 TMPEXT = *.lof *.lot *.toc *.aux *.out *.log
+BIBC   = biber
 
 OUTDIR = out
 AUXDIR = auxi
@@ -12,6 +13,8 @@ all: lab-report
 lab-report:
 	$(TEX) -output-directory=$(OUTDIR) -aux-directory=$(AUXDIR) --jobname="ItHPC Lab Report" $@.tex
 
+bib:
+	$(BIBC) $(OUTDIR)/"ItHPC Lab Report"
 
 # CLEANING UP
 clean: clean-miktex clean-tex
