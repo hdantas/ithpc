@@ -280,7 +280,7 @@ t(n) = \alpha + \beta \cdot n
 \label{eq:alphabeta}
 \end{equation}
 
-Where $\alpha$ and $\beta$ are arbitrary constants. To determine these constants we will use the least-squares method. The results of applying this technique\tablefootnote{The Google Drive implementation of least-squares, \emph{LINEST} function, was used for this computation. For more information please see \url{https://support.google.com/drive/answer/3094249}.} to the available dataset are shown in table~\ref{tbl:alphabeta}
+Where $\alpha$ and $\beta$ are arbitrary constants. To determine these constants we will use the least-squares method. The results of applying this technique\footnote{The Google Drive implementation of least-squares, \emph{LINEST} function, was used for this computation. For more information please see \url{https://support.google.com/drive/answer/3094249}.} to the available dataset are shown in table~\ref{tbl:alphabeta}
 
 \begin{table}[H]
 \centering
@@ -474,7 +474,6 @@ $g$      &    $n$   &   $n_{\text{est}}$   &   $\delta$ (\%) \\ \midrule
 
 The conclusion that can be drawn from table~\ref{tbl:est-iterations} is that the iteration evolution is approximately linear with the grid size. This claim is supported by the low relative error between predicted and actual data points, in particular as dimensions increase. Nonetheless in order to make a stronger claim it is important to perform a more refined study (\ie increase the data set) as we only consider four point.
 
-
 \subsubsection{2.6}
 
 \begin{figure}[ht]
@@ -508,7 +507,7 @@ When this value is reached no more iterations occur. It is important to note tha
 
 Figure~\ref{fig:error} depicts the evolution of the error with increased iterations for a 500x500 grid size. It is worthy to mention that the error reduces drastically until approximately the hundredth iteration. From that point on the rate of descent is decreased
 
-
+\subsubsection{2.7}
 \subsubsection{2.8}
 
 Changing the number of red/black sweeps between border exchanges has a significant impact both on the total number of iterations and the total running time, as exhibited in table~\ref{tbl:sweeps}. As the work between communication steps increases the number of iterations to converge declines, however the time per iteration augments. The issue, is that the latter rate is higher than the former which results in a global execution time penalty.
@@ -569,14 +568,42 @@ The conclusion from the results presented in table~\ref{tbl:optimization} is tha
 
 For the remaining of this document the ``optimized'' version of the code will be used.
 
+\subsubsection{2.10}
 \subsubsection{2.11}
 
+To investigate the impact of the \texttt{Exchange\_Borders} function the code on the performance the total time spent on this function as well as the amount of data transmitted were studied.
+To account for the time we added calls to the \texttt{resume\_timer} and \texttt{stop\_time} functions at the beginning and end, respectively of \texttt{Exchange\_Borders}.
+On the other hand to measure the amount of data send we simply added the appropriate value to a global counter for each time the function under studied is called. This value is easy to obtain as each \texttt{MPI\_Send} command sends \texttt{dim[X\_DIR] - 2} or \texttt{dim[Y\_DIR] - 2} \texttt{MPI\_DOUBLE}s.
+
+Table~\ref{tbl:exchangeborders} summarizes the empirical results. As the number of iterations for the two 4-node topologies studied (\ie \texttt{tp:}441 and \texttt{tp:}422) is the same, the amount of data transmitted is also the same. Thus the timing results are also similar and consequently only the former is considered on the table.
+
+\begin{table}[H] 
+\centering
+\begin{tabular}{*{4}{c}}
+ \toprule
+\texttt{gs}  &  Comm time per node (\si{s})  &  Total data sent (\si{\mega\byte})  & Bandwidth (\si[per-mode=symbol]{\mega\byte\per\second}) \\ \midrule
+200          &  0.20                         &  11.66                              & 59.69                                  \\
+400          &  0.72                         &  73.61                              & 102.41                                 \\
+800          &  2.92                         &  366.58                             & 125.46                                 \\
+2000         &  6.53                         &  1 150.51                           & 176.16                                 \\
+\bottomrule
+\end{tabular}
+\caption{Total amount of data sent\protect\footnotemark~and individual communication time in the \texttt{Exchange\_Borders} function.}
+\label{tbl:exchangeborders}
+\end{table}
+
+%Hack to have footnote in the table caption.
+\footnotetext{The shown values only consider sent data. To determine the total traffic (\ie data sent and data received) one should simply double those numbers.} 
 
 \subsubsection{2.12}
 
+The impact of the communication overhead is limited. Even for large grid sizes halving the amount of data sent is likely to cause, at best, moderate improvements.
+Given the code changes necessary to accomplish that goal we conclude it is not worth the effort.
+In addition the maintainability of the code would decrease rapidly as such modifications would hamper readability and comprehension of the code base.
 
+Nonetheless to accommodate this optimization the address of the first point to exchange would have to be calculated differently, taking into account the parity value.
+Moreover the size of the ``jump'' between transmittable points would also need to be modified.
+Such a change would best be done in the \texttt{Setup\_MPI\_Datatypes()} where the custom data types are defined.
+The greatest advantage would be the $50\%$ reduction number of points to exchange.
 
-
-
-
-
+\subsubsection{2.13}

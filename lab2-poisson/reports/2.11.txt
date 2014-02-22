@@ -1,49 +1,47 @@
-bw: Bandwith: = 97792
+ds: Data sent = 12224000
 g: Grid Size = 200 x 200
 pt: Topology: 4 4 1
-	(0) data_communicated = 3056 (24448 bytes))
-	(0) Elapsed Wtime:       0.164062 s (128.0% CPU)
+	(0) Elapsed Wtime:       0.195312 s ( 97.3% CPU)
 	(0) n: Number of iterations : 382
-	(1) data_communicated = 3056 (24448 bytes))
-	(1) Elapsed Wtime:       0.191406 s ( 88.8% CPU)
+	(1) Elapsed Wtime:       0.183594 s (108.9% CPU)
 	(1) n: Number of iterations : 382
-	(2) data_communicated = 3056 (24448 bytes))
-	(2) Elapsed Wtime:       0.195312 s ( 97.3% CPU)
+	(2) Elapsed Wtime:       0.191406 s ( 67.9% CPU)
 	(2) n: Number of iterations : 382
-	(3) data_communicated = 3056 (24448 bytes))
-	(3) Elapsed Wtime:       0.191406 s ( 99.3% CPU)
+	(3) Elapsed Wtime:       0.187500 s (112.0% CPU)
 	(3) n: Number of iterations : 382
 
-bw: Bandwith: = 308736
+ds: Data sent = 77184000
 g: Grid Size = 400 x 400
 pt: Topology: 4 4 1
-	(0) data_communicated = 9648 (77184 bytes))
-	(0) Elapsed Wtime:       0.582031 s ( 75.6% CPU)
+	(0) Elapsed Wtime:       0.589844 s (101.7% CPU)
 	(0) n: Number of iterations : 1206
-	(1) data_communicated = 9648 (77184 bytes))
-	(1) Elapsed Wtime:       0.640625 s ( 99.9% CPU)
+	(1) Elapsed Wtime:       0.703125 s ( 91.0% CPU)
 	(1) n: Number of iterations : 1206
-	(2) data_communicated = 9648 (77184 bytes))
-	(2) Elapsed Wtime:       0.667969 s (104.8% CPU)
+	(2) Elapsed Wtime:       0.664062 s ( 99.4% CPU)
 	(2) n: Number of iterations : 1206
-	(3) data_communicated = 9648 (77184 bytes))
-	(3) Elapsed Wtime:       0.621094 s ( 88.6% CPU)
+	(3) Elapsed Wtime:       0.718750 s (104.3% CPU)
 	(3) n: Number of iterations : 1206
 
-bw: Bandwith: = 768768
+ds: Data sent = 384384000
 g: Grid Size = 800 x 800
 pt: Topology: 4 4 1
-	(0) data_communicated = 24024 (192192 bytes))
-	(0) Elapsed Wtime:       2.109375 s (108.1% CPU)
+	(0) Elapsed Wtime:       2.699219 s ( 95.6% CPU)
 	(0) n: Number of iterations : 3003
-	(1) data_communicated = 24024 (192192 bytes))
-	(1) Elapsed Wtime:       2.539062 s (100.0% CPU)
+	(1) Elapsed Wtime:       2.824219 s ( 93.5% CPU)
 	(1) n: Number of iterations : 3003
-	(2) data_communicated = 24024 (192192 bytes))
-	(2) Elapsed Wtime:       2.753906 s (102.8% CPU)
+	(2) Elapsed Wtime:       2.921875 s ( 97.2% CPU)
 	(2) n: Number of iterations : 3003
-	(3) data_communicated = 24024 (192192 bytes))
-	(3) Elapsed Wtime:       2.515625 s (101.8% CPU)
+	(3) Elapsed Wtime:       2.609375 s (104.6% CPU)
 	(3) n: Number of iterations : 3003
 
-
+ds: Data sent = 1206400000
+g: Grid Size = 2000 x 2000
+pt: Topology: 4 4 1
+	(0) Elapsed Wtime:       3.441406 s ( 94.1% CPU)
+	(0) n: Number of iterations : 3770
+	(1) Elapsed Wtime:       5.144531 s ( 88.2% CPU)
+	(1) n: Number of iterations : 3770
+	(2) Elapsed Wtime:       6.531250 s ( 96.6% CPU)
+	(2) n: Number of iterations : 3770
+	(3) Elapsed Wtime:       4.519531 s ( 88.5% CPU)
+	(3) n: Number of iterations : 3770

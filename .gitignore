@@ -7,6 +7,10 @@
 *.aux
 *.log
 *.dat
+*.bbl
+*.bcf
+*.blg
+*.xml
 PI*
 lab5-matmul/A.txt
 lab5-matmul/originalA.txt
