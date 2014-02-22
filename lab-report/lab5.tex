@@ -4,10 +4,11 @@ This section is dedicated to the implementation of the general matrix multiplica
 $A$, $B$ and $C$ are the matrices to be multiplied and the result respectively, while $\alpha$ and $\beta$ are scalar coefficients. 
 The developed code was built upon the provided sequential implementation (\texttt{matmul.c}).
 It uses the Message Passing Interface (MPI) for inter-node communication and Open Multi-Processing (OpenMP) for intra-node computations.
-Unless, specifically specified the code is running on 4 nodes from DAS3. This assumption facilitates the explanation of the proposed solution although in the C code implementation the number of nodes can be chosen arbitrarily as long as the grid can be evenly distributed among them.
+
+Unless specifically specified the code is running on 4 nodes from DAS3. This assumption facilitates the explanation of the proposed solution.
+Nonetheless the C code implementation is capable of handle an arbitrary number of nodes as long as the grid can be evenly distributed among them.
 Finally the compiler used was \texttt{gcc 4.3.2} invoked with several optimization flags that shall be enumerated in~\ref{ssec:results}.
-% You are allowed to use at most 4 nodes on DAS3.
-% You are allowed to use gcc 4.3.2, rather than other compilers.
+
 
 \begin{equation}
 C = \alpha AB + \beta C
@@ -17,6 +18,7 @@ C = \alpha AB + \beta C
 This section is organized as follows: in subsection~\ref{ssec:arch} the higher level architecture of the code is explained.
 In essence it covers how the matrices are partitioned and divided among processors to enable parallel computation and what communication steps are necessary top obtain the final result.
 Subsequently subsection~\ref{ssec:results} will be focused on the performance analysis of this implementation.
+The work presented in this document was inspired by several sources in addition to the course materials, namely \cite{sandeep, ortega, chien}.
 
 \subsection{Architecture}
 \label{ssec:arch}
@@ -26,7 +28,9 @@ The subscripts in equations \ref{eq:partition}-\ref{eq:partition2} indicate the 
 
 \begin{equation}
 C = \alpha AB + \beta C
+\label{eq:mainproblem}
 \end{equation}
+
 \begin{align}
     \begin{bmatrix}
       C_0 & C_1 \\
@@ -58,7 +62,7 @@ C_3 &= \alpha (A_2 B_1 + A_3 B_3) + \beta C_3
 \label{eq:partition2}
 \end{align}
 
-Therefore each node requires two parts from each of A and B to calculate its share of C. Moreover it is not surprising to find that the way A and B are allocated is different, while A is partitioned horizontally, B is sliced vertically. For simplicity purposes, in the actual implementation each node initializes the matrices independently but coherently although it only uses the subsets it needs. Alternatively this could be done using MPI. For example node zero would initialize all matrices and send the respective parts to the remaining three nodes.
+Therefore each node requires two parts from each of A and B to calculate its share of C. Moreover it is not surprising to find that the way A and B are divided is different, while A is partitioned horizontally, B is sliced vertically. For simplicity purposes, in the actual implementation each node initializes the matrices independently but coherently although it only uses the subsets it needs. Alternatively this could be done using MPI. For example node zero would initialize all matrices and send the respective parts to the remaining three nodes.
 
 The next step involves three operations per node: two multiplications and one addition. The multiplication are realized in a similar fashion to the sequential program, \ie with three nested loops. However an OpenMP directive is used to parallelize the outer \texttt{for} loop. After some experimentation it was concluded that applying a single directive to the outer loop yielded the best performance.
 The following OpenMP directive is responsible for that task.
@@ -79,17 +83,111 @@ Other options for parallelizing the loop, shown below, were studied but with les
 The major final step is to aggregate all values back into a single node. This is accomplished through calls to \texttt{MPI\_Send()} and \texttt{MPI\_Recv()}.
 Node zero was elected to collect the data from the remaining nodes. Thereafter it compiles all of it, including its own share, in a single 2D array and writes the result to a text file.
 
-In summary three main steps were necessary to fulfill the task at end:
+In summary three main steps were necessary to solve equation~\ref{eq:mainproblem}:
 \begin{enumerate}
 \item Divide evenly the input matrices A and B between nodes.
-\item Each node computes the required operations over its designated subsets.
-\item Aggregate all results in a single node and write result to a file.
+\item Compute the required operations over the node-restricted subsets.
+\item Aggregate all results in a single node and write results to a file.
 \end{enumerate}
 
-Although the high level overview is strikingly simple the implementation was not so straightforward. As always the devil is in the details and in particular properly handling the indices of each matrix in an abstract way proved to be quite cumbersome.
+Although the high level overview is strikingly simple the implementation was not so straightforward. As always the devil is in the details and in particular properly handling the indexes of each matrix in an abstract way proved to be quite cumbersome.
+
+The last remark of this section is dedicated to the compiler flags used, both for functional and performance purposes.
+In order to generate a valid executable three flags were use:
+\begin{enumerate}
+\item \texttt{-lrt}: links the real time libraries necessary for the timing operations.
+\item \texttt{-lm}: enable the operations enumerated in \texttt{math.h}
+\item \texttt{-Wall}: shows all warnings at compile time. Used solely for debugging purposes.
+\end{enumerate}
+
+For optimization purposes several options were explored from the vast array of options provided by \texttt{gcc 4.3.2}. For more information see \cite{gcc}.
+
+\begin{enumerate}
+% -O2 -ffast-math -march=native -mmmx -m3dnow -funroll-loops
+\item \texttt{-O2}: GCC performs nearly all supported optimizations that do not involve a space-speed tradeoff.
+\item \texttt{-ffast-math}: attempts to improve the performance of math operations. It may break some implementations as it may not follow the exact implementation of IEEE or ISO rules/specifications for math functions.
+\item \texttt{-march=native}, \texttt{-mmmx} and  \texttt{-m3dnow} : makes use of target-specific extensions of the instruction set.
+\item \texttt{-funroll-loop}: as the name implies it unrolls loops. This flag increases the code size and may or may not results in a shorter execution speed.
+\end{enumerate}
 
 \subsection{Results}
 \label{ssec:results}
 
 In the text that follows the results of the previously described implementation will be presented and analyzed.
+
+Table~\ref{tbl:results} includes the results for the implementation of the problem defined in equation~\ref{eq:mainproblem} using the approach outlined in section~\ref{ssec:arch}.
+The metrics presented are essentially the same as included with \texttt{matmul.c}, provided with the lab assignment, which implements a sequential solution to the same problem.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{*{5}{c}}
+ \toprule
+Dimension &  Rank &  Total time (\si{s}) &  GFLOPs    &  Bandwidth (\si[per-mode=symbol]{\byte\per\nano\second}) \\ \midrule %TODO add units
+\multirow{4}{*}{2048}
+          &  0    &   4.5456             &  3.7795    &  0.02953   \\
+          &  1    &   3.9980             &  4.2971    &  0.03357   \\
+          &  2    &   4.1377             &  4.1520    &  0.03244   \\
+          &  3    &   4.5075             &  3.8114    &  0.02978   \\\\
+%
+\multirow{4}{*}{4096}
+          &  0    &  33.1720             &  4.1432    &  0.01618   \\
+          &  1    &  31.1238             &  4.4159    &  0.01725   \\
+          &  2    &  31.5166             &  4.3608    &  0.01703   \\
+          &  3    &  32.9985             &  4.1650    &  0.01627   \\
+\bottomrule
+\end{tabular}
+\caption{Performance metrics obtained for the implementation of the General Matrix Multiplication.}
+\label{tbl:results}
+\end{table}
+
+The overall performance increases significantly with the dimensions. The peak GLOPs was measured close to \emph{4.5}.
+
+The theoretical GFLOP is calculated as shown in equation~\ref{eq:flop}.
+
+\begin{align}
+\text{FLOPs}   &=~\text{Core Count} \cdot \text{Core Frequency} \cdot \frac{\text{FLOPs}}{\text{cycle}} \\
+\text{GFLOPs} &=~2 \cdot 2.612 \cdot 4 \approx 21
+\label{eq:flop}
+\end{align}
+
+Therefore the current implementation is able to operate at around 20\% of the theoretical FLOP capacity.
+
+
+To better understand where most of the time is spent more fine-grained time measurements were performed.
+In table~\ref{tbl:timing} we discriminate between communication times and CPU times.
+The former considers the time consumed in the code that includes \texttt{MPI\_Send} and \texttt{MPI\_Recv} function calls.
+While the latter relates to the time necessary to complete the multiplication operations.
+As previous explained these operations are carried out by the individual nodes over subsets of the input matrices.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{*{5}{c}}
+ \toprule
+Dimension & Rank  &  Total time (\si{s})  &  Comm time  (\si{s})  &  CPU time(\si{s})  \\ \midrule 
+\multirow{4}{*}{2048}
+          &  0    &   4.5456              &  0.8749               &   3.6707           \\
+          &  1    &   3.9980              &  0.3452               &   3.6527           \\
+          &  2    &   4.1377              &  0.4118               &   3.7259           \\
+          &  3    &   4.5075              &  0.7952               &   3.7123           \\\\
+%
+\multirow{4}{*}{4096}
+          &  0    &  33.1720              &  3.3974               &  29.7745           \\
+          &  1    &  31.1238              &  1.4560               &  29.6678           \\
+          &  2    &  31.5166              &  1.7756               &  29.7410           \\
+          &  3    &  32.9985              &  3.5850               &  29.4135           \\
+
+\bottomrule
+\end{tabular}
+\caption{Empirical data with the communication and CPU times discriminated.}
+\label{tbl:timing}
+\end{table}
+
+
+The conclusion drawn from table~\ref{tbl:timing} is evident: the majority of time (around $90\%$) is dedicated to the actual multiplications.
+This is not surprising as there are only four nodes and each communicates just once with the root node (\ie node with rank zero).
+        
+
+
+
+
 
