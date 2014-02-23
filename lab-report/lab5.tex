@@ -64,12 +64,12 @@ C_3 &= \alpha (A_2 B_1 + A_3 B_3) + \beta C_3
 
 Therefore each node requires two parts from each of A and B to calculate its share of C. Moreover it is not surprising to find that the way A and B are divided is different, while A is partitioned horizontally, B is sliced vertically. For simplicity purposes, in the actual implementation each node initializes the matrices independently but coherently although it only uses the subsets it needs. Alternatively this could be done using MPI. For example node zero would initialize all matrices and send the respective parts to the remaining three nodes.
 
-The next step involves three operations per node: two multiplications and one addition. The multiplication are realized in a similar fashion to the sequential program, \ie with three nested loops. However an OpenMP directive is used to parallelize the outer \texttt{for} loop. After some experimentation it was concluded that applying a single directive to the outer loop yielded the best performance.
-The following OpenMP directive is responsible for that task.
+The next step involves three operations per node: two multiplications and one addition. The multiplication operation is realized in a similar fashion to the method demonstrated in~\cite{chien}. The main idea is to divide each matrix (or part of a matrix in this case) in smaller blocks of size \texttt{BLOCK\_SIZE} to make better use of the cache space. In addition OpenMP directives are used to parallelize this work. The implementation includes a series of \texttt{for} loops that were suitable candidates for these directives. After various experiments we elected, based on the performance metrics, to simply parallelize the outer loop.
 
+The following code excerpt illustrates how to invoke the directive.
 \begin{lstlisting}
 #pragma omp parallel for default(none) private(...)
-	shared(...)
+  shared(...)
 \end{lstlisting}
 
 Other options for parallelizing the loop, shown below, were studied but with less interesting results.
@@ -79,6 +79,27 @@ Other options for parallelizing the loop, shown below, were studied but with les
 #pragma omp for schedule(dynamic, chunk) nowait
 #pragma omp for schedule(runtime) nowait
 \end{lstlisting}
+
+Another parameter that needed to be selected was the \texttt{BLOCK\_SIZE}. Once again empirical data was the method used to select the best data. This information can be observed in table~\ref{tbl:omp}. Based on it the value 36 was chosen. The remainder of the data included in this document takes this selection into account.
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{*{3}{c}}
+ \toprule
+\texttt{BLOCK\_SIZE} &   Total time (\si{s}) &  Maximum GFLOPs   \\ \midrule
+16                   &   0.3772              &  2.8935           \\
+32                   &   0.3475              &  3.9204           \\
+\bf 36               &   \bf 0.3290          &  \bf 4.6831       \\
+48                   &   0.3344              &  4.5406           \\
+64                   &   0.3380              &  4.3492           \\
+128                  &   0.5975              &  1.5966           \\
+\bottomrule
+\end{tabular}
+\caption{Determining the best \texttt{BLOCK\_SIZE} for a 2048x2048 grid.}
+\label{tbl:omp}
+\end{table}
+
 
 The major final step is to aggregate all values back into a single node. This is accomplished through calls to \texttt{MPI\_Send()} and \texttt{MPI\_Recv()}.
 Node zero was elected to collect the data from the remaining nodes. Thereafter it compiles all of it, including its own share, in a single 2D array and writes the result to a text file.
@@ -90,7 +111,7 @@ In summary three main steps were necessary to solve equation~\ref{eq:mainproblem
 \item Aggregate all results in a single node and write results to a file.
 \end{enumerate}
 
-Although the high level overview is strikingly simple the implementation was not so straightforward. As always the devil is in the details and in particular properly handling the indexes of each matrix in an abstract way proved to be quite cumbersome.
+Although the high level overview is strikingly simple the implementation was not so straightforward. As always the devil is in the details and in particular properly handling the indexes of each matrix and submatrix in an abstract way proved to be quite cumbersome.
 
 The last remark of this section is dedicated to the compiler flags used, both for functional and performance purposes.
 In order to generate a valid executable three flags were use:
@@ -122,33 +143,40 @@ The metrics presented are essentially the same as included with \texttt{matmul.c
 \centering
 \begin{tabular}{*{5}{c}}
  \toprule
-Dimension &  Rank &  Total time (\si{s}) &  GFLOPs    &  Bandwidth (\si[per-mode=symbol]{\byte\per\nano\second}) \\ \midrule %TODO add units
+Dimension &  Rank &  Total time (\si{s}) &  GFLOPs    &  Bandwidth (\si[per-mode=symbol]{\byte\per\nano\second}) \\ \midrule
+\multirow{4}{*}{1024}
+&  0  &  0.634124  &  3.386536  &  0.052915 \\
+&  1  &  0.496178  &  4.328052  &  0.067626 \\
+&  2  &  0.527540  &  4.070751  &  0.063605 \\
+&  3  &  0.622204  &  3.451413  &  0.053928 \\\\
+%
 \multirow{4}{*}{2048}
-          &  0    &   4.5456             &  3.7795    &  0.02953   \\
-          &  1    &   3.9980             &  4.2971    &  0.03357   \\
-          &  2    &   4.1377             &  4.1520    &  0.03244   \\
-          &  3    &   4.5075             &  3.8114    &  0.02978   \\\\
+&  0 &   4.311446  &   3.984712  &  0.031131 \\
+&  1 &   3.807184  &   4.512487  &  0.035254 \\
+&  2 &   3.885920  &   4.421056  &  0.034539 \\
+&  3 &   4.272333  &   4.021191  &  0.031416 \\\\
 %
 \multirow{4}{*}{4096}
-          &  0    &  33.1720             &  4.1432    &  0.01618   \\
-          &  1    &  31.1238             &  4.4159    &  0.01725   \\
-          &  2    &  31.5166             &  4.3608    &  0.01703   \\
-          &  3    &  32.9985             &  4.1650    &  0.01627   \\
+&  0 &   32.34151  &   4.249614  &  0.016600 \\
+&  1 &   30.26010  &   4.541919  &  0.017742 \\
+&  2 &   30.65119  &   4.483967  &  0.017515 \\
+&  3 &   32.17709  &   4.271329  &  0.016685 \\
 \bottomrule
 \end{tabular}
 \caption{Performance metrics obtained for the implementation of the General Matrix Multiplication.}
 \label{tbl:results}
 \end{table}
 
-The overall performance increases significantly with the dimensions. The peak GLOPs was measured close to \emph{4.5}.
+The overall performance increases slightly with the dimensions. The peak GLOPs was measured above to \emph{4.5}.
 
 The theoretical GFLOP is calculated as shown in equation~\ref{eq:flop}.
 
 \begin{align}
 \text{FLOPs}   &=~\text{Core Count} \cdot \text{Core Frequency} \cdot \frac{\text{FLOPs}}{\text{cycle}} \\
-\text{GFLOPs} &=~2 \cdot 2.612 \cdot 4 \approx 21
+\text{GFLOPs\footnotemark} &=~2 \cdot 2.612 \cdot 4 \approx 21
 \label{eq:flop}
 \end{align}
+\footnotetext{The values used were obtained through inspection of the \texttt{/proc/cpuinfo} file.}
 
 Therefore the current implementation is able to operate at around 20\% of the theoretical FLOP capacity.
 
@@ -164,17 +192,21 @@ As previous explained these operations are carried out by the individual nodes o
 \begin{tabular}{*{5}{c}}
  \toprule
 Dimension & Rank  &  Total time (\si{s})  &  Comm time  (\si{s})  &  CPU time(\si{s})  \\ \midrule 
+\multirow{4}{*}{1024}
+&  0  &  0.634124  &  0.222224  &  0.411894   \\
+&  1  &  0.496178  &  0.082787  &  0.413384   \\
+&  2  &  0.527540  &  0.114259  &  0.413273   \\
+&  3  &  0.622204  &  0.208747  &  0.413450   \\\\
 \multirow{4}{*}{2048}
-          &  0    &   4.5456              &  0.8749               &   3.6707           \\
-          &  1    &   3.9980              &  0.3452               &   3.6527           \\
-          &  2    &   4.1377              &  0.4118               &   3.7259           \\
-          &  3    &   4.5075              &  0.7952               &   3.7123           \\\\
-%
+&  0  &  4.311446  &  0.863112  &  3.448329   \\
+&  1  &  3.807184  &  0.329370  &  3.477807   \\
+&  2  &  3.885920  &  0.427981  &  3.457932   \\
+&  3  &  4.272333  &  0.784389  &  3.487938   \\\\
 \multirow{4}{*}{4096}
-          &  0    &  33.1720              &  3.3974               &  29.7745           \\
-          &  1    &  31.1238              &  1.4560               &  29.6678           \\
-          &  2    &  31.5166              &  1.7756               &  29.7410           \\
-          &  3    &  32.9985              &  3.5850               &  29.4135           \\
+&  0  &  32.341511  &  3.418472  &  28.923031   \\
+&  1  &  30.260109  &  2.407693  &  27.852407   \\
+&  2  &  30.651197  &  2.558106  &  28.093084   \\
+&  3  &  32.177096  &  3.502032  &  28.675056   \\
 
 \bottomrule
 \end{tabular}

@@ -1,0 +1,37 @@
+Studying different block sizes (2048 x 2048)
+
+BLOCK_SIZE = 8
+	rank:  0, Total time: 6.446923, Comm time: 0.843676, CPU time: 5.603241, gflops: 2.664817, bandwidth: 0.020819
+	rank:  1, Total time: 5.939371, Comm time: 0.377252, CPU time: 5.562110, gflops: 2.892540, bandwidth: 0.022598
+	rank:  2, Total time: 6.027018, Comm time: 0.440690, CPU time: 5.586319, gflops: 2.850476, bandwidth: 0.022269
+	rank:  3, Total time: 6.408974, Comm time: 0.866105, CPU time: 5.542862, gflops: 2.680596, bandwidth: 0.020942
+
+BLOCK_SIZE = 16
+	rank:  0, Total time: 4.898851, Comm time: 0.862904, CPU time: 4.035940, gflops: 3.506918, bandwidth: 0.027398
+	rank:  1, Total time: 4.382062, Comm time: 0.347593, CPU time: 4.034461, gflops: 3.920499, bandwidth: 0.030629
+	rank:  2, Total time: 4.476369, Comm time: 0.454592, CPU time: 4.021769, gflops: 3.837903, bandwidth: 0.029984
+	rank:  3, Total time: 4.858453, Comm time: 0.843263, CPU time: 4.015183, gflops: 3.536078, bandwidth: 0.027626
+
+BLOCK_SIZE = 36
+	rank:  2, Total time: 3.762105, Comm time: 0.438033, CPU time: 3.324065, gflops: 4.566557, bandwidth: 0.035676
+	rank:  3, Total time: 4.142030, Comm time: 0.792777, CPU time: 3.349247, gflops: 4.147693, bandwidth: 0.032404
+	rank:  1, Total time: 3.668407, Comm time: 0.329071, CPU time: 3.339329, gflops: 4.683196, bandwidth: 0.036587
+	rank:  0, Total time: 4.180220, Comm time: 0.867462, CPU time: 3.312751, gflops: 4.109800, bandwidth: 0.032108
+
+BLOCK_SIZE = 48
+	rank:  0, Total time: 4.337095, Comm time: 0.878733, CPU time: 3.458354, gflops: 3.961146, bandwidth: 0.030946
+	rank:  1, Total time: 3.783566, Comm time: 0.334402, CPU time: 3.449157, gflops: 4.540655, bandwidth: 0.035474
+	rank:  2, Total time: 3.916855, Comm time: 0.423622, CPU time: 3.493224, gflops: 4.386139, bandwidth: 0.034267
+	rank:  3, Total time: 4.289015, Comm time: 0.829394, CPU time: 3.459614, gflops: 4.005551, bandwidth: 0.031293
+
+BLOCK_SIZE = 64
+	rank:  0, Total time: 4.498242, Comm time: 0.895369, CPU time: 3.602866, gflops: 3.819241, bandwidth: 0.029838
+	rank:  1, Total time: 3.950042, Comm time: 0.338008, CPU time: 3.612026, gflops: 4.349288, bandwidth: 0.033979
+	rank:  2, Total time: 4.085258, Comm time: 0.446658, CPU time: 3.638592, gflops: 4.205333, bandwidth: 0.032854
+	rank:  3, Total time: 4.462274, Comm time: 0.844426, CPU time: 3.617842, gflops: 3.850026, bandwidth: 0.030078
+
+BLOCK_SIZE = 128
+	rank:  0, Total time: 11.297079, Comm time: 0.927145, CPU time: 10.369928, gflops: 1.520736, bandwidth: 0.011881
+	rank:  1, Total time: 10.760206, Comm time: 0.597566, CPU time: 10.162633, gflops: 1.596612, bandwidth: 0.012474
+	rank:  2, Total time: 10.857157, Comm time: 0.383248, CPU time: 10.473902, gflops: 1.582354, bandwidth: 0.012362
+	rank:  3, Total time: 11.252820, Comm time: 1.086536, CPU time: 10.166277, gflops: 1.526717, bandwidth: 0.011927

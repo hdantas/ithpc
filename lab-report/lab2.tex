@@ -38,7 +38,7 @@ The following is printed to the standard output:
 	(1)     Number of iterations  : 2355
 \end{lstlisting}
 
-\subsubsection{Step 3}
+% \subsubsection{Step 3}
 
 % After rewriting the timing functions mentioned in the exercise description, the new output is as follows:
 % \begin{lstlisting}
@@ -192,7 +192,7 @@ For example for processor 2 (in a 3 processor configuration) it is visible that 
 \end{lstlisting}
 
 
-\subsubsection{Step 8}
+% \subsubsection{Step 8}
 \subsubsection{Step 9}
 
 After implementing the collective reduction operation the total number of iterations is indeed the same, as confirmed by the program's output.
@@ -206,12 +206,12 @@ After implementing the collective reduction operation the total number of iterat
 	(2) Elapsed Wtime:       1.507812 s ( 96.8% CPU)
 \end{lstlisting}
 
-\subsubsection{Step 10}
+% \subsubsection{Step 10}
 
 
 \subsection{Part 2}
 
-\subsubsection{2.1}
+% \subsubsection{2.1}
 \subsubsection{2.2}
 
 After changing the code to accommodate for the algorithmic improvement, 5 tests were performed to compare different values for the relaxation parameter $\omega$. The results are summarized in table~\ref{tbl:omega}.
@@ -507,7 +507,7 @@ When this value is reached no more iterations occur. It is important to note tha
 
 Figure~\ref{fig:error} depicts the evolution of the error with increased iterations for a 500x500 grid size. It is worthy to mention that the error reduces drastically until approximately the hundredth iteration. From that point on the rate of descent is decreased
 
-\subsubsection{2.7}
+% \subsubsection{2.7}
 \subsubsection{2.8}
 
 Changing the number of red/black sweeps between border exchanges has a significant impact both on the total number of iterations and the total running time, as exhibited in table~\ref{tbl:sweeps}. As the work between communication steps increases the number of iterations to converge declines, however the time per iteration augments. The issue, is that the latter rate is higher than the former which results in a global execution time penalty.
@@ -568,7 +568,7 @@ The conclusion from the results presented in table~\ref{tbl:optimization} is tha
 
 For the remaining of this document the ``optimized'' version of the code will be used.
 
-\subsubsection{2.10}
+% \subsubsection{2.10}
 \subsubsection{2.11}
 
 To investigate the impact of the \texttt{Exchange\_Borders} function the code on the performance the total time spent on this function as well as the amount of data transmitted were studied.
@@ -606,4 +606,4 @@ Moreover the size of the ``jump'' between transmittable points would also need t
 Such a change would best be done in the \texttt{Setup\_MPI\_Datatypes()} where the custom data types are defined.
 The greatest advantage would be the $50\%$ reduction number of points to exchange.
 
-\subsubsection{2.13}
+% \subsubsection{2.13}
