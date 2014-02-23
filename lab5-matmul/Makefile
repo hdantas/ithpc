@@ -1,7 +1,7 @@
 DIM = 2048 2048
 P = 4
 FLAGS = -lrt -lm -Wall 
-OPTIMIZATION = -O2 -ffast-math -msse -msse2 -msse3 -mmmx -m3dnow -funroll-loops
+OPTIMIZATION = -O2 -ffast-math -march=native -mmmx -m3dnow -funroll-loops
 
 #-fmodulo-sched-allow-regmoves -fgcse-lm -fgcse-sm -fgcse-las -fgcse-after-reload -fsched-spec-load-dangerous -fsched2-use-traces -fsee -fipa-struct-reorg -fipa-cp -fipa-matrix-reorg -ftree-loop-linear -ftree-parallelize-loops=4 -ftracer -funroll-loops -fvariable-expansion-in-unroller -freorder-blocks-and-partition -fwhole-program -fprofile-use -ffast-math -fno-math-errno -funsafe-math-optimizations -fassociative-math -fno-signed-zeros -fno-trapping-math -freciprocal-math -ffinite-math-only -fno-signaling-nans -fno-trapping-math -fsingle-precision-constant -fbranch-probabilities -fprofile-values -fvpt -ftracer -funroll-loops -fpeel-loops -fdata-sections -fbranch-target-load-optimize -fbranch-target-load-optimize2 -fsection-anchors 
    
@@ -21,14 +21,14 @@ omp: lab5omp.c
 run-omp: omp
 	./$^.out $(DIM)
 
-par: oldlab5par.c
-	mpicc $^ -o $@.out $(FLAGS) -fopenmp
+par: lab5par.c
+	mpicc $^ -o $@.out $(FLAGS) $(OPTIMIZATION) -fopenmp
 
 run-par: par
 	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P) $(DIM)
 
 mpi: lab5mpi.c
-	mpicc $^ -o $@.out $(FLAGS) $(OPTIMIZATION) #-fopenmp
+	mpicc $^ -o $@.out $(FLAGS) $(OPTIMIZATION)
 
 run-mpi: mpi
 	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P) $(DIM)
