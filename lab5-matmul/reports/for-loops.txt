@@ -1,0 +1,25 @@
+parallelizing for loops (512x512)
+
+only outer
+rank:  0, Total time: 0.112608, Comm time: 0.056133, CPU time: 0.056468, gflops: 2.383804, bandwidth: 0.074494
+rank:  1, Total time: 0.077456, Comm time: 0.020839, CPU time: 0.056610, gflops: 3.465657, bandwidth: 0.108302
+rank:  2, Total time: 0.081995, Comm time: 0.025356, CPU time: 0.056630, gflops: 3.273813, bandwidth: 0.102307
+rank:  3, Total time: 0.104490, Comm time: 0.047928, CPU time: 0.056554, gflops: 2.569007, bandwidth: 0.080281
+
+outer loop + inner1
+rank:  0, Total time: 0.112976, Comm time: 0.056951, CPU time: 0.056018, gflops: 2.376037, bandwidth: 0.074251
+rank:  1, Total time: 0.077322, Comm time: 0.021311, CPU time: 0.056004, gflops: 3.471658, bandwidth: 0.108489
+rank:  2, Total time: 0.082108, Comm time: 0.026179, CPU time: 0.055922, gflops: 3.269301, bandwidth: 0.102166
+rank:  3, Total time: 0.110097, Comm time: 0.053985, CPU time: 0.056104, gflops: 2.438175, bandwidth: 0.076193
+
+outer loops + inner2
+rank:  0, Total time: 0.110303, Comm time: 0.054576, CPU time: 0.055720, gflops: 2.433619, bandwidth: 0.076051
+rank:  1, Total time: 0.077589, Comm time: 0.021546, CPU time: 0.056036, gflops: 3.459711, bandwidth: 0.108116
+rank:  2, Total time: 0.084035, Comm time: 0.028077, CPU time: 0.055947, gflops: 3.194326, bandwidth: 0.099823
+rank:  3, Total time: 0.107794, Comm time: 0.052058, CPU time: 0.055728, gflops: 2.490265, bandwidth: 0.077821
+
+all 3 loops
+rank:  0, Total time: 0.110791, Comm time: 0.054837, CPU time: 0.055948, gflops: 2.422896, bandwidth: 0.075715
+rank:  1, Total time: 0.077964, Comm time: 0.021643, CPU time: 0.056313, gflops: 3.443068, bandwidth: 0.107596
+rank:  2, Total time: 0.076913, Comm time: 0.020763, CPU time: 0.056144, gflops: 3.490123, bandwidth: 0.109066
+rank:  3, Total time: 0.107903, Comm time: 0.051905, CPU time: 0.055991, gflops: 2.487748, bandwidth: 0.077742
