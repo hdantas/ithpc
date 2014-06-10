@@ -1,11 +1,7 @@
 DIM = 2048 2048
 P = 4
 FLAGS = -lrt -lm -Wall 
-OPTIMIZATION = -O2 -ffast-math -march=native -mmmx -m3dnow -funroll-loops
-
-#-fmodulo-sched-allow-regmoves -fgcse-lm -fgcse-sm -fgcse-las -fgcse-after-reload -fsched-spec-load-dangerous -fsched2-use-traces -fsee -fipa-struct-reorg -fipa-cp -fipa-matrix-reorg -ftree-loop-linear -ftree-parallelize-loops=4 -ftracer -funroll-loops -fvariable-expansion-in-unroller -freorder-blocks-and-partition -fwhole-program -fprofile-use -ffast-math -fno-math-errno -funsafe-math-optimizations -fassociative-math -fno-signed-zeros -fno-trapping-math -freciprocal-math -ffinite-math-only -fno-signaling-nans -fno-trapping-math -fsingle-precision-constant -fbranch-probabilities -fprofile-values -fvpt -ftracer -funroll-loops -fpeel-loops -fdata-sections -fbranch-target-load-optimize -fbranch-target-load-optimize2 -fsection-anchors 
-   
-	# After running a program compiled with -fprofile-arcs (see Options for Debugging Your Program or gcc), you can compile it a second time using -fbranch-probabilities, to improve optimizations based on the number of times each branch was taken. When the program compiled with -fprofile-arcs exits it saves arc execution counts to a file called sourcename.gcda for each source file. The information in this data file is very dependent on the structure of the generated code, so you must use the same source code and the same optimization options for both compilations   
+OPTIMIZATION = -O2 -ffast-math -msse -msse2 -msse3 -mmmx -m3dnow -funroll-loops
 
 all: run-par 
 
@@ -21,14 +17,14 @@ omp: lab5omp.c
 run-omp: omp
 	./$^.out $(DIM)
 
-par: lab5par.c
-	mpicc $^ -o $@.out $(FLAGS) $(OPTIMIZATION) -fopenmp
+par: oldlab5par.c
+	mpicc $^ -o $@.out $(FLAGS) -fopenmp
 
 run-par: par
 	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P) $(DIM)
 
 mpi: lab5mpi.c
-	mpicc $^ -o $@.out $(FLAGS) $(OPTIMIZATION)
+	mpicc $^ -o $@.out $(FLAGS) $(OPTIMIZATION) #-fopenmp
 
 run-mpi: mpi
 	prun -v -pbs-script /usr/local/sitedep/reserve.sge/sge-script `pwd`/$^.out $(P) $(DIM)
